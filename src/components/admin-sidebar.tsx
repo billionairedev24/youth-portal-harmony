@@ -58,7 +58,10 @@ export function AdminSidebar() {
   return (
     <aside
       className={cn(
-        "sticky top-0 flex-shrink-0 h-screen bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm transition-all duration-300",
+        "sticky top-0 flex-shrink-0 h-screen transition-all duration-300",
+        "bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm",
+        "dark:from-gold-900/40 dark:to-gold-950/60 dark:backdrop-blur-lg",
+        "border-r border-gold-200/50 dark:border-gold-800/30",
         collapsed ? "w-16" : "w-64",
         isMobile && "fixed inset-y-0 left-0 w-16"
       )}
@@ -69,9 +72,9 @@ export function AdminSidebar() {
           className="absolute -right-4 top-20 z-50 p-0 border-0"
         >
           {collapsed ? (
-            <ChevronRight className="h-6 w-6 text-gold-900" />
+            <ChevronRight className="h-6 w-6 text-gold-900 dark:text-gold-100" />
           ) : (
-            <ChevronLeft className="h-6 w-6 text-gold-900" />
+            <ChevronLeft className="h-6 w-6 text-gold-900 dark:text-gold-100" />
           )}
         </button>
       )}
@@ -85,15 +88,17 @@ export function AdminSidebar() {
               key={item.label}
               onClick={() => handleNavigation(item.href)}
               className={cn(
-                "flex w-full items-center space-x-2 rounded-lg px-3 py-2 text-gold-800 transition-colors hover:bg-gold-200/50",
+                "flex w-full items-center space-x-2 rounded-lg px-3 py-2 transition-all duration-200",
+                "text-gold-800 dark:text-gold-100",
+                "hover:bg-gold-200/50 dark:hover:bg-gold-800/30",
                 (collapsed || isMobile) ? "justify-center" : "justify-start",
-                activeRoute === item.href && "bg-gold-200/50 font-medium"
+                activeRoute === item.href && "bg-gold-200/50 dark:bg-gold-800/40 font-medium"
               )}
               title={collapsed || isMobile ? item.label : undefined}
               disabled={isLoading}
             >
               {isLoading && activeRoute === item.href ? (
-                <Spinner size="sm" className="text-gold-800" />
+                <Spinner size="sm" className="text-gold-800 dark:text-gold-100" />
               ) : (
                 <item.icon className="h-5 w-5 flex-shrink-0" />
               )}
