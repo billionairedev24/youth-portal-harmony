@@ -77,8 +77,8 @@ const SuggestionsPage = () => {
     },
   ];
 
-  const handleStatusChange = (id: string, status: "new" | "processed") => {
-    updateSuggestionStatus(id, status);
+  const handleStatusChange = (id: string, status: "new" | "processed", comment?: string) => {
+    updateSuggestionStatus(id, status, comment);
     toast.success("Suggestion status updated successfully");
     setDialogOpen(false);
   };

@@ -10,12 +10,13 @@ export interface Suggestion {
   authorName: string;
   createdAt: string;
   status: SuggestionStatus;
+  comment?: string;
 }
 
 interface SuggestionsStore {
   suggestions: Suggestion[];
-  addSuggestion: (suggestion: Omit<Suggestion, "id" | "status" | "createdAt">) => void;
-  updateSuggestionStatus: (id: string, status: SuggestionStatus) => void;
+  addSuggestion: (suggestion: Omit<Suggestion, "id" | "status" | "createdAt" | "comment">) => void;
+  updateSuggestionStatus: (id: string, status: SuggestionStatus, comment?: string) => void;
 }
 
 export const useSuggestionsStore = create<SuggestionsStore>((set) => ({
@@ -42,10 +43,10 @@ export const useSuggestionsStore = create<SuggestionsStore>((set) => ({
         },
       ],
     })),
-  updateSuggestionStatus: (id, status) =>
+  updateSuggestionStatus: (id, status, comment) =>
     set((state) => ({
       suggestions: state.suggestions.map((suggestion) =>
-        suggestion.id === id ? { ...suggestion, status } : suggestion
+        suggestion.id === id ? { ...suggestion, status, comment } : suggestion
       ),
     })),
 }));

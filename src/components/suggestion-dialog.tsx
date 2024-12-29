@@ -11,12 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Suggestion } from "@/stores/suggestions-store";
 import { format } from "date-fns";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 
 interface SuggestionDialogProps {
   suggestion: Suggestion | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onStatusChange?: (id: string, status: "new" | "processed") => void;
+  onStatusChange?: (id: string, status: "new" | "processed", comment?: string) => void;
   mode?: "view" | "review";
 }
 
@@ -27,13 +29,15 @@ export function SuggestionDialog({
   onStatusChange,
   mode = "view",
 }: SuggestionDialogProps) {
+  const [comment, setComment] = useState("");
+
   if (!suggestion) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
+          <DialogTitle className="text-3xl font-bold">
             Suggestion Details
           </DialogTitle>
           <DialogDescription>
@@ -62,15 +66,36 @@ export function SuggestionDialog({
                 {suggestion.description}
               </p>
             </div>
+            {suggestion.comment && (
+              <div>
+                <h3 className="font-medium mb-2">Resolution Comment</h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">
+                  {suggestion.comment}
+                </p>
+              </div>
+            )}
+            {mode === "review" && suggestion.status === "new" && (
+              <div>
+                <h3 className="font-medium mb-2">Add Resolution Comment</h3>
+                <Textarea
+                  placeholder="Add a comment about how this suggestion was handled..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+            )}
           </div>
         </ScrollArea>
 
         {mode === "review" && suggestion.status === "new" && (
           <DialogFooter className="mt-6">
             <Button
-              onClick={() =>
-                onStatusChange?.(suggestion.id, "processed")
-              }
+              onClick={() => {
+                onStatusChange?.(suggestion.id, "processed", comment);
+                setComment("");
+              }}
+              disabled={!comment.trim()}
             >
               Mark as Processed
             </Button>
