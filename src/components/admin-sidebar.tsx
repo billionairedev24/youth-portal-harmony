@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Megaphone,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
@@ -74,7 +73,7 @@ export function AdminSidebar() {
           ) : (
             <ChevronLeft className="h-6 w-6 text-gold-900" />
           )}
-        </Button>
+        </button>
       )}
       <div className="flex h-full flex-col">
         <div className="flex h-16 items-center px-4">
