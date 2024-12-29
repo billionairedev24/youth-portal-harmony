@@ -3,7 +3,7 @@ import {
   ChartContainer,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LabelList } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { format, subMonths } from "date-fns";
 
 const generateLastTwelveMonthsData = () => {
@@ -73,18 +73,14 @@ export function AttendanceCharts() {
                 fill="#FFB800"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
-              >
-                <LabelList dataKey="men" position="center" fill="white" />
-              </Bar>
+              />
               <Bar
                 dataKey="women"
                 name="Women"
                 fill="#CC9900"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
-              >
-                <LabelList dataKey="women" position="center" fill="white" />
-              </Bar>
+              />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
