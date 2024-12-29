@@ -14,11 +14,13 @@ import { Settings, User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { NotificationBell } from "./notification-bell";
 import { ProfileUpdateDialog } from "./profile-update-dialog";
+import { SettingsDialog } from "./settings-dialog";
 import { useState } from "react";
 
 export function Navbar() {
   const navigate = useNavigate();
   const [showProfileDialog, setShowProfileDialog] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -75,7 +77,10 @@ export function Navbar() {
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-gold-200/50">
+                <DropdownMenuItem 
+                  className="hover:bg-gold-200/50"
+                  onClick={() => setShowSettingsDialog(true)}
+                >
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
@@ -96,6 +101,11 @@ export function Navbar() {
       <ProfileUpdateDialog 
         open={showProfileDialog} 
         onOpenChange={setShowProfileDialog}
+      />
+
+      <SettingsDialog
+        open={showSettingsDialog}
+        onOpenChange={setShowSettingsDialog}
       />
     </>
   );
