@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, Settings2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,13 +36,36 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({
-  columns,
+  columns: userColumns,
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const columns = React.useMemo(() => [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    ...userColumns,
+  ], [userColumns]);
 
   const table = useReactTable({
     data,
@@ -63,12 +87,20 @@ export function DataTable<TData, TValue>({
   });
 
   const downloadCSV = () => {
-    const headers = columns.map((column) => column.header as string);
-    const rows = table
-      .getFilteredRowModel()
-      .rows.map((row) =>
-        columns.map((column) => row.getValue(column.id as string))
-      );
+    const headers = columns
+      .filter((column) => column.id !== "select" && column.id !== "actions")
+      .map((column) => column.header as string);
+    
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const allRows = table.getFilteredRowModel().rows;
+    const rowsToExport = Object.keys(rowSelection).length > 0 ? selectedRows : allRows;
+
+    const rows = rowsToExport.map((row) =>
+      columns
+        .filter((column) => column.id !== "select" && column.id !== "actions")
+        .map((column) => row.getValue(column.id as string))
+    );
+
     const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -100,7 +132,7 @@ export function DataTable<TData, TValue>({
             onClick={downloadCSV}
           >
             <Download className="mr-2 h-4 w-4" />
-            Export
+            Export {Object.keys(rowSelection).length > 0 ? "Selected" : "All"}
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
