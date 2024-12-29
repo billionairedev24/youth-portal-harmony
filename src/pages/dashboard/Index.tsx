@@ -14,7 +14,6 @@ const UserDashboard = () => {
   
   const activeEvents = events.filter(event => !event.archived);
 
-  // Fix: Use isSameDay for more accurate date comparison
   const selectedDateEvents = activeEvents.filter(event => {
     const eventDate = parseISO(event.date);
     return date ? isSameDay(eventDate, date) : isSameDay(eventDate, new Date());
@@ -68,7 +67,6 @@ const UserDashboard = () => {
   return (
     <UserLayout>
       <div className="space-y-6 animate-fade-in">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
