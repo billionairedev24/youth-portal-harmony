@@ -86,7 +86,7 @@ const UserDashboard = () => {
             <CardHeader>
               <CardTitle>Calendar</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex justify-center">
               <div className="relative">
                 {Object.entries(eventDates).map(([dateStr, event]) => {
                   const eventDate = parseISO(dateStr);
@@ -114,7 +114,7 @@ const UserDashboard = () => {
                   mode="single"
                   selected={date}
                   onSelect={setDate}
-                  className="rounded-md border"
+                  className="rounded-md border mx-auto"
                   modifiers={modifiers}
                   modifiersStyles={modifiersStyles}
                   classNames={{
