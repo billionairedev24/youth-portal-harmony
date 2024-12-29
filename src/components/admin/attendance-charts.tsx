@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, subMonths, startOfMonth, eachMonthOfInterval } from "date-fns";
 import { Users } from "lucide-react";
 import { useEventsStore } from "@/stores/events-store";
 
@@ -37,17 +37,46 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function AttendanceCharts() {
   const { events } = useEventsStore();
+  
+  // Filter events with attendance records
+  const eventsWithAttendance = events.filter(event => event.attendance);
+  
+  // If no attendance records, don't show the chart
+  if (eventsWithAttendance.length === 0) {
+    return null;
+  }
 
-  const attendanceData = events
-    .filter(event => event.attendance)
-    .map(event => ({
-      date: parseISO(event.date),
-      month: format(parseISO(event.date), 'MMM yyyy'),
-      men: event.attendance?.men || 0,
-      women: event.attendance?.women || 0,
-      total: (event.attendance?.men || 0) + (event.attendance?.women || 0),
-    }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
+  // Get the last 12 months
+  const today = new Date();
+  const last12Months = eachMonthOfInterval({
+    start: startOfMonth(subMonths(today, 11)),
+    end: startOfMonth(today)
+  });
+
+  // Create a map of existing attendance data
+  const attendanceMap = eventsWithAttendance.reduce((acc, event) => {
+    const monthKey = format(parseISO(event.date), 'yyyy-MM');
+    if (!acc[monthKey]) {
+      acc[monthKey] = { men: 0, women: 0 };
+    }
+    acc[monthKey].men += event.attendance?.men || 0;
+    acc[monthKey].women += event.attendance?.women || 0;
+    return acc;
+  }, {} as Record<string, { men: number; women: number }>);
+
+  // Generate attendance data for all months
+  const attendanceData = last12Months.map(date => {
+    const monthKey = format(date, 'yyyy-MM');
+    const monthData = attendanceMap[monthKey] || { men: 0, women: 0 };
+    
+    return {
+      date,
+      month: format(date, 'MMM yyyy'),
+      men: monthData.men,
+      women: monthData.women,
+      total: monthData.men + monthData.women,
+    };
+  });
 
   return (
     <Card>
