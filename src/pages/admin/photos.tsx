@@ -1,22 +1,16 @@
 import { AdminLayout } from "@/components/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImagePlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { PhotoUploadDialog } from "@/components/photos/photo-upload-dialog";
 import { PhotoGrid } from "@/components/photos/photo-grid";
-import { PhotoSlideshow } from "@/components/photos/photo-slideshow";
-import { Photo } from "@/components/photos/types";
 import { Input } from "@/components/ui/input";
 import { useEventsStore } from "@/stores/events-store";
+import { Photo } from "@/components/photos/types";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [selectedEventId, setSelectedEventId] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [showSlideshow, setShowSlideshow] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedEventPhotos, setSelectedEventPhotos] = useState<Photo[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   
   const events = useEventsStore((state) => state.events);
@@ -48,10 +42,8 @@ const PhotosPage = () => {
   };
 
   const startSlideshow = (eventId: string) => {
-    const eventPhotos = photos.filter((photo) => photo.eventId === eventId);
-    setSelectedEventPhotos(eventPhotos);
-    setCurrentSlide(0);
-    setShowSlideshow(true);
+    // Implement slideshow functionality
+    console.log("Starting slideshow for event:", eventId);
   };
 
   const downloadPhoto = (photo: Photo) => {
@@ -76,13 +68,6 @@ const PhotosPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-64"
             />
-            <PhotoUploadDialog
-              onUpload={handleFileUpload}
-              isUploading={isUploading}
-              selectedEventId={selectedEventId}
-              onEventChange={setSelectedEventId}
-              events={events}
-            />
           </div>
         </div>
 
@@ -91,42 +76,19 @@ const PhotosPage = () => {
             <CardTitle>Event Photos</CardTitle>
           </CardHeader>
           <CardContent>
-            {photos.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-96 space-y-4">
-                <ImagePlus className="h-16 w-16 text-muted-foreground" />
-                <p className="text-lg text-muted-foreground">No photos uploaded yet</p>
-                <PhotoUploadDialog
-                  onUpload={handleFileUpload}
-                  isUploading={isUploading}
-                  selectedEventId={selectedEventId}
-                  onEventChange={setSelectedEventId}
-                  events={events}
-                />
-              </div>
-            ) : (
-              <PhotoGrid
-                photos={photos}
-                onStartSlideshow={startSlideshow}
-                onDownload={downloadPhoto}
-                searchTerm={searchTerm}
-              />
-            )}
+            <PhotoGrid
+              photos={photos}
+              onStartSlideshow={startSlideshow}
+              onDownload={downloadPhoto}
+              searchTerm={searchTerm}
+              onUpload={handleFileUpload}
+              isUploading={isUploading}
+              selectedEventId={selectedEventId}
+              onEventChange={setSelectedEventId}
+              events={events}
+            />
           </CardContent>
         </Card>
-
-        <PhotoSlideshow
-          isOpen={showSlideshow}
-          onClose={() => setShowSlideshow(false)}
-          photos={selectedEventPhotos}
-          currentSlide={currentSlide}
-          onPrevSlide={() => setCurrentSlide((prev) =>
-            prev === 0 ? selectedEventPhotos.length - 1 : prev - 1
-          )}
-          onNextSlide={() => setCurrentSlide((prev) =>
-            prev === selectedEventPhotos.length - 1 ? 0 : prev + 1
-          )}
-          onDownload={downloadPhoto}
-        />
       </div>
     </AdminLayout>
   );

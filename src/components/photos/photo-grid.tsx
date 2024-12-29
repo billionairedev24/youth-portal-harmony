@@ -3,6 +3,7 @@ import { Download, ImagePlus } from "lucide-react";
 import { Photo } from "./types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PhotoUploadDialog } from "./photo-upload-dialog";
+import { Event } from "@/stores/events-store";
 
 interface PhotoGridProps {
   photos: Photo[];
