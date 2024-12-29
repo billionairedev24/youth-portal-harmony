@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import {
   Select,
@@ -28,13 +28,7 @@ export const PhotoUploadDialog = ({
     state.events.filter(event => !event.archived)
   );
   
-  const [eventId, setEventId] = useState<string>("");
-
-  useEffect(() => {
-    if (!eventId) {
-      setEventId(selectedEventId || events[0]?.id || "");
-    }
-  }, []);
+  const [eventId, setEventId] = useState(selectedEventId || events[0]?.id || "");
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

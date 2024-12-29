@@ -14,7 +14,7 @@ const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const events = useEventsStore((state) => state.events.filter(event => !event.archived));
   const defaultEventId = useMemo(() => events[0]?.id || "", []);
-  const [selectedEventId] = useState(defaultEventId);
+  const [selectedEventId, setSelectedEventId] = useState(defaultEventId);
   const [isUploading, setIsUploading] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
