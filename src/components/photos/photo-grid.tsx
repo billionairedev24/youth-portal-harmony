@@ -45,8 +45,18 @@ export const PhotoGrid = ({
     photo.eventName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Group photos by event
-  const photosByEvent = filteredPhotos.reduce((acc, photo) => {
+  // Calculate pagination
+  const totalPhotos = filteredPhotos.length;
+  const totalPages = Math.ceil(totalPhotos / itemsPerPage);
+  
+  // Get paginated photos
+  const paginatedPhotos = filteredPhotos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Group paginated photos by event
+  const photosByEvent = paginatedPhotos.reduce((acc, photo) => {
     if (!acc[photo.eventName]) {
       acc[photo.eventName] = [];
     }
@@ -54,15 +64,7 @@ export const PhotoGrid = ({
     return acc;
   }, {} as Record<string, Photo[]>);
 
-  // Calculate pagination
-  const totalEvents = Object.keys(photosByEvent).length;
-  const totalPages = Math.ceil(totalEvents / itemsPerPage);
-  
-  // Get paginated events
-  const paginatedEvents = Object.entries(photosByEvent)
-    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  if (Object.keys(photosByEvent).length === 0) {
+  if (filteredPhotos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[400px] space-y-4">
         <ImagePlus className="h-16 w-16 text-muted-foreground" />
@@ -93,9 +95,9 @@ export const PhotoGrid = ({
           events={events}
         />
       </div>
-      <ScrollArea className="h-[600px]">
+      <ScrollArea className="h-[600px] pb-4">
         <div className="space-y-8">
-          {paginatedEvents.map(([eventName, eventPhotos]) => (
+          {Object.entries(photosByEvent).map(([eventName, eventPhotos]) => (
             <div key={eventName} className="space-y-4">
               <h2 className="text-xl font-semibold">{eventName}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -133,32 +135,35 @@ export const PhotoGrid = ({
         </div>
       </ScrollArea>
       {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(page)}
-                  isActive={currentPage === page}
-                >
-                  {page}
-                </PaginationLink>
+        <div className="mt-4 flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  className={`cursor-pointer ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                />
               </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  className={`cursor-pointer ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       )}
     </div>
   );
