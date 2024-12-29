@@ -3,7 +3,7 @@ import {
   ChartContainer,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LabelList } from "recharts";
 import { format, subMonths } from "date-fns";
 
 const generateLastTwelveMonthsData = () => {
@@ -41,13 +41,15 @@ export function AttendanceCharts() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={monthlyAttendanceData}
-              margin={{ top: 20, right: 20, left: -20, bottom: 70 }}
+              margin={{ top: 20, right: 20, left: -20, bottom: 100 }}
             >
               <XAxis 
                 dataKey="month"
-                tick={{ fill: 'currentColor', angle: -90, textAnchor: 'end', dy: 10 }}
-                height={60}
+                tick={{ fill: 'currentColor', transform: 'rotate(-90)' }}
+                height={80}
                 axisLine={{ stroke: 'currentColor' }}
+                textAnchor="end"
+                interval={0}
               />
               <YAxis
                 tick={{ fill: 'currentColor' }}
@@ -57,21 +59,32 @@ export function AttendanceCharts() {
                 content={<ChartTooltipContent />}
                 cursor={false}
               />
-              <Legend />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                wrapperStyle={{
+                  paddingTop: '20px',
+                  marginTop: '20px'
+                }}
+              />
               <Bar
                 dataKey="men"
                 name="Men"
                 fill="#FFB800"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
-              />
+              >
+                <LabelList dataKey="men" position="center" fill="white" />
+              </Bar>
               <Bar
                 dataKey="women"
                 name="Women"
                 fill="#CC9900"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
-              />
+              >
+                <LabelList dataKey="women" position="center" fill="white" />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
