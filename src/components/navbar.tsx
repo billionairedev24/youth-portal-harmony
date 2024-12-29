@@ -72,11 +72,11 @@ export function Navbar() {
                   variant="ghost"
                   className="relative h-10 w-10 rounded-full hover:bg-gold-200/50"
                 >
-                  <Avatar className="h-10 w-10 border-2 border-gold-200">
+                  <Avatar className="h-10 w-10">
                     {mockUser.avatar && (
                       <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
                     )}
-                    <AvatarFallback className="bg-gold-100 text-gold-900 font-semibold">
+                    <AvatarFallback className="bg-[#9b87f5] text-white font-semibold">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
