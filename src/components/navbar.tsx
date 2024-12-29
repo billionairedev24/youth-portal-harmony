@@ -40,9 +40,9 @@ export function Navbar() {
                 className="relative h-10 w-10 rounded-full hover:bg-gold-200/50"
               >
                 <Avatar className="h-10 w-10 border-2 border-gold-200">
-                  {mockUser.avatar ? (
+                  {mockUser.avatar && (
                     <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
-                  ) : null}
+                  )}
                   <AvatarFallback className="bg-gold-100 text-gold-900 font-semibold">
                     {userInitials}
                   </AvatarFallback>
