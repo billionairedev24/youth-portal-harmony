@@ -65,11 +65,9 @@ export function AdminSidebar() {
       )}
     >
       {!isMobile && (
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-4 top-20 z-50"
+          className="absolute -right-4 top-20 z-50 p-0 border-0"
         >
           {collapsed ? (
             <ChevronRight className="h-6 w-6 text-gold-900" />
