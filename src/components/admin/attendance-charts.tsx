@@ -49,7 +49,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </div>
         <div className="mt-3 pt-2 border-t">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-foreground">Total Attendance</span>
+            <span className="text-sm font-medium text-foreground">Total</span>
             <span className="text-sm font-bold">{payload[0].value + payload[1].value}</span>
           </div>
         </div>
