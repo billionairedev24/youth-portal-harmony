@@ -1,51 +1,34 @@
 import { AdminLayout } from "@/components/admin-layout";
-import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImagePlus } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { PhotoUploadDialog } from "@/components/photos/photo-upload-dialog";
+import { PhotoGrid } from "@/components/photos/photo-grid";
+import { PhotoSlideshow } from "@/components/photos/photo-slideshow";
 import { Photo } from "@/components/photos/types";
-import { useEventsStore } from "@/stores/events-store";
-import { PhotosHeader } from "@/components/photos/photos-header";
-import { PhotosContent } from "@/components/photos/photos-content";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState("event1"); // Hardcoded for demo
   const [isUploading, setIsUploading] = useState(false);
-  const events = useEventsStore((state) => 
-    state.events.filter(event => !event.archived)
-  );
-  
-  // Initialize selectedEventId only once when component mounts
-  const [selectedEventId, setSelectedEventId] = useState<string>("");
-  
-  // Set initial event ID only once when events are loaded
-  useEffect(() => {
-    if (events.length > 0 && !selectedEventId) {
-      setSelectedEventId(events[0].id);
-    }
-  }, [events, selectedEventId]);
+  const [showSlideshow, setShowSlideshow] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedEventPhotos, setSelectedEventPhotos] = useState<Photo[]>([]);
 
   const handleFileUpload = async (files: FileList, eventId: string) => {
-    if (!eventId) {
-      toast.error("Please select an event first");
-      return;
-    }
-
     setIsUploading(true);
     try {
-      const selectedEvent = events.find(e => e.id === eventId);
-      if (!selectedEvent) {
-        toast.error("Invalid event selected");
-        return;
-      }
-
       const newPhotos = Array.from(files).map((file) => ({
         id: Date.now().toString() + Math.random(),
         url: URL.createObjectURL(file),
         eventId: eventId,
-        eventName: selectedEvent.title,
+        eventName: "Sample Event", // In a real app, this would come from your events data
         date: new Date().toISOString(),
       }));
 
-      setPhotos(prev => [...prev, ...newPhotos]);
+      setPhotos([...photos, ...newPhotos]);
       toast.success("Photos uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload photos");
@@ -54,29 +37,76 @@ const PhotosPage = () => {
     }
   };
 
-  const handleDeletePhoto = (photoId: string) => {
-    setPhotos(prev => prev.filter(photo => photo.id !== photoId));
-    toast.success("Photo deleted successfully");
+  const startSlideshow = (eventId: string) => {
+    const eventPhotos = photos.filter((photo) => photo.eventId === eventId);
+    setSelectedEventPhotos(eventPhotos);
+    setCurrentSlide(0);
+    setShowSlideshow(true);
+  };
+
+  const downloadPhoto = (photo: Photo) => {
+    const link = document.createElement("a");
+    link.href = photo.url;
+    link.download = `photo-${photo.id}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Photo downloaded successfully");
   };
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <PhotosHeader
-          onUpload={handleFileUpload}
-          isUploading={isUploading}
-          selectedEventId={selectedEventId}
-          onEventChange={setSelectedEventId}
-          events={events}
-        />
-        <PhotosContent
-          photos={photos}
-          events={events}
-          onUpload={handleFileUpload}
-          isUploading={isUploading}
-          selectedEventId={selectedEventId}
-          onEventChange={setSelectedEventId}
-          onDelete={handleDeletePhoto}
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Photo Management</h1>
+          {photos.length > 0 && (
+            <PhotoUploadDialog
+              onUpload={handleFileUpload}
+              isUploading={isUploading}
+              selectedEventId={selectedEventId}
+            />
+          )}
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Event Photos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[500px]">
+              {photos.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-96 space-y-4">
+                  <ImagePlus className="h-16 w-16 text-muted-foreground" />
+                  <p className="text-lg text-muted-foreground">No photos uploaded yet</p>
+                  <PhotoUploadDialog
+                    onUpload={handleFileUpload}
+                    isUploading={isUploading}
+                    selectedEventId={selectedEventId}
+                  />
+                </div>
+              ) : (
+                <PhotoGrid
+                  photos={photos}
+                  onStartSlideshow={startSlideshow}
+                  onDownload={downloadPhoto}
+                />
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        <PhotoSlideshow
+          isOpen={showSlideshow}
+          onClose={() => setShowSlideshow(false)}
+          photos={selectedEventPhotos}
+          currentSlide={currentSlide}
+          onPrevSlide={() => setCurrentSlide((prev) =>
+            prev === 0 ? selectedEventPhotos.length - 1 : prev - 1
+          )}
+          onNextSlide={() => setCurrentSlide((prev) =>
+            prev === selectedEventPhotos.length - 1 ? 0 : prev + 1
+          )}
+          onDownload={downloadPhoto}
         />
       </div>
     </AdminLayout>

@@ -2,58 +2,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface PhotoUploadDialogProps {
   onUpload: (files: FileList, eventId: string) => void;
   isUploading: boolean;
   selectedEventId: string;
-  onEventChange: (eventId: string) => void;
-  events: any[];
 }
 
 export const PhotoUploadDialog = ({
   onUpload,
   isUploading,
   selectedEventId,
-  onEventChange,
-  events = [], // Provide default empty array
 }: PhotoUploadDialogProps) => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || !selectedEventId) return;
+    if (!files || !selectedEventId) {
+      toast.error("Please select files and an event");
+      return;
+    }
     onUpload(files, selectedEventId);
-    e.target.value = ''; // Reset the input after upload
   };
-
-  // Only render if we have events
-  if (!events || events.length === 0) {
-    return null;
-  }
 
   return (
     <div className="flex gap-4 items-center">
-      <Select 
-        value={selectedEventId} 
-        onValueChange={onEventChange}
-      >
-        <SelectTrigger className="w-48">
-          <SelectValue placeholder="Select Event" />
-        </SelectTrigger>
-        <SelectContent>
-          {events.map((event) => (
-            <SelectItem key={event.id} value={event.id}>
-              {event.title}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Input
+        type="text"
+        placeholder="Select Event"
+        value={selectedEventId}
+        className="w-48"
+        readOnly
+      />
       <Label
         htmlFor="photo-upload"
         className={`cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ${
