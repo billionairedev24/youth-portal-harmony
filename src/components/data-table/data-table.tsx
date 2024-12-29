@@ -4,33 +4,25 @@ import {
   ColumnFiltersState,
   SortingState,
   VisibilityState,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  type Table as TableType,
 } from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { DataTablePagination } from "./data-table-pagination";
-import { downloadCSV } from "./csv-utils";
+import { DataTableHeader } from "./data-table-header";
+import { DataTableBody } from "./data-table-body";
+import { handleTableExport } from "./export-utils";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-// Define the extended TableMeta type
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends unknown> {
     onExport?: () => void;
@@ -49,14 +41,14 @@ export function DataTable<TData, TValue>({
   const columns = React.useMemo(() => [
     {
       id: "select",
-      header: ({ table }) => (
+      header: ({ table }: { table: any }) => (
         <Checkbox
           checked={table.getIsAllPageRowsSelected()}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
       ),
-      cell: ({ row }) => (
+      cell: ({ row }: { row: any }) => (
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -68,49 +60,6 @@ export function DataTable<TData, TValue>({
     },
     ...userColumns,
   ], [userColumns]);
-
-  const handleExport = React.useCallback((tableInstance: TableType<TData>) => {
-    const visibleColumns = columns
-      .filter((column) => 
-        column.id !== "select" && 
-        column.id !== "actions" && 
-        tableInstance.getColumn(column.id)?.getIsVisible()
-      );
-    
-    const headers = visibleColumns
-      .map((column) => {
-        const header = column.header;
-        return typeof header === 'string' ? header : column.id;
-      });
-    
-    const selectedRows = tableInstance.getFilteredSelectedRowModel().rows;
-    const allRows = tableInstance.getFilteredRowModel().rows;
-    const rowsToExport = Object.keys(rowSelection).length > 0 ? selectedRows : allRows;
-
-    const rows = rowsToExport.map((row) =>
-      visibleColumns.map((column) => {
-        const cell = row.getAllCells().find(cell => cell.column.id === column.id);
-        if (!cell) return '';
-        
-        const value = cell.getValue();
-        if (value === null || value === undefined) return '';
-        
-        // Handle different types of cell content
-        if (typeof value === 'object') {
-          if (React.isValidElement(value)) {
-            // If it's a React element, try to extract text content
-            const props = value.props as { children?: React.ReactNode };
-            return props.children ? String(props.children) : '';
-          }
-          return JSON.stringify(value);
-        }
-        
-        return String(value);
-      })
-    );
-
-    downloadCSV(headers, rows);
-  }, [columns, rowSelection]);
 
   const table = useReactTable({
     data,
@@ -130,7 +79,7 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
     meta: {
-      onExport: () => handleExport(table),
+      onExport: () => handleTableExport(table, columns, rowSelection),
     },
   });
 
@@ -142,50 +91,8 @@ export function DataTable<TData, TValue>({
       />
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+          <DataTableHeader table={table} />
+          <DataTableBody table={table} columns={columns} />
         </Table>
       </div>
       <DataTablePagination table={table} />
