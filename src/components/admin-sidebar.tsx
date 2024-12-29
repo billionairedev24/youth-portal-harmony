@@ -8,6 +8,8 @@ import {
   LayoutDashboard,
   MessageSquare,
   Megaphone,
+  DollarSign,
+  Image,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -46,6 +48,8 @@ export function AdminSidebar() {
     { icon: Users, label: "Members", href: "/admin/members" },
     { icon: MessageSquare, label: "Suggestions", href: "/admin/suggestions" },
     { icon: Megaphone, label: "Announcements", href: "/admin/announcements" },
+    { icon: DollarSign, label: "Budget", href: "/admin/budget" },
+    { icon: Image, label: "Photos", href: "/admin/photos" },
   ];
 
   const handleNavigation = (href: string) => {

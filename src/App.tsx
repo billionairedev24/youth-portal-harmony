@@ -11,6 +11,8 @@ import PollsPage from "./pages/admin/polls";
 import MembersPage from "./pages/admin/members";
 import SuggestionsPage from "./pages/admin/suggestions";
 import AnnouncementsPage from "./pages/admin/announcements";
+import BudgetPage from "./pages/admin/budget";
+import PhotosPage from "./pages/admin/photos";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/admin/members" element={<MembersPage />} />
           <Route path="/admin/suggestions" element={<SuggestionsPage />} />
           <Route path="/admin/announcements" element={<AnnouncementsPage />} />
+          <Route path="/admin/budget" element={<BudgetPage />} />
+          <Route path="/admin/photos" element={<PhotosPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
