@@ -5,6 +5,7 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { format, subMonths } from "date-fns";
+import { Users } from "lucide-react";
 
 const generateLastTwelveMonthsData = () => {
   const data = [];
@@ -31,11 +32,25 @@ const generateLastTwelveMonthsData = () => {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-background/95 p-3 border rounded-lg shadow-lg">
-        <p className="font-semibold mb-2">{label}</p>
-        <p className="text-sm">Men: {payload[0].value}</p>
-        <p className="text-sm">Women: {payload[1].value}</p>
-        <p className="text-sm font-medium mt-1 border-t pt-1">Total: {payload[0].value + payload[1].value}</p>
+      <div className="bg-background/95 p-4 border rounded-lg shadow-lg backdrop-blur-sm">
+        <div className="flex items-center gap-2 mb-3 pb-2 border-b">
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <p className="font-semibold">{label}</p>
+        </div>
+        <div className="space-y-1.5">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">Men</span>
+            <span className="text-sm font-medium">{payload[0].value}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">Women</span>
+            <span className="text-sm font-medium">{payload[1].value}</span>
+          </div>
+          <div className="flex justify-between items-center pt-2 mt-1 border-t font-medium">
+            <span className="text-sm">Total Attendance</span>
+            <span className="text-sm">{payload[0].value + payload[1].value}</span>
+          </div>
+        </div>
       </div>
     );
   }
