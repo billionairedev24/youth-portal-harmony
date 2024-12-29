@@ -19,7 +19,17 @@ interface SuggestionsStore {
 }
 
 export const useSuggestionsStore = create<SuggestionsStore>((set) => ({
-  suggestions: [],
+  suggestions: [
+    {
+      id: "1",
+      title: "Add Monthly Newsletter",
+      description: "I suggest we start a monthly newsletter to keep all members updated about our activities and upcoming events. This would help improve communication and engagement within our community.",
+      authorId: "user123",
+      authorName: "John Smith",
+      createdAt: "2024-03-20T10:00:00.000Z",
+      status: "new"
+    }
+  ],
   addSuggestion: (suggestion) => 
     set((state) => ({
       suggestions: [
