@@ -35,6 +35,14 @@ export function Navbar() {
     .map((n) => n[0])
     .join("");
 
+  const handleProfileDialogChange = (open: boolean) => {
+    setShowProfileDialog(open);
+  };
+
+  const handleSettingsDialogChange = (open: boolean) => {
+    setShowSettingsDialog(open);
+  };
+
   return (
     <>
       <header className="w-full bg-gradient-to-r from-gold-50/50 to-gold-100/50 backdrop-blur-sm">
@@ -85,14 +93,20 @@ export function Navbar() {
                 <DropdownMenuGroup>
                   <DropdownMenuItem 
                     className="hover:bg-gold-200/50"
-                    onClick={() => setShowProfileDialog(true)}
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      handleProfileDialogChange(true);
+                    }}
                   >
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className="hover:bg-gold-200/50"
-                    onClick={() => setShowSettingsDialog(true)}
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      handleSettingsDialogChange(true);
+                    }}
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
@@ -101,7 +115,7 @@ export function Navbar() {
                 <DropdownMenuSeparator className="bg-gold-200" />
                 <DropdownMenuItem 
                   className="text-red-600 hover:bg-gold-200/50"
-                  onClick={handleLogout}
+                  onSelect={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
@@ -114,12 +128,12 @@ export function Navbar() {
 
       <ProfileUpdateDialog 
         open={showProfileDialog} 
-        onOpenChange={setShowProfileDialog}
+        onOpenChange={handleProfileDialogChange}
       />
 
       <SettingsDialog
         open={showSettingsDialog}
-        onOpenChange={setShowSettingsDialog}
+        onOpenChange={handleSettingsDialogChange}
       />
     </>
   );
