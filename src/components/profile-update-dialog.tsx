@@ -66,6 +66,10 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     }
   };
 
+  const handleDialogInteraction = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -78,7 +82,7 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     >
       <DialogContent 
         className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleDialogInteraction}
       >
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
