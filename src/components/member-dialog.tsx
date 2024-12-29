@@ -50,7 +50,7 @@ export function MemberDialog({ member, open, onOpenChange }: MemberDialogProps) 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-muted-foreground">Birthday</label>
-                  <p className="text-sm">{format(new Date(member.birthday), 'MMMM do, yyyy')}</p>
+                  <p className="text-sm">{format(new Date(member.birthday), 'MMMM do')}</p>
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">Role</label>

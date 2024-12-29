@@ -120,7 +120,7 @@ const MembersPage = () => {
       header: "Birthday",
       cell: ({ row }) => {
         const member = row.original;
-        return format(new Date(member.birthday), 'MMMM do, yyyy');
+        return format(new Date(member.birthday), 'MMMM do');
       },
     },
     {
