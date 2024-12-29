@@ -139,7 +139,7 @@ const EventsPage = () => {
   ];
 
   const EmptyState = ({ type }: { type: "scheduled" | "archived" }) => (
-    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+    <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-secondary/20 rounded-lg border-2 border-dashed border-secondary">
       {type === "scheduled" ? (
         <Calendar className="h-12 w-12 text-muted-foreground" />
       ) : (
@@ -153,6 +153,12 @@ const EventsPage = () => {
           ? "There are no upcoming events scheduled at the moment. Create a new event to get started."
           : "No events have been archived yet. Events that are no longer active will appear here."}
       </p>
+      {type === "scheduled" && (
+        <Button onClick={handleCreateEvent} variant="outline" className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Create your first event
+        </Button>
+      )}
     </div>
   );
 

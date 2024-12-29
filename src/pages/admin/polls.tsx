@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Eye, MoreHorizontal, Pencil, XSquare, VoteIcon, Plus } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, XSquare, VoteIcon, Plus, Trash } from "lucide-react";
 import { PollDetailsDialog } from "@/components/poll-details-dialog";
 import { EditPollDialog } from "@/components/edit-poll-dialog";
 import { useState } from "react";
@@ -16,7 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { usePollsStore } from "@/stores/polls-store";
 
 const PollsPage = () => {
-  const { polls, updatePoll, addPoll } = usePollsStore();
+  const { polls, updatePoll, addPoll, deletePoll } = usePollsStore();
   const { toast } = useToast();
   const [selectedPoll, setSelectedPoll] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -134,6 +134,19 @@ const PollsPage = () => {
                 <XSquare className="mr-2 h-4 w-4" />
                 {poll.status === "active" ? "Close" : "Activate"}
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => {
+                  deletePoll(poll.id);
+                  toast({
+                    title: "Poll deleted",
+                    description: "The poll has been permanently deleted.",
+                  });
+                }}
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -142,7 +155,7 @@ const PollsPage = () => {
   ];
 
   const EmptyState = () => (
-    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+    <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-secondary/20 rounded-lg border-2 border-dashed border-secondary">
       <VoteIcon className="h-12 w-12 text-muted-foreground" />
       <h3 className="text-lg font-semibold">No Polls Found</h3>
       <p className="text-sm text-muted-foreground max-w-sm text-center">
