@@ -86,7 +86,7 @@ export function SuggestionDialog({
                   placeholder="Add a comment about how this suggestion was handled..."
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  className="min-h-[100px] resize-none bg-gold-50/50 border-gold-200 focus:border-gold-300 focus:ring-gold-200/50 focus:ring-offset-0 placeholder:text-gold-500/70"
+                  className="min-h-[100px] resize-none bg-gold-50/50 border-gold-200 focus:border-gold-300 focus:ring-0 focus:outline-none placeholder:text-gold-500/70"
                 />
               </div>
             )}
