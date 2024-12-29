@@ -41,7 +41,7 @@ export function AttendanceCharts() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={monthlyAttendanceData}
-              margin={{ top: 20, right: 20, left: -20, bottom: 0 }}
+              margin={{ top: 40, right: 20, left: -20, bottom: 20 }}
             >
               <XAxis 
                 dataKey="month"
