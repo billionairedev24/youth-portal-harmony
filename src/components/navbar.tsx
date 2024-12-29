@@ -12,6 +12,7 @@ import {
 import { getGreeting, mockUser } from "@/lib/utils";
 import { Settings, User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { NotificationBell } from "./notification-bell";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -28,7 +29,8 @@ export function Navbar() {
 
   return (
     <header className="w-full bg-gradient-to-r from-gold-50/50 to-gold-100/50 backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-end px-4">
+      <div className="container flex h-16 items-center justify-end px-4 gap-2">
+        <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
