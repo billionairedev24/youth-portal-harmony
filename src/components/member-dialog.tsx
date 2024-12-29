@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Member } from "@/stores/members-store";
+import { format } from "date-fns";
 
 interface MemberDialogProps {
   member: Member | null;
@@ -45,21 +46,29 @@ export function MemberDialog({ member, open, onOpenChange }: MemberDialogProps) 
             </div>
 
             <div className="grid gap-2">
+              <h3 className="font-semibold">Personal Information</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-muted-foreground">Birthday</label>
+                  <p className="text-sm">{format(new Date(member.birthday), 'MMMM do, yyyy')}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground">Role</label>
+                  <p className="text-sm capitalize">{member.role}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
               <h3 className="font-semibold">Address</h3>
               <p className="text-sm">{member.address}</p>
             </div>
 
             <div className="grid gap-2">
               <h3 className="font-semibold">Preferences</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-muted-foreground">Notification Method</label>
-                  <p className="text-sm capitalize">{member.notificationPreference}</p>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">Role</label>
-                  <p className="text-sm capitalize">{member.role}</p>
-                </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Notification Method</label>
+                <p className="text-sm capitalize">{member.notificationPreference}</p>
               </div>
             </div>
           </div>

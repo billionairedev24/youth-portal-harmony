@@ -16,6 +16,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { Member, NotificationPreference } from "@/stores/members-store";
 import { MemberDialog } from "@/components/member-dialog";
 import { MessageMemberDialog } from "@/components/message-member-dialog";
+import { format } from "date-fns";
 
 const MembersPage = () => {
   const { members, toggleRole } = useMembersStore();
@@ -112,6 +113,14 @@ const MembersPage = () => {
             </Button>
           </div>
         );
+      },
+    },
+    {
+      accessorKey: "birthday",
+      header: "Birthday",
+      cell: ({ row }) => {
+        const member = row.original;
+        return format(new Date(member.birthday), 'MMMM do, yyyy');
       },
     },
     {

@@ -11,6 +11,7 @@ export interface Member {
   email: string;
   phone: string;
   address: string;
+  birthday: string;
   notificationPreference: NotificationPreference;
   role: Role;
 }
@@ -32,6 +33,7 @@ export const useMembersStore = create<MembersStore>((set) => ({
       email: "jane@example.com",
       phone: "+1234567890",
       address: "123 Main St, City, Country",
+      birthday: "1995-03-15",
       notificationPreference: "email",
       role: "member",
     },
@@ -43,6 +45,7 @@ export const useMembersStore = create<MembersStore>((set) => ({
       email: "john@example.com",
       phone: "+0987654321",
       address: "456 Oak St, Town, Country",
+      birthday: "1992-07-22",
       notificationPreference: "whatsapp",
       role: "admin",
     },
