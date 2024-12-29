@@ -1,14 +1,11 @@
 import { AdminLayout } from "@/components/admin-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImagePlus } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { PhotoUploadDialog } from "@/components/photos/photo-upload-dialog";
-import { PhotoGrid } from "@/components/photos/photo-grid";
 import { PhotoSlideshow } from "@/components/photos/photo-slideshow";
 import { Photo } from "@/components/photos/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEventsStore } from "@/stores/events-store";
+import { PhotosHeader } from "@/components/photos/photos-header";
+import { PhotosContent } from "@/components/photos/photos-content";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -65,48 +62,25 @@ const PhotosPage = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Photo Management</h1>
-          {events.length > 0 && (
-            <PhotoUploadDialog
-              onUpload={handleFileUpload}
-              isUploading={isUploading}
-              selectedEventId={selectedEventId}
-              onEventChange={setSelectedEventId}
-            />
-          )}
-        </div>
+        <PhotosHeader
+          onUpload={handleFileUpload}
+          isUploading={isUploading}
+          selectedEventId={selectedEventId}
+          onEventChange={setSelectedEventId}
+          events={events}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Event Photos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[500px]">
-              {photos.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-96 space-y-4">
-                  <ImagePlus className="h-16 w-16 text-muted-foreground" />
-                  <p className="text-lg text-muted-foreground">No photos uploaded yet</p>
-                  {events.length > 0 && (
-                    <PhotoUploadDialog
-                      onUpload={handleFileUpload}
-                      isUploading={isUploading}
-                      selectedEventId={selectedEventId}
-                      onEventChange={setSelectedEventId}
-                    />
-                  )}
-                </div>
-              ) : (
-                <PhotoGrid
-                  photos={photos}
-                  onStartSlideshow={startSlideshow}
-                  onDownload={downloadPhoto}
-                  onDelete={handleDeletePhoto}
-                />
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
+        <PhotosContent
+          photos={photos}
+          events={events}
+          onUpload={handleFileUpload}
+          isUploading={isUploading}
+          selectedEventId={selectedEventId}
+          onEventChange={setSelectedEventId}
+          onStartSlideshow={startSlideshow}
+          onDownload={downloadPhoto}
+          onDelete={handleDeletePhoto}
+        />
 
         <PhotoSlideshow
           isOpen={showSlideshow}
