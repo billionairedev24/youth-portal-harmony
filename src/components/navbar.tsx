@@ -17,7 +17,6 @@ export function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // In a real app, this would clear auth tokens/state
     localStorage.removeItem('user');
     navigate('/');
   };
