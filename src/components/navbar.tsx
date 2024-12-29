@@ -10,12 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getGreeting, mockUser } from "@/lib/utils";
-import { Settings, User, LogOut } from "lucide-react";
+import { Settings, User, LogOut, Moon, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { NotificationBell } from "./notification-bell";
 import { ProfileUpdateDialog } from "./profile-update-dialog";
 import { SettingsDialog } from "./settings-dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -23,6 +23,19 @@ export function Navbar() {
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -53,7 +66,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="w-full bg-gradient-to-r from-gold-50/50 to-gold-100/50 backdrop-blur-sm">
+      <header className="w-full bg-gradient-to-r from-gold-50/50 to-gold-100/50 backdrop-blur-sm dark:from-gold-900/50 dark:to-gold-800/50">
         <div className="container flex h-16 items-center px-4">
           <div className="flex items-center flex-1">
             {!isAdminRoute && (
@@ -65,18 +78,30 @@ export function Navbar() {
             )}
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="mr-2"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             <NotificationBell />
             <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-10 w-10 rounded-full hover:bg-gold-200/50"
+                  className="relative h-10 w-10 rounded-full hover:bg-gold-200/50 dark:hover:bg-gold-700/50"
                 >
                   <Avatar className="h-10 w-10">
                     {mockUser.avatar ? (
                       <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
                     ) : (
-                      <AvatarFallback className="bg-gold-200/50 text-gold-900 font-semibold">
+                      <AvatarFallback className="bg-gold-200/50 text-gold-900 dark:bg-gold-700/50 dark:text-gold-100 font-semibold">
                         {userInitials}
                       </AvatarFallback>
                     )}
@@ -84,40 +109,40 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
-                className="w-56 bg-gradient-to-br from-gold-50 to-gold-100" 
+                className="w-56 bg-gradient-to-br from-gold-50 to-gold-100 dark:from-gold-900 dark:to-gold-800" 
                 align="end" 
                 forceMount
               >
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none text-gold-900">
+                    <p className="text-sm font-medium leading-none text-gold-900 dark:text-gold-100">
                       {getGreeting()}, {mockUser.name}
                     </p>
-                    <p className="text-xs leading-none text-gold-600">
+                    <p className="text-xs leading-none text-gold-600 dark:text-gold-400">
                       {mockUser.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gold-200" />
+                <DropdownMenuSeparator className="bg-gold-200 dark:bg-gold-700" />
                 <DropdownMenuGroup>
                   <DropdownMenuItem 
-                    className="hover:bg-gold-200/50"
+                    className="hover:bg-gold-200/50 dark:hover:bg-gold-700/50"
                     onSelect={handleProfileClick}
                   >
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    className="hover:bg-gold-200/50"
+                    className="hover:bg-gold-200/50 dark:hover:bg-gold-700/50"
                     onSelect={handleSettingsClick}
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator className="bg-gold-200" />
+                <DropdownMenuSeparator className="bg-gold-200 dark:bg-gold-700" />
                 <DropdownMenuItem 
-                  className="text-red-600 hover:bg-gold-200/50"
+                  className="text-red-600 hover:bg-gold-200/50 dark:hover:bg-gold-700/50"
                   onSelect={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />

@@ -74,7 +74,7 @@ const UserDashboard = () => {
         <div className="flex justify-end">
           <Button 
             onClick={() => setShowSuggestionDialog(true)}
-            className="bg-gold-500 hover:bg-gold-600 text-white"
+            className="bg-gold-500 hover:bg-gold-600 text-white dark:bg-gold-600 dark:hover:bg-gold-700"
           >
             <MessageSquarePlus className="w-4 h-4 mr-2" />
             Create Suggestion
@@ -82,9 +82,9 @@ const UserDashboard = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+          <Card className="dark:bg-gold-900/50 dark:border-gold-700">
             <CardHeader>
-              <CardTitle>Calendar</CardTitle>
+              <CardTitle className="dark:text-gold-100">Calendar</CardTitle>
             </CardHeader>
             <CardContent className="flex justify-center">
               <div className="relative">
@@ -106,7 +106,22 @@ const UserDashboard = () => {
                           }}
                         />
                       </HoverCardTrigger>
-                      {renderEventTooltip(eventDate)}
+                      <HoverCardContent className="w-80 dark:bg-gold-900 dark:border-gold-700">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold dark:text-gold-100">{event.title}</h4>
+                          <p className="text-sm text-muted-foreground dark:text-gold-400">{event.objectives}</p>
+                          <div className="flex flex-col gap-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              <span className="dark:text-gold-300">{event.time}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4" />
+                              <span className="dark:text-gold-300">{event.location}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
                     </HoverCard>
                   );
                 })}
@@ -114,21 +129,21 @@ const UserDashboard = () => {
                   mode="single"
                   selected={date}
                   onSelect={setDate}
-                  className="rounded-md border mx-auto"
+                  className="rounded-md border mx-auto dark:bg-gold-900/50 dark:border-gold-700 dark:text-gold-100"
                   modifiers={modifiers}
                   modifiersStyles={modifiersStyles}
                   classNames={{
-                    day_selected: "bg-gold-500 text-primary-foreground hover:bg-gold-500 hover:text-primary-foreground focus:bg-gold-500 focus:text-primary-foreground",
-                    day_today: "bg-accent text-accent-foreground",
+                    day_selected: "bg-gold-500 text-primary-foreground hover:bg-gold-500 hover:text-primary-foreground focus:bg-gold-500 focus:text-primary-foreground dark:bg-gold-600",
+                    day_today: "bg-accent text-accent-foreground dark:bg-gold-800 dark:text-gold-100",
                   }}
                 />
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="dark:bg-gold-900/50 dark:border-gold-700">
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="dark:text-gold-100">
                 {selectedDateEvents.length > 0 
                   ? `Events on ${format(date || new Date(), 'MMMM d, yyyy')}`
                   : "Upcoming Events"}
@@ -141,30 +156,30 @@ const UserDashboard = () => {
                     .map((event) => (
                       <div
                         key={event.id}
-                        className="p-4 rounded-lg bg-secondary/50 space-y-2"
+                        className="p-4 rounded-lg bg-secondary/50 dark:bg-gold-800/50 space-y-2"
                       >
-                        <h3 className="font-semibold text-lg">{event.title}</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <h3 className="font-semibold text-lg dark:text-gold-100">{event.title}</h3>
+                        <p className="text-sm text-muted-foreground dark:text-gold-400">
                           {event.objectives}
                         </p>
                         <div className="flex flex-col gap-2 text-sm">
                           <div className="flex items-center gap-2">
                             <CalendarDays className="h-4 w-4" />
-                            <span>{format(parseISO(event.date), 'MMMM d, yyyy')}</span>
+                            <span className="dark:text-gold-300">{format(parseISO(event.date), 'MMMM d, yyyy')}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4" />
-                            <span>{event.time}</span>
+                            <span className="dark:text-gold-300">{event.time}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
-                            <span>{event.location}</span>
+                            <span className="dark:text-gold-300">{event.location}</span>
                           </div>
                         </div>
                       </div>
                     ))}
                   {(selectedDateEvents.length === 0 && activeEvents.length === 0) && (
-                    <p className="text-muted-foreground text-center py-4">
+                    <p className="text-muted-foreground dark:text-gold-400 text-center py-4">
                       No upcoming events
                     </p>
                   )}
@@ -175,9 +190,9 @@ const UserDashboard = () => {
         </div>
 
         <div>
-          <Card>
+          <Card className="dark:bg-gold-900/50 dark:border-gold-700">
             <CardHeader>
-              <CardTitle>Active Polls</CardTitle>
+              <CardTitle className="dark:text-gold-100">Active Polls</CardTitle>
             </CardHeader>
             <CardContent>
               <UserPolls />
