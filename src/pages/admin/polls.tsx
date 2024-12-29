@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Eye, MoreHorizontal, Pencil, XSquare } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, XSquare, VoteIcon } from "lucide-react";
 import { PollDetailsDialog } from "@/components/poll-details-dialog";
 import { EditPollDialog } from "@/components/edit-poll-dialog";
 import { useState } from "react";
@@ -121,6 +121,16 @@ const PollsPage = () => {
 
   const selectedPollData = polls.find((p) => p.id === selectedPoll) || null;
 
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+      <VoteIcon className="h-12 w-12 text-muted-foreground" />
+      <h3 className="text-lg font-semibold">No Polls Found</h3>
+      <p className="text-sm text-muted-foreground max-w-sm text-center">
+        There are no polls available at the moment. Create a new poll to start gathering feedback from your community.
+      </p>
+    </div>
+  );
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -129,7 +139,11 @@ const PollsPage = () => {
           <p className="text-muted-foreground">Manage your polls</p>
         </div>
 
-        <DataTable columns={columns} data={polls} />
+        {polls.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <DataTable columns={columns} data={polls} />
+        )}
 
         <PollDetailsDialog
           pollId={selectedPoll}

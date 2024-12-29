@@ -7,6 +7,7 @@ import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { Progress } from "./ui/progress";
+import { VoteIcon } from "lucide-react";
 
 export function UserPolls() {
   const { polls, vote } = usePollsStore();
@@ -22,10 +23,8 @@ export function UserPolls() {
       return;
     }
 
-    // In a real app, you'd get the actual user ID from auth
     const userId = "user-1"; 
     
-    // Check if user has already voted
     const poll = polls.find(p => p.id === pollId);
     if (poll?.votes.some(v => v.userId === userId) && !editingPollId) {
       toast.error("You have already voted in this poll");
@@ -35,7 +34,6 @@ export function UserPolls() {
     vote(pollId, userId, selectedOption);
     toast.success(editingPollId ? "Vote updated successfully!" : "Vote submitted successfully!");
     
-    // Clear the editing state and selection
     setEditingPollId(null);
     setSelectedOptions(prev => ({
       ...prev,
@@ -58,13 +56,11 @@ export function UserPolls() {
   };
 
   const hasUserVoted = (poll: any) => {
-    // In a real app, you'd get the actual user ID from auth
     const userId = "user-1";
     return poll.votes.some((vote: any) => vote.userId === userId);
   };
 
   const getUserVote = (poll: any) => {
-    // In a real app, you'd get the actual user ID from auth
     const userId = "user-1";
     const userVote = poll.votes.find((vote: any) => vote.userId === userId);
     return userVote?.option || "";
@@ -79,12 +75,18 @@ export function UserPolls() {
     setEditingPollId(pollId);
   };
 
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+      <VoteIcon className="h-12 w-12 text-muted-foreground" />
+      <h3 className="text-lg font-semibold">No Active Polls</h3>
+      <p className="text-sm text-muted-foreground max-w-sm text-center">
+        There are no active polls at the moment. Check back later for new polls to participate in.
+      </p>
+    </div>
+  );
+
   if (!activePollsExist) {
-    return (
-      <div className="text-center text-muted-foreground py-8">
-        No active polls at the moment
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (
