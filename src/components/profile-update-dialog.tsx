@@ -96,13 +96,6 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     >
       <DialogContent 
         className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden"
-        onInteractOutside={(e) => {
-          e.preventDefault();
-        }}
-        onEscapeKeyDown={(e) => {
-          e.preventDefault();
-          handleOpenChange(false);
-        }}
       >
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
@@ -158,9 +151,7 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
                           <div
                             key={index}
                             className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
+                            onClick={() => {
                               handleAddressSelect(suggestion, field.onChange);
                             }}
                           >
