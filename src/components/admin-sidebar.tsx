@@ -23,12 +23,12 @@ export function AdminSidebar() {
   return (
     <div
       className={cn(
-        "h-screen border-r bg-background transition-all duration-300",
+        "min-h-screen border-r bg-background shadow-lg transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
       <div className="flex h-full flex-col">
-        <div className="flex items-center justify-end border-b p-2">
+        <div className="flex h-16 items-center justify-end border-b p-2">
           <Button
             variant="ghost"
             size="icon"
