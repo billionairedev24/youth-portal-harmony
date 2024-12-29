@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Eye, MoreHorizontal, Pencil, Trash, Calendar, Archive } from "lucide-react";
-import { PollDetailsDialog } from "@/components/poll-details-dialog";
-import { EditPollDialog } from "@/components/edit-poll-dialog";
+import { EventDialog } from "@/components/event-dialog";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { usePollsStore } from "@/stores/polls-store";
+import { useEventsStore } from "@/stores/events-store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { type ColumnDef } from "@tanstack/react-table";
+import { type Event } from "@/stores/events-store";
 
 const EventsPage = () => {
   const { events, updateEvent, deleteEvent, toggleArchive } = useEventsStore();
@@ -22,6 +23,93 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [dialogMode, setDialogMode] = useState<"view" | "edit">("view");
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const columns: ColumnDef<Event>[] = [
+    {
+      accessorKey: "title",
+      header: "Title",
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+    },
+    {
+      accessorKey: "time",
+      header: "Time",
+    },
+    {
+      accessorKey: "location",
+      header: "Location",
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const event = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedEvent(event);
+                  setDialogMode("view");
+                  setDialogOpen(true);
+                }}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                View details
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedEvent(event);
+                  setDialogMode("edit");
+                  setDialogOpen(true);
+                }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  toggleArchive(event.id);
+                  toast({
+                    title: event.archived ? "Event restored" : "Event archived",
+                    description: event.archived
+                      ? "The event has been moved to active events."
+                      : "The event has been moved to archived events.",
+                  });
+                }}
+              >
+                <Archive className="mr-2 h-4 w-4" />
+                {event.archived ? "Restore" : "Archive"}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => {
+                  deleteEvent(event.id);
+                  toast({
+                    title: "Event deleted",
+                    description: "The event has been permanently deleted.",
+                  });
+                }}
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
+  const handleSave = async (event: Event) => {
+    updateEvent(event.id, event);
+  };
 
   const EmptyState = ({ type }: { type: "scheduled" | "archived" }) => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4">
