@@ -41,11 +41,12 @@ export function AttendanceCharts() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={monthlyAttendanceData}
-              margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
+              margin={{ top: 20, right: 20, left: -20, bottom: 70 }}
             >
               <XAxis 
                 dataKey="month"
-                tick={{ fill: 'currentColor' }}
+                tick={{ fill: 'currentColor', angle: -90, textAnchor: 'end', dy: 10 }}
+                height={60}
                 axisLine={{ stroke: 'currentColor' }}
               />
               <YAxis
