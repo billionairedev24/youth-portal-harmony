@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { Eye, MoreHorizontal, Pencil, Trash, Calendar, Archive, Plus } from "lucide-react";
 import { EventDialog } from "@/components/event-dialog";
 import { useState } from "react";
@@ -154,13 +153,16 @@ const EventsPage = () => {
           : "No events have been archived yet. Events that are no longer active will appear here."}
       </p>
       {type === "scheduled" && (
-        <Button onClick={handleCreateEvent} variant="outline" className="flex items-center gap-2">
+        <Button onClick={handleCreateEvent} variant="default" className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Create your first event
         </Button>
       )}
     </div>
   );
+
+  const activeEvents = events.filter(event => !event.archived);
+  const archivedEvents = events.filter(event => event.archived);
 
   return (
     <AdminLayout>
@@ -172,10 +174,12 @@ const EventsPage = () => {
               Manage your youth group events
             </p>
           </div>
-          <Button onClick={handleCreateEvent} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Create Event
-          </Button>
+          {activeEvents.length > 0 && (
+            <Button onClick={handleCreateEvent} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create Event
+            </Button>
+          )}
         </div>
 
         <Tabs defaultValue="scheduled" className="space-y-4">
@@ -184,22 +188,22 @@ const EventsPage = () => {
             <TabsTrigger value="archived">Archived Events</TabsTrigger>
           </TabsList>
           <TabsContent value="scheduled" className="space-y-4">
-            {events.filter(event => !event.archived).length === 0 ? (
+            {activeEvents.length === 0 ? (
               <EmptyState type="scheduled" />
             ) : (
               <DataTable
                 columns={columns}
-                data={events.filter(event => !event.archived)}
+                data={activeEvents}
               />
             )}
           </TabsContent>
           <TabsContent value="archived" className="space-y-4">
-            {events.filter(event => event.archived).length === 0 ? (
+            {archivedEvents.length === 0 ? (
               <EmptyState type="archived" />
             ) : (
               <DataTable
                 columns={columns}
-                data={events.filter(event => event.archived)}
+                data={archivedEvents}
               />
             )}
           </TabsContent>
