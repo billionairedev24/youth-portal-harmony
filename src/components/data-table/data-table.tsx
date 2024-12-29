@@ -98,8 +98,9 @@ export function DataTable<TData, TValue>({
         // Handle different types of cell content
         if (typeof value === 'object') {
           if (React.isValidElement(value)) {
-            // If it's a React element, try to get text content
-            return value.props.children || '';
+            // If it's a React element, try to extract text content
+            const props = value.props as { children?: React.ReactNode };
+            return props.children ? String(props.children) : '';
           }
           return JSON.stringify(value);
         }
