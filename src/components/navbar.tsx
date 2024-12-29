@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getGreeting, mockUser } from "@/lib/utils";
 import { Settings, User, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { NotificationBell } from "./notification-bell";
 import { ProfileUpdateDialog } from "./profile-update-dialog";
 import { SettingsDialog } from "./settings-dialog";
@@ -19,6 +19,7 @@ import { useState } from "react";
 
 export function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
 
@@ -26,6 +27,8 @@ export function Navbar() {
     localStorage.removeItem('user');
     navigate('/');
   };
+
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   const userInitials = mockUser.name
     .split(" ")
@@ -37,11 +40,13 @@ export function Navbar() {
       <header className="w-full bg-gradient-to-r from-gold-50/50 to-gold-100/50 backdrop-blur-sm">
         <div className="container flex h-16 items-center px-4">
           <div className="flex items-center flex-1">
-            <img 
-              src="/placeholder.svg" 
-              alt="Logo" 
-              className="h-8 w-auto mr-4"
-            />
+            {!isAdminRoute && (
+              <img 
+                src="/placeholder.svg" 
+                alt="Logo" 
+                className="h-8 w-auto mr-4"
+              />
+            )}
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
