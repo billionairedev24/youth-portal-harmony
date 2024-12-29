@@ -32,8 +32,8 @@ const UserDashboard = () => {
 
   const modifiersStyles = {
     hasEvent: {
-      backgroundColor: 'rgba(var(--gold-500), 0.1)',
-      position: 'relative' as const,
+      backgroundColor: 'rgba(234, 179, 8, 0.1)',
+      fontWeight: 'bold'
     }
   };
 
@@ -74,22 +74,18 @@ const UserDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="relative">
-                {Array.from({ length: 31 }).map((_, i) => {
-                  const currentDate = new Date();
-                  currentDate.setDate(i + 1);
-                  const dateStr = format(currentDate, 'yyyy-MM-dd');
-                  const event = eventDates[dateStr];
-
-                  return event ? (
-                    <HoverCard key={dateStr}>
+                {activeEvents.map((event) => {
+                  const eventDate = new Date(event.date);
+                  return (
+                    <HoverCard key={event.id}>
                       <HoverCardTrigger asChild>
-                        <div className="absolute" style={{ visibility: 'hidden' }}>
+                        <div style={{ position: 'absolute', visibility: 'hidden' }}>
                           Trigger
                         </div>
                       </HoverCardTrigger>
-                      {renderEventTooltip(currentDate)}
+                      {renderEventTooltip(eventDate)}
                     </HoverCard>
-                  ) : null;
+                  );
                 })}
                 <Calendar
                   mode="single"
