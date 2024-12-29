@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { BudgetEmptyState } from "@/components/budget/budget-empty-state";
+import { BudgetSummary } from "@/components/budget/budget-summary";
 
 type BudgetEntry = {
   id: string;
@@ -154,53 +156,24 @@ const BudgetPage = () => {
           </Dialog>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Income</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-600">
-                ${totalIncome.toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-red-600">
-                ${totalExpenses.toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Balance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p
-                className={`text-2xl font-bold ${
-                  totalIncome - totalExpenses >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                ${(totalIncome - totalExpenses).toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Budget Entries</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DataTable columns={columns} data={entries} />
-          </CardContent>
-        </Card>
+        {entries.length === 0 ? (
+          <BudgetEmptyState onCreateBudget={() => setIsDialogOpen(true)} />
+        ) : (
+          <>
+            <BudgetSummary 
+              totalIncome={totalIncome}
+              totalExpenses={totalExpenses}
+            />
+            <Card>
+              <CardHeader>
+                <CardTitle>Budget Entries</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DataTable columns={columns} data={entries} />
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </AdminLayout>
   );
