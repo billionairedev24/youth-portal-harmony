@@ -58,15 +58,40 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     setShowSuggestions(false);
   };
 
-  const onSubmit = (data: ProfileFormValues) => {
-    console.log("Profile update data:", data);
-    console.log("New profile image:", imagePreview);
-    toast.success("Profile updated successfully!");
-    onOpenChange(false);
+  const onSubmit = async (data: ProfileFormValues) => {
+    try {
+      console.log("Profile update data:", data);
+      console.log("New profile image:", imagePreview);
+      toast.success("Profile updated successfully!");
+      
+      // Reset form and states
+      form.reset();
+      setImagePreview(null);
+      setAddressSuggestions([]);
+      setShowSuggestions(false);
+      
+      // Close the dialog
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile");
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={open} 
+      onOpenChange={(newOpen) => {
+        if (!newOpen) {
+          // Reset form and states when dialog is closed
+          form.reset();
+          setImagePreview(null);
+          setAddressSuggestions([]);
+          setShowSuggestions(false);
+        }
+        onOpenChange(newOpen);
+      }}
+    >
       <DialogContent className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
