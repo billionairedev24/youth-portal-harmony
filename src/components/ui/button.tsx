@@ -13,10 +13,10 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border-2 border-gold-200 bg-transparent hover:bg-gold-50/50 hover:border-gold-300 hover:text-gold-800",
+          "border-2 border-gold-200 bg-gradient-to-br from-gold-400/10 via-gold-500/10 to-gold-600/10 hover:from-gold-400/20 hover:to-gold-600/20 hover:border-gold-300 hover:text-gold-800",
         secondary:
-          "bg-secondary/80 text-secondary-foreground hover:bg-secondary",
-        ghost: "hover:bg-gold-100/50 hover:text-gold-900",
+          "bg-gradient-to-br from-gold-200/80 via-gold-300/80 to-gold-400/80 text-secondary-foreground hover:from-gold-300 hover:to-gold-500",
+        ghost: "hover:bg-gradient-to-br hover:from-gold-400/10 hover:to-gold-600/10 hover:text-gold-900",
         link: "text-gold-600 underline-offset-4 hover:underline decoration-gold-300",
       },
       size: {
