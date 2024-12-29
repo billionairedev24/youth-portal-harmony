@@ -74,19 +74,21 @@ const UserDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="relative">
-                {activeEvents.map((event) => {
-                  const eventDate = new Date(event.date);
-                  return (
-                    <HoverCard key={event.id}>
-                      <HoverCardTrigger asChild>
-                        <div style={{ position: 'absolute', visibility: 'hidden' }}>
-                          Trigger
-                        </div>
-                      </HoverCardTrigger>
-                      {renderEventTooltip(eventDate)}
-                    </HoverCard>
-                  );
-                })}
+                {Object.entries(eventDates).map(([dateStr, event]) => (
+                  <HoverCard key={dateStr}>
+                    <HoverCardTrigger asChild>
+                      <button 
+                        className="absolute w-9 h-9 z-10"
+                        style={{
+                          left: `${new Date(dateStr).getDate() * 40}px`,
+                          top: `${Math.floor((new Date(dateStr).getDate() - 1) / 7) * 40}px`,
+                          opacity: 0,
+                        }}
+                      />
+                    </HoverCardTrigger>
+                    {renderEventTooltip(new Date(dateStr))}
+                  </HoverCard>
+                ))}
                 <Calendar
                   mode="single"
                   selected={date}
@@ -94,6 +96,10 @@ const UserDashboard = () => {
                   className="rounded-md border"
                   modifiers={modifiers}
                   modifiersStyles={modifiersStyles}
+                  classNames={{
+                    day_selected: "bg-gold-500 text-primary-foreground hover:bg-gold-500 hover:text-primary-foreground focus:bg-gold-500 focus:text-primary-foreground",
+                    day_today: "bg-accent text-accent-foreground",
+                  }}
                 />
               </div>
             </CardContent>
