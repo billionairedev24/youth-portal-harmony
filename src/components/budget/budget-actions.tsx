@@ -25,21 +25,26 @@ export function BudgetActions<TData>({ row }: BudgetActionsProps<TData>) {
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleView = () => {
     setShowViewDialog(true);
+    setIsDropdownOpen(false);
   };
 
   const handleEdit = () => {
     toast.info("Opening budget entry editor");
+    setIsDropdownOpen(false);
   };
 
   const handleDelete = () => {
     setShowDeleteDialog(true);
+    setIsDropdownOpen(false);
   };
 
   const handleSendForReview = () => {
     setShowReviewDialog(true);
+    setIsDropdownOpen(false);
   };
 
   const confirmDelete = () => {
@@ -54,7 +59,7 @@ export function BudgetActions<TData>({ row }: BudgetActionsProps<TData>) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
@@ -93,11 +98,13 @@ export function BudgetActions<TData>({ row }: BudgetActionsProps<TData>) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* View Dialog */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Budget Entry Details</DialogTitle>
+            <DialogDescription>
+              View the details of this budget entry.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -116,7 +123,6 @@ export function BudgetActions<TData>({ row }: BudgetActionsProps<TData>) {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -136,7 +142,6 @@ export function BudgetActions<TData>({ row }: BudgetActionsProps<TData>) {
         </DialogContent>
       </Dialog>
 
-      {/* Review Confirmation Dialog */}
       <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
         <DialogContent>
           <DialogHeader>
