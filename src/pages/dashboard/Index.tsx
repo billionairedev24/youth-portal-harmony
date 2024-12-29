@@ -6,6 +6,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
@@ -19,6 +20,65 @@ const UserDashboard = () => {
     event => event.date === format(date || new Date(), 'yyyy-MM-dd')
   );
 
+  // Create a map of dates with events for highlighting
+  const eventDates = activeEvents.reduce((acc, event) => {
+    const eventDate = new Date(event.date);
+    acc[format(eventDate, 'yyyy-MM-dd')] = event;
+    return acc;
+  }, {} as Record<string, typeof activeEvents[0]>);
+
+  // Custom modifiers for the calendar
+  const modifiers = {
+    hasEvent: (date: Date) => {
+      return format(date, 'yyyy-MM-dd') in eventDates;
+    }
+  };
+
+  // Custom modifier styles
+  const modifiersStyles = {
+    hasEvent: {
+      backgroundColor: 'rgba(var(--gold-500), 0.1)',
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        bottom: '2px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '4px',
+        height: '4px',
+        borderRadius: '50%',
+        backgroundColor: 'rgb(var(--gold-500))'
+      }
+    }
+  };
+
+  const renderEventTooltip = (date: Date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const event = eventDates[dateStr];
+    
+    if (!event) return null;
+
+    return (
+      <HoverCardContent className="w-80">
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">{event.title}</h4>
+          <p className="text-sm text-muted-foreground">{event.objectives}</p>
+          <div className="flex flex-col gap-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>{event.time}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>{event.location}</span>
+            </div>
+          </div>
+        </div>
+      </HoverCardContent>
+    );
+  };
+
   return (
     <UserLayout>
       <div className="space-y-6 animate-fade-in">
@@ -29,12 +89,33 @@ const UserDashboard = () => {
               <CardTitle>Calendar</CardTitle>
             </CardHeader>
             <CardContent>
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border"
-              />
+              <div className="relative">
+                {Array.from({ length: 31 }).map((_, i) => {
+                  const currentDate = new Date();
+                  currentDate.setDate(i + 1);
+                  const dateStr = format(currentDate, 'yyyy-MM-dd');
+                  const event = eventDates[dateStr];
+
+                  return event ? (
+                    <HoverCard key={dateStr}>
+                      <HoverCardTrigger asChild>
+                        <div className="absolute" style={{ visibility: 'hidden' }}>
+                          Trigger
+                        </div>
+                      </HoverCardTrigger>
+                      {renderEventTooltip(currentDate)}
+                    </HoverCard>
+                  ) : null;
+                })}
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  className="rounded-md border"
+                  modifiers={modifiers}
+                  modifiersStyles={modifiersStyles}
+                />
+              </div>
             </CardContent>
           </Card>
           
