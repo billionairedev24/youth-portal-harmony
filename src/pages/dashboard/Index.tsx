@@ -7,6 +7,7 @@ import { format, isSameDay, parseISO } from "date-fns";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { UserPolls } from "@/components/user-polls";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
@@ -156,6 +157,17 @@ const UserDashboard = () => {
                   )}
                 </div>
               </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Polls</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UserPolls />
             </CardContent>
           </Card>
         </div>
