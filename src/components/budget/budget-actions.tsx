@@ -1,11 +1,12 @@
 import { Row } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Eye, Edit, Trash, Send } from "lucide-react";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 interface BudgetActionsProps<TData> {
@@ -30,42 +31,27 @@ export function BudgetActions<TData>({ row }: BudgetActionsProps<TData>) {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleView}>
-            <Eye className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>View details</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleEdit}>
-            <Edit className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Edit entry</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleDelete}>
-            <Trash className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Delete entry</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" onClick={handleSendForReview}>
-            <Send className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Send for review</TooltipContent>
-      </Tooltip>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={handleView}>
+          View details
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleEdit}>
+          Edit entry
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleDelete}>
+          Delete entry
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSendForReview}>
+          Send for review
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
