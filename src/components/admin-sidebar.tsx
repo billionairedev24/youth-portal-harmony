@@ -9,10 +9,16 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Spinner } from "@/components/ui/spinner";
 
 export function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeRoute, setActiveRoute] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -27,12 +33,24 @@ export function AdminSidebar() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    setActiveRoute(location.pathname);
+    setIsLoading(false);
+  }, [location.pathname]);
+
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
     { icon: Calendar, label: "Events", href: "/admin/events" },
     { icon: Vote, label: "Polls", href: "/admin/polls" },
     { icon: Users, label: "Members", href: "/admin/members" },
   ];
+
+  const handleNavigation = (href: string) => {
+    if (href !== location.pathname) {
+      setIsLoading(true);
+      navigate(href);
+    }
+  };
 
   return (
     <aside
@@ -62,18 +80,26 @@ export function AdminSidebar() {
         </div>
         <nav className="flex-1 space-y-2 p-2">
           {menuItems.map((item) => (
-            <a
+            <button
               key={item.label}
-              href={item.href}
+              onClick={() => handleNavigation(item.href)}
               className={cn(
-                "flex items-center space-x-2 rounded-lg px-3 py-2 text-gold-800 transition-colors hover:bg-gold-200/50",
-                (collapsed || isMobile) ? "justify-center" : "justify-start"
+                "flex w-full items-center space-x-2 rounded-lg px-3 py-2 text-gold-800 transition-colors hover:bg-gold-200/50",
+                (collapsed || isMobile) ? "justify-center" : "justify-start",
+                activeRoute === item.href && "bg-gold-200/50 font-medium"
               )}
               title={collapsed || isMobile ? item.label : undefined}
+              disabled={isLoading}
             >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && !isMobile && <span className="truncate">{item.label}</span>}
-            </a>
+              {isLoading && activeRoute === item.href ? (
+                <Spinner size="sm" className="text-gold-800" />
+              ) : (
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+              )}
+              {!collapsed && !isMobile && (
+                <span className="truncate">{item.label}</span>
+              )}
+            </button>
           ))}
         </nav>
       </div>
