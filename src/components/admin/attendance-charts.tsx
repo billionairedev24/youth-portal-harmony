@@ -1,33 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { format, subMonths } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Users } from "lucide-react";
-
-const generateLastTwelveMonthsData = () => {
-  const data = [];
-  const currentDate = new Date();
-
-  for (let i = 11; i >= 0; i--) {
-    const date = subMonths(currentDate, i);
-    // Generate some random data for demonstration
-    const men = Math.floor(Math.random() * 30) + 15;
-    const women = Math.floor(Math.random() * 30) + 15;
-    
-    data.push({
-      date,
-      month: format(date, 'MMM yyyy'),
-      total: men + women,
-      men,
-      women,
-    });
-  }
-
-  return data;
-};
+import { useEventsStore } from "@/stores/events-store";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -60,7 +36,18 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function AttendanceCharts() {
-  const monthlyAttendanceData = generateLastTwelveMonthsData();
+  const { events } = useEventsStore();
+
+  const attendanceData = events
+    .filter(event => event.attendance)
+    .map(event => ({
+      date: parseISO(event.date),
+      month: format(parseISO(event.date), 'MMM yyyy'),
+      men: event.attendance?.men || 0,
+      women: event.attendance?.women || 0,
+      total: (event.attendance?.men || 0) + (event.attendance?.women || 0),
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
     <Card>
@@ -71,7 +58,7 @@ export function AttendanceCharts() {
         <ChartContainer className="h-[400px] w-full" config={{}}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={monthlyAttendanceData}
+              data={attendanceData}
               margin={{ top: 40, right: 20, left: 20, bottom: 60 }}
             >
               <XAxis 

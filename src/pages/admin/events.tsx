@@ -7,8 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eye, MoreHorizontal, Pencil, Trash, Calendar, Archive, Plus } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, Trash, Calendar, Archive, Plus, UserPlus } from "lucide-react";
 import { EventDialog } from "@/components/event-dialog";
+import { RecordAttendanceDialog } from "@/components/admin/record-attendance-dialog";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useEventsStore } from "@/stores/events-store";
@@ -17,11 +18,12 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { type Event } from "@/stores/events-store";
 
 const EventsPage = () => {
-  const { events, updateEvent, deleteEvent, toggleArchive, addEvent } = useEventsStore();
+  const { events, updateEvent, deleteEvent, toggleArchive, addEvent, recordAttendance } = useEventsStore();
   const { toast } = useToast();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [dialogMode, setDialogMode] = useState<"view" | "edit" | "create">("view");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
 
   const handleCreateEvent = () => {
     setSelectedEvent({
@@ -102,6 +104,15 @@ const EventsPage = () => {
               >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedEvent(event);
+                  setAttendanceDialogOpen(true);
+                }}
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Record Attendance
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
@@ -216,6 +227,15 @@ const EventsPage = () => {
           onSave={handleSave}
           mode={dialogMode === "view" ? "view" : "edit"}
         />
+
+        {selectedEvent && (
+          <RecordAttendanceDialog
+            event={selectedEvent}
+            open={attendanceDialogOpen}
+            onOpenChange={setAttendanceDialogOpen}
+            onSave={recordAttendance}
+          />
+        )}
       </div>
     </AdminLayout>
   );

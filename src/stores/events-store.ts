@@ -9,6 +9,11 @@ export type Event = {
   date: string;
   time: string;
   archived: boolean;
+  attendance?: {
+    men: number;
+    women: number;
+    date: string;
+  };
 };
 
 type EventsStore = {
@@ -17,6 +22,7 @@ type EventsStore = {
   updateEvent: (id: string, event: Partial<Event>) => void;
   deleteEvent: (id: string) => void;
   toggleArchive: (id: string) => void;
+  recordAttendance: (eventId: string, menCount: number, womenCount: number) => void;
 };
 
 export const useEventsStore = create<EventsStore>((set) => ({
@@ -58,6 +64,21 @@ export const useEventsStore = create<EventsStore>((set) => ({
     set((state) => ({
       events: state.events.map((event) =>
         event.id === id ? { ...event, archived: !event.archived } : event
+      ),
+    })),
+  recordAttendance: (eventId, menCount, womenCount) =>
+    set((state) => ({
+      events: state.events.map((event) =>
+        event.id === eventId
+          ? {
+              ...event,
+              attendance: {
+                men: menCount,
+                women: womenCount,
+                date: event.date,
+              },
+            }
+          : event
       ),
     })),
 }));
