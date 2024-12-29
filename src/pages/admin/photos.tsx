@@ -8,10 +8,12 @@ import { PhotoGrid } from "@/components/photos/photo-grid";
 import { PhotoSlideshow } from "@/components/photos/photo-slideshow";
 import { Photo } from "@/components/photos/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEventsStore } from "@/stores/events-store";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [selectedEventId, setSelectedEventId] = useState("event1"); // Hardcoded for demo
+  const events = useEventsStore((state) => state.events);
+  const [selectedEventId, setSelectedEventId] = useState(events[0]?.id || "");
   const [isUploading, setIsUploading] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -20,11 +22,12 @@ const PhotosPage = () => {
   const handleFileUpload = async (files: FileList, eventId: string) => {
     setIsUploading(true);
     try {
+      const selectedEvent = events.find(e => e.id === eventId);
       const newPhotos = Array.from(files).map((file) => ({
         id: Date.now().toString() + Math.random(),
         url: URL.createObjectURL(file),
         eventId: eventId,
-        eventName: "Sample Event", // In a real app, this would come from your events data
+        eventName: selectedEvent?.title || "Unknown Event",
         date: new Date().toISOString(),
       }));
 
@@ -35,6 +38,10 @@ const PhotosPage = () => {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleDeletePhoto = (photoId: string) => {
+    setPhotos(photos.filter(photo => photo.id !== photoId));
   };
 
   const startSlideshow = (eventId: string) => {
@@ -89,6 +96,7 @@ const PhotosPage = () => {
                   photos={photos}
                   onStartSlideshow={startSlideshow}
                   onDownload={downloadPhoto}
+                  onDelete={handleDeletePhoto}
                 />
               )}
             </ScrollArea>

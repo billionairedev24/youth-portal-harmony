@@ -4,6 +4,14 @@ import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEventsStore } from "@/stores/events-store";
 
 interface PhotoUploadDialogProps {
   onUpload: (files: FileList, eventId: string) => void;
@@ -16,6 +24,10 @@ export const PhotoUploadDialog = ({
   isUploading,
   selectedEventId,
 }: PhotoUploadDialogProps) => {
+  const events = useEventsStore((state) => 
+    state.events.filter(event => !event.archived)
+  );
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || !selectedEventId) {
@@ -27,13 +39,18 @@ export const PhotoUploadDialog = ({
 
   return (
     <div className="flex gap-4 items-center">
-      <Input
-        type="text"
-        placeholder="Select Event"
-        value={selectedEventId}
-        className="w-48"
-        readOnly
-      />
+      <Select value={selectedEventId} disabled>
+        <SelectTrigger className="w-48">
+          <SelectValue placeholder="Select Event" />
+        </SelectTrigger>
+        <SelectContent>
+          {events.map((event) => (
+            <SelectItem key={event.id} value={event.id}>
+              {event.title}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Label
         htmlFor="photo-upload"
         className={`cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ${
