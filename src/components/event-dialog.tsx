@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Event } from "@/stores/events-store";
 import { useState } from "react";
 
@@ -29,92 +30,62 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
     onOpenChange(false);
   };
 
+  const renderField = (label: string, value: string | undefined, fieldName: keyof Event) => {
+    return (
+      <div className="grid gap-2">
+        <label htmlFor={fieldName} className="text-sm font-medium">
+          {label}
+        </label>
+        {mode === "edit" ? (
+          fieldName === "objectives" ? (
+            <Textarea
+              id={fieldName}
+              value={value || ""}
+              onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
+              className="resize-none"
+            />
+          ) : (
+            <Input
+              id={fieldName}
+              type={fieldName === "date" ? "date" : fieldName === "time" ? "time" : "text"}
+              value={value || ""}
+              onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
+            />
+          )
+        ) : (
+          <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded-md min-h-[2.5rem] flex items-center">
+            {value || "N/A"}
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>{mode === "edit" ? "Edit Event" : "Event Details"}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {mode === "edit" ? "Edit Event" : "Event Details"}
+          </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <label htmlFor="title">Title</label>
-            {mode === "edit" ? (
-              <Input
-                id="title"
-                value={formData.title || ""}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
-            ) : (
-              <p className="text-sm">{event.title}</p>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <label htmlFor="objectives">Objectives</label>
-            {mode === "edit" ? (
-              <Textarea
-                id="objectives"
-                value={formData.objectives || ""}
-                onChange={(e) => setFormData({ ...formData, objectives: e.target.value })}
-              />
-            ) : (
-              <p className="text-sm">{event.objectives}</p>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <label htmlFor="personnel">Personnel</label>
-            {mode === "edit" ? (
-              <Input
-                id="personnel"
-                value={formData.personnel || ""}
-                onChange={(e) => setFormData({ ...formData, personnel: e.target.value })}
-              />
-            ) : (
-              <p className="text-sm">{event.personnel}</p>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <label htmlFor="location">Location</label>
-            {mode === "edit" ? (
-              <Input
-                id="location"
-                value={formData.location || ""}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              />
-            ) : (
-              <p className="text-sm">{event.location}</p>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <label htmlFor="date">Date</label>
-              {mode === "edit" ? (
-                <Input
-                  id="date"
-                  type="date"
-                  value={formData.date || ""}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                />
-              ) : (
-                <p className="text-sm">{event.date}</p>
-              )}
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="time">Time</label>
-              {mode === "edit" ? (
-                <Input
-                  id="time"
-                  type="time"
-                  value={formData.time || ""}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                />
-              ) : (
-                <p className="text-sm">{event.time}</p>
-              )}
+        
+        <ScrollArea className="flex-1 px-1">
+          <div className="grid gap-6 py-4">
+            {renderField("Title", formData.title, "title")}
+            {renderField("Objectives", formData.objectives, "objectives")}
+            {renderField("Personnel", formData.personnel, "personnel")}
+            {renderField("Location", formData.location, "location")}
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {renderField("Date", formData.date, "date")}
+              {renderField("Time", formData.time, "time")}
             </div>
           </div>
-        </div>
+        </ScrollArea>
+
         {mode === "edit" && (
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button onClick={handleSave}>Save changes</Button>
           </DialogFooter>
         )}
