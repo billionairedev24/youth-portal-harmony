@@ -33,7 +33,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
   const renderField = (label: string, value: string | undefined, fieldName: keyof Event) => {
     return (
       <div className="grid gap-2">
-        <label htmlFor={fieldName} className="text-sm font-medium">
+        <label htmlFor={fieldName} className="text-sm font-medium text-muted-foreground">
           {label}
         </label>
         {mode === "edit" ? (
@@ -42,7 +42,8 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
               id={fieldName}
               value={value || ""}
               onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
-              className="resize-none"
+              className="resize-none min-h-[100px] bg-secondary/50 border-0 focus-visible:ring-0"
+              placeholder={`Enter ${label.toLowerCase()}`}
             />
           ) : (
             <Input
@@ -50,12 +51,14 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
               type={fieldName === "date" ? "date" : fieldName === "time" ? "time" : "text"}
               value={value || ""}
               onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
+              className="bg-secondary/50 border-0 focus-visible:ring-0"
+              placeholder={`Enter ${label.toLowerCase()}`}
             />
           )
         ) : (
-          <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded-md min-h-[2.5rem] flex items-center">
+          <div className="text-sm bg-secondary/50 p-3 rounded-md min-h-[2.5rem] flex items-center">
             {value || "N/A"}
-          </p>
+          </div>
         )}
       </div>
     );
@@ -86,7 +89,9 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
 
         {mode === "edit" && (
           <DialogFooter className="mt-6">
-            <Button onClick={handleSave}>Save changes</Button>
+            <Button onClick={handleSave} className="w-full sm:w-auto">
+              Save changes
+            </Button>
           </DialogFooter>
         )}
       </DialogContent>
