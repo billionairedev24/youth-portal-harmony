@@ -44,7 +44,7 @@ export function AttendanceCharts() {
               />
               <Tooltip 
                 content={<ChartTooltipContent />}
-                cursor={{ fill: 'rgba(255, 184, 0, 0.1)' }}
+                cursor={false}
               />
               <Legend />
               <Bar
