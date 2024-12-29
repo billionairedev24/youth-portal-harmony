@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -10,13 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEventsStore } from "@/stores/events-store";
 
 interface PhotoUploadDialogProps {
   onUpload: (files: FileList, eventId: string) => void;
   isUploading: boolean;
   selectedEventId: string;
   onEventChange: (eventId: string) => void;
+  events: any[];
 }
 
 export const PhotoUploadDialog = ({
@@ -24,18 +23,13 @@ export const PhotoUploadDialog = ({
   isUploading,
   selectedEventId,
   onEventChange,
+  events,
 }: PhotoUploadDialogProps) => {
-  const events = useEventsStore((state) => 
-    state.events.filter(event => !event.archived)
-  );
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || !selectedEventId) {
-      toast.error("Please select files and an event");
-      return;
-    }
+    if (!files || !selectedEventId) return;
     onUpload(files, selectedEventId);
+    e.target.value = ''; // Reset the input after upload
   };
 
   if (events.length === 0) {

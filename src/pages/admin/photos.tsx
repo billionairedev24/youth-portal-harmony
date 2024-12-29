@@ -11,18 +11,23 @@ const PhotosPage = () => {
   const events = useEventsStore((state) => 
     state.events.filter(event => !event.archived)
   );
-  const [selectedEventId, setSelectedEventId] = useState("");
+  const [selectedEventId, setSelectedEventId] = useState(events[0]?.id || "");
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (files: FileList, eventId: string) => {
     setIsUploading(true);
     try {
       const selectedEvent = events.find(e => e.id === eventId);
+      if (!selectedEvent) {
+        toast.error("Please select an event first");
+        return;
+      }
+
       const newPhotos = Array.from(files).map((file) => ({
         id: Date.now().toString() + Math.random(),
         url: URL.createObjectURL(file),
         eventId: eventId,
-        eventName: selectedEvent?.title || "Unknown Event",
+        eventName: selectedEvent.title,
         date: new Date().toISOString(),
       }));
 
@@ -36,7 +41,7 @@ const PhotosPage = () => {
   };
 
   const handleDeletePhoto = (photoId: string) => {
-    setPhotos(photos.filter(photo => photo.id !== photoId));
+    setPhotos(prev => prev.filter(photo => photo.id !== photoId));
     toast.success("Photo deleted successfully");
   };
 

@@ -24,6 +24,7 @@ export const PhotosHeader = ({
           isUploading={isUploading}
           selectedEventId={selectedEventId}
           onEventChange={onEventChange}
+          events={events}
         />
       )}
     </div>
