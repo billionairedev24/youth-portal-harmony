@@ -57,7 +57,7 @@ export function AdminSidebar() {
         </Button>
       )}
       <div className="flex h-full flex-col">
-        <div className="flex h-16 items-center justify-center px-4">
+        <div className="flex h-16 items-center px-4">
           <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
         </div>
         <nav className="flex-1 space-y-2 p-2">
