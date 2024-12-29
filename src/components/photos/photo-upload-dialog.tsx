@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
   Select,
@@ -27,19 +27,28 @@ export const PhotoUploadDialog = ({
   const events = useEventsStore((state) => 
     state.events.filter(event => !event.archived)
   );
+  
+  const [currentEventId, setCurrentEventId] = useState(selectedEventId);
+
+  useEffect(() => {
+    setCurrentEventId(selectedEventId);
+  }, [selectedEventId]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || !selectedEventId) {
+    if (!files || !currentEventId) {
       toast.error("Please select files and an event");
       return;
     }
-    onUpload(files, selectedEventId);
+    onUpload(files, currentEventId);
   };
 
   return (
     <div className="flex gap-4 items-center">
-      <Select value={selectedEventId} disabled>
+      <Select 
+        value={currentEventId} 
+        onValueChange={setCurrentEventId}
+      >
         <SelectTrigger className="w-48">
           <SelectValue placeholder="Select Event" />
         </SelectTrigger>
@@ -67,7 +76,7 @@ export const PhotoUploadDialog = ({
         accept="image/*"
         className="hidden"
         onChange={handleFileUpload}
-        disabled={isUploading || !selectedEventId}
+        disabled={isUploading || !currentEventId}
       />
     </div>
   );
