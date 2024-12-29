@@ -46,7 +46,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
           fieldName === "objectives" ? (
             <Textarea
               id={fieldName}
-              value={formData[fieldName] ?? ""}
+              value={formData[fieldName] || ""}
               onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
               className="resize-none min-h-[100px] bg-secondary/50 border-0 focus-visible:ring-0"
               placeholder={`Enter ${label.toLowerCase()}`}
@@ -55,7 +55,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
             <Input
               id={fieldName}
               type={fieldName === "date" ? "date" : fieldName === "time" ? "time" : "text"}
-              value={formData[fieldName] ?? ""}
+              value={formData[fieldName] || ""}
               onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
               className="bg-secondary/50 border-0 focus-visible:ring-0"
               placeholder={`Enter ${label.toLowerCase()}`}

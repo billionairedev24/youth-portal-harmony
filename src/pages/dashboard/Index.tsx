@@ -12,44 +12,28 @@ const UserDashboard = () => {
   const { events } = useEventsStore();
   const [date, setDate] = useState<Date | undefined>(new Date());
   
-  // Filter out archived events
   const activeEvents = events.filter(event => !event.archived);
 
-  // Get events for the selected date
   const selectedDateEvents = activeEvents.filter(
     event => event.date === format(date || new Date(), 'yyyy-MM-dd')
   );
 
-  // Create a map of dates with events for highlighting
   const eventDates = activeEvents.reduce((acc, event) => {
     const eventDate = new Date(event.date);
     acc[format(eventDate, 'yyyy-MM-dd')] = event;
     return acc;
   }, {} as Record<string, typeof activeEvents[0]>);
 
-  // Custom modifiers for the calendar
   const modifiers = {
     hasEvent: (date: Date) => {
       return format(date, 'yyyy-MM-dd') in eventDates;
     }
   };
 
-  // Custom modifier styles
   const modifiersStyles = {
     hasEvent: {
       backgroundColor: 'rgba(var(--gold-500), 0.1)',
-      position: 'relative',
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        bottom: '2px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '4px',
-        height: '4px',
-        borderRadius: '50%',
-        backgroundColor: 'rgb(var(--gold-500))'
-      }
+      position: 'relative' as const,
     }
   };
 
