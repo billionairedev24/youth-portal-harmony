@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Poll } from "@/stores/polls-store";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 interface EditPollDialogProps {
   poll: Poll | null;
@@ -21,6 +23,7 @@ interface EditPollDialogProps {
 
 export function EditPollDialog({ poll, open, onOpenChange, onSave }: EditPollDialogProps) {
   const [editingPoll, setEditingPoll] = useState<Poll | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (poll) {
@@ -42,9 +45,17 @@ export function EditPollDialog({ poll, open, onOpenChange, onSave }: EditPollDia
     });
   };
 
-  const handleSave = () => {
-    onSave(editingPoll);
-    onOpenChange(false);
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      await onSave(editingPoll);
+      toast.success("Poll updated successfully");
+      onOpenChange(false);
+    } catch (error) {
+      toast.error("Failed to update poll");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -52,6 +63,9 @@ export function EditPollDialog({ poll, open, onOpenChange, onSave }: EditPollDia
       <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Edit Poll</DialogTitle>
+          <DialogDescription>
+            Make changes to your poll here. Click save when you're done.
+          </DialogDescription>
         </DialogHeader>
         
         <ScrollArea className="flex-1 pr-4">
@@ -117,8 +131,8 @@ export function EditPollDialog({ poll, open, onOpenChange, onSave }: EditPollDia
         </ScrollArea>
 
         <DialogFooter className="mt-6">
-          <Button onClick={handleSave} className="w-full sm:w-auto">
-            Save changes
+          <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
+            {isSaving ? "Saving..." : "Save changes"}
           </Button>
         </DialogFooter>
       </DialogContent>
