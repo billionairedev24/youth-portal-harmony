@@ -3,7 +3,7 @@ import { AdminSidebar } from "./admin-sidebar";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-gold-50 to-gold-100">
       <Navbar />
       <div className="flex">
         <AdminSidebar />

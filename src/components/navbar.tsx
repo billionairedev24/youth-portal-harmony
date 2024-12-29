@@ -10,30 +10,64 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getGreeting, mockUser } from "@/lib/utils";
-import { Settings, User, LogOut } from "lucide-react";
+import { Settings, User, LogOut, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-gold-100 to-gold-200 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
+        <Button
+          variant="ghost"
+          className="mr-4 md:hidden"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </Button>
         <div className="mr-4 flex">
           <a href="/" className="flex items-center space-x-2">
             <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
-            <span className="font-bold text-xl">Youth Group</span>
+            <span className="font-bold text-xl text-gold-900">Youth Group</span>
           </a>
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none" />
+        <nav
+          className={cn(
+            "absolute left-0 right-0 top-16 bg-gradient-to-r from-gold-100 to-gold-200 p-4 md:static md:p-0 transform transition-transform duration-200 ease-in-out md:transform-none",
+            isOpen ? "translate-y-0" : "-translate-y-full md:translate-y-0"
+          )}
+        >
+          <ul className="flex flex-col space-y-4 md:flex-row md:space-x-6 md:space-y-0">
+            <li>
+              <a href="/events" className="text-gold-900 hover:text-gold-700">
+                Events
+              </a>
+            </li>
+            <li>
+              <a href="/polls" className="text-gold-900 hover:text-gold-700">
+                Polls
+              </a>
+            </li>
+            <li>
+              <a href="/members" className="text-gold-900 hover:text-gold-700">
+                Members
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-10 w-10 rounded-full"
+                  className="relative h-10 w-10 rounded-full hover:bg-gold-200"
                 >
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-10 w-10 border-2 border-gold-300">
                     <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
-                    <AvatarFallback>
+                    <AvatarFallback className="bg-gold-200 text-gold-900">
                       {mockUser.name
                         .split(" ")
                         .map((n) => n[0])
