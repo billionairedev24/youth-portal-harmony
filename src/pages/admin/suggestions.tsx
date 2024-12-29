@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Eye, MoreHorizontal } from "lucide-react";
+import { Eye, MoreHorizontal, Inbox } from "lucide-react";
 import { useState } from "react";
 import { useSuggestionsStore } from "@/stores/suggestions-store";
 import { type ColumnDef } from "@tanstack/react-table";
@@ -93,7 +93,19 @@ const SuggestionsPage = () => {
           </p>
         </div>
 
-        <DataTable columns={columns} data={suggestions} />
+        {suggestions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center space-y-4 bg-white/50 backdrop-blur-sm rounded-lg p-12 border border-gold-200/50">
+            <div className="h-12 w-12 rounded-full bg-gold-100 flex items-center justify-center">
+              <Inbox className="h-6 w-6 text-gold-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gold-900">No Suggestions Yet</h3>
+            <p className="text-gold-600 text-center max-w-sm">
+              When members submit suggestions, they will appear here for review.
+            </p>
+          </div>
+        ) : (
+          <DataTable columns={columns} data={suggestions} />
+        )}
 
         <SuggestionDialog
           suggestion={selectedSuggestion}
