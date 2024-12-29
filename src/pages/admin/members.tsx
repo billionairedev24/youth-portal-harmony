@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useMembersStore } from "@/stores/members-store";
 import type { ColumnDef } from "@tanstack/react-table";
-import type { Member } from "@/stores/members-store";
+import type { Member, NotificationPreference } from "@/stores/members-store";
 
 const MembersPage = () => {
   const { members, toggleRole } = useMembersStore();
@@ -118,7 +118,7 @@ const MembersPage = () => {
       accessorKey: "notificationPreference",
       header: "Notification Preference",
       cell: ({ row }) => {
-        const preference = row.getValue("notificationPreference");
+        const preference = row.getValue("notificationPreference") as NotificationPreference;
         return (
           <span className="capitalize">{preference}</span>
         );
@@ -138,7 +138,6 @@ const MembersPage = () => {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => {
-                  // View member functionality to be implemented
                   toast({
                     title: "View member",
                     description: "This functionality will be implemented soon.",
@@ -150,7 +149,6 @@ const MembersPage = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  // Message member functionality to be implemented
                   toast({
                     title: "Message member",
                     description: "This functionality will be implemented soon.",
