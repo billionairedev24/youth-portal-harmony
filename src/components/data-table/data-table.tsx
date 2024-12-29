@@ -89,9 +89,21 @@ export function DataTable<TData, TValue>({
 
     const rows = rowsToExport.map((row) =>
       visibleColumns.map((column) => {
-        const value = row.getValue(column.id);
+        const cell = row.getAllCells().find(cell => cell.column.id === column.id);
+        if (!cell) return '';
+        
+        const value = cell.getValue();
         if (value === null || value === undefined) return '';
-        if (typeof value === 'object') return JSON.stringify(value);
+        
+        // Handle different types of cell content
+        if (typeof value === 'object') {
+          if (React.isValidElement(value)) {
+            // If it's a React element, try to get text content
+            return value.props.children || '';
+          }
+          return JSON.stringify(value);
+        }
+        
         return String(value);
       })
     );
