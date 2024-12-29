@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { ProfileImageUpload } from "./profile/profile-image-upload";
 import { SocialLinksSection } from "./profile/social-links-section";
@@ -65,13 +65,19 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     setShowSuggestions(false);
   }, [form]);
 
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open, resetForm]);
+
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      console.log("Profile update data:", data);
-      console.log("New profile image:", imagePreview);
-      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
+      
+      console.log("Profile update data:", data);
+      console.log("New profile image:", imagePreview);
       
       toast.success("Profile updated successfully!");
       resetForm();
@@ -82,20 +88,13 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     }
   };
 
-  const handleOpenChange = useCallback((newOpen: boolean) => {
-    if (!newOpen) {
-      resetForm();
-    }
-    onOpenChange(newOpen);
-  }, [onOpenChange, resetForm]);
-
   return (
     <Dialog 
       open={open} 
-      onOpenChange={handleOpenChange}
+      onOpenChange={onOpenChange}
     >
       <DialogContent 
-        className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden"
+        className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
       >
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
@@ -146,14 +145,12 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
                       />
                     </FormControl>
                     {showSuggestions && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+                      <div className="absolute z-50 w-full mt-1 bg-background border border-input rounded-md shadow-lg">
                         {addressSuggestions.map((suggestion, index) => (
                           <div
                             key={index}
-                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => {
-                              handleAddressSelect(suggestion, field.onChange);
-                            }}
+                            className="px-4 py-2 cursor-pointer hover:bg-accent"
+                            onClick={() => handleAddressSelect(suggestion, field.onChange)}
                           >
                             {suggestion}
                           </div>
