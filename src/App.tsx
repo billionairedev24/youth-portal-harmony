@@ -10,6 +10,7 @@ import EventsPage from "./pages/admin/events";
 import PollsPage from "./pages/admin/polls";
 import MembersPage from "./pages/admin/members";
 import SuggestionsPage from "./pages/admin/suggestions";
+import AnnouncementsPage from "./pages/admin/announcements";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/admin/polls" element={<PollsPage />} />
           <Route path="/admin/members" element={<MembersPage />} />
           <Route path="/admin/suggestions" element={<SuggestionsPage />} />
+          <Route path="/admin/announcements" element={<AnnouncementsPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
