@@ -46,9 +46,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             <span className="text-sm text-muted-foreground">Women</span>
             <span className="text-sm font-medium">{payload[1].value}</span>
           </div>
-          <div className="flex justify-between items-center pt-2 mt-1 border-t font-medium">
-            <span className="text-sm">Total Attendance</span>
-            <span className="text-sm">{payload[0].value + payload[1].value}</span>
+        </div>
+        <div className="mt-3 pt-2 border-t">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-foreground">Total Attendance</span>
+            <span className="text-sm font-bold">{payload[0].value + payload[1].value}</span>
           </div>
         </div>
       </div>
