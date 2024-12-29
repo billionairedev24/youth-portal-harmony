@@ -5,6 +5,7 @@ export const profileFormSchema = z.object({
   x: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   linkedin: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   facebook: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  address: z.string().min(5, "Address must be at least 5 characters."),
   bio: z.string().max(160, "Bio must not be longer than 160 characters."),
 });
 

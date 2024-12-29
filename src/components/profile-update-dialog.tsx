@@ -27,6 +27,7 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
       x: "",
       linkedin: "",
       facebook: "",
+      address: "",
       bio: "",
     },
   });
@@ -77,7 +78,6 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
                       <Input 
                         placeholder="Enter your nickname" 
                         {...field} 
-                        className="focus:ring-0"
                       />
                     </FormControl>
                     <FormMessage />
@@ -89,6 +89,23 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
 
               <FormField
                 control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter your address" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="bio"
                 render={({ field }) => (
                   <FormItem>
@@ -96,7 +113,7 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
                     <FormControl>
                       <Textarea 
                         placeholder="Tell us about yourself" 
-                        className="resize-none focus:ring-0" 
+                        className="resize-none" 
                         {...field} 
                       />
                     </FormControl>
