@@ -1,16 +1,32 @@
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, ImagePlus } from "lucide-react";
 import { Photo } from "./types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { PhotoUploadDialog } from "./photo-upload-dialog";
 
 interface PhotoGridProps {
   photos: Photo[];
   onStartSlideshow: (eventId: string) => void;
   onDownload: (photo: Photo) => void;
   searchTerm: string;
+  onUpload: (files: FileList, eventId: string) => void;
+  isUploading: boolean;
+  selectedEventId: string;
+  onEventChange: (eventId: string) => void;
+  events: Event[];
 }
 
-export const PhotoGrid = ({ photos, onStartSlideshow, onDownload, searchTerm }: PhotoGridProps) => {
+export const PhotoGrid = ({ 
+  photos, 
+  onStartSlideshow, 
+  onDownload, 
+  searchTerm,
+  onUpload,
+  isUploading,
+  selectedEventId,
+  onEventChange,
+  events
+}: PhotoGridProps) => {
   // Filter photos based on search term
   const filteredPhotos = photos.filter(photo => 
     photo.eventName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -27,8 +43,20 @@ export const PhotoGrid = ({ photos, onStartSlideshow, onDownload, searchTerm }: 
 
   if (Object.keys(photosByEvent).length === 0) {
     return (
-      <div className="text-center text-muted-foreground py-8">
-        No photos found for "{searchTerm}"
+      <div className="flex flex-col items-center justify-center h-[400px] space-y-4">
+        <ImagePlus className="h-16 w-16 text-muted-foreground" />
+        <p className="text-lg text-muted-foreground">
+          {searchTerm 
+            ? `No photos found for "${searchTerm}"`
+            : "No photos have been uploaded yet"}
+        </p>
+        <PhotoUploadDialog
+          onUpload={onUpload}
+          isUploading={isUploading}
+          selectedEventId={selectedEventId}
+          onEventChange={onEventChange}
+          events={events}
+        />
       </div>
     );
   }
