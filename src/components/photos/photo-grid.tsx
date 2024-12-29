@@ -1,18 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Download, ImagePlus } from "lucide-react";
-import { Photo } from "./types";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { PhotoUploadDialog } from "./photo-upload-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Photo } from "./types";
 import { Event } from "@/stores/events-store";
 import { useState } from "react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { PhotoCard } from "./photo-card";
+import { EmptyState } from "./empty-state";
+import { PhotoPagination } from "./photo-pagination";
 
 interface PhotoGridProps {
   photos: Photo[];
@@ -38,24 +31,20 @@ export const PhotoGrid = ({
   events
 }: PhotoGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9; // 3x3 grid
+  const itemsPerPage = 9;
 
-  // Filter photos based on search term
   const filteredPhotos = photos.filter(photo => 
     photo.eventName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Calculate pagination
   const totalPhotos = filteredPhotos.length;
   const totalPages = Math.ceil(totalPhotos / itemsPerPage);
   
-  // Get paginated photos
   const paginatedPhotos = filteredPhotos.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  // Group paginated photos by event
   const photosByEvent = paginatedPhotos.reduce((acc, photo) => {
     if (!acc[photo.eventName]) {
       acc[photo.eventName] = [];
@@ -66,21 +55,14 @@ export const PhotoGrid = ({
 
   if (filteredPhotos.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[400px] space-y-4">
-        <ImagePlus className="h-16 w-16 text-muted-foreground" />
-        <p className="text-lg text-muted-foreground">
-          {searchTerm 
-            ? `No photos found for "${searchTerm}"`
-            : "No photos have been uploaded yet"}
-        </p>
-        <PhotoUploadDialog
-          onUpload={onUpload}
-          isUploading={isUploading}
-          selectedEventId={selectedEventId}
-          onEventChange={onEventChange}
-          events={events}
-        />
-      </div>
+      <EmptyState
+        searchTerm={searchTerm}
+        onUpload={onUpload}
+        isUploading={isUploading}
+        selectedEventId={selectedEventId}
+        onEventChange={onEventChange}
+        events={events}
+      />
     );
   }
 
@@ -102,69 +84,23 @@ export const PhotoGrid = ({
               <h2 className="text-xl font-semibold">{eventName}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {eventPhotos.map((photo) => (
-                  <div
+                  <PhotoCard
                     key={photo.id}
-                    className="relative group rounded-lg overflow-hidden"
-                  >
-                    <img
-                      src={photo.url}
-                      alt={`Event photo ${photo.id}`}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => onStartSlideshow(photo.eventId)}
-                      >
-                        View
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => onDownload(photo)}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+                    photo={photo}
+                    onStartSlideshow={onStartSlideshow}
+                    onDownload={onDownload}
+                  />
                 ))}
               </div>
             </div>
           ))}
         </div>
       </ScrollArea>
-      {totalPages > 1 && (
-        <div className="mt-4 flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  className={`cursor-pointer ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
-                />
-              </PaginationItem>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                    className="cursor-pointer"
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  className={`cursor-pointer ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
+      <PhotoPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
