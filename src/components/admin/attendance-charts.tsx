@@ -51,7 +51,7 @@ export function AttendanceCharts() {
                 interval={0}
                 tick={{
                   fill: 'currentColor',
-                  dy: 10,
+                  dy: 5,
                 }}
                 axisLine={{ stroke: 'currentColor' }}
               />
@@ -64,11 +64,11 @@ export function AttendanceCharts() {
                 cursor={false}
               />
               <Legend 
-                verticalAlign="bottom" 
+                verticalAlign="top"
+                align="right"
                 height={36}
                 wrapperStyle={{
-                  paddingTop: '10px',
-                  marginTop: '10px'
+                  paddingBottom: '20px'
                 }}
               />
               <Bar
