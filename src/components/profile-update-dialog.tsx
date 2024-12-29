@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { profileFormSchema, type ProfileFormValues } from "./profile/profile-form-schema";
 import { ProfileForm } from "./profile/profile-form";
@@ -43,12 +43,6 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     setImagePreview(null);
   }, [form]);
 
-  useEffect(() => {
-    if (!open) {
-      resetForm();
-    }
-  }, [open, resetForm]);
-
   const onSubmit = async (data: ProfileFormValues) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -63,10 +57,17 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     }
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      resetForm();
+    }
+    onOpenChange(newOpen);
+  };
+
   return (
     <Dialog 
       open={open} 
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent 
         className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"

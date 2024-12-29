@@ -5,7 +5,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { Settings2 } from "lucide-react";
 import { NotificationSettings } from "./settings/notification-settings";
@@ -24,15 +23,6 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     defaultValues,
   });
 
-  useEffect(() => {
-    if (!open) {
-      form.reset(defaultValues);
-    }
-    return () => {
-      form.reset(defaultValues);
-    };
-  }, [open, form]);
-
   const onSubmit = async (data: SettingsFormValues) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -45,10 +35,17 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     }
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      form.reset(defaultValues);
+    }
+    onOpenChange(newOpen);
+  };
+
   return (
     <Dialog 
       open={open} 
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent 
         className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
