@@ -87,30 +87,61 @@ export function DataTable<TData, TValue>({
   });
 
   const downloadCSV = () => {
-    const headers = columns
-      .filter((column) => column.id !== "select" && column.id !== "actions")
-      .map((column) => column.header as string);
+    // Get visible columns excluding select and actions
+    const visibleColumns = columns
+      .filter((column) => 
+        column.id !== "select" && 
+        column.id !== "actions" && 
+        table.getColumn(column.id)?.getIsVisible()
+      );
     
+    // Get headers from visible columns
+    const headers = visibleColumns
+      .map((column) => {
+        const header = column.header;
+        return typeof header === 'string' ? header : column.id;
+      });
+    
+    // Get selected rows or all rows if none selected
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     const allRows = table.getFilteredRowModel().rows;
     const rowsToExport = Object.keys(rowSelection).length > 0 ? selectedRows : allRows;
 
+    // Transform rows data
     const rows = rowsToExport.map((row) =>
-      columns
-        .filter((column) => column.id !== "select" && column.id !== "actions")
-        .map((column) => row.getValue(column.id as string))
+      visibleColumns.map((column) => {
+        const value = row.getValue(column.id);
+        // Handle different types of values
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'object') return JSON.stringify(value);
+        return String(value);
+      })
     );
 
-    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
+    // Combine headers and rows, escape commas and quotes
+    const csvContent = [
+      headers.map(escapeCSV),
+      ...rows.map(row => row.map(escapeCSV))
+    ].map(row => row.join(",")).join("\n");
+
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.setAttribute("hidden", "");
-    a.setAttribute("href", url);
-    a.setAttribute("download", "export.csv");
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Helper function to escape CSV values
+  const escapeCSV = (value: string) => {
+    const stringValue = String(value);
+    if (stringValue.includes(",") || stringValue.includes("\"") || stringValue.includes("\n")) {
+      return `"${stringValue.replace(/"/g, '""')}"`;
+    }
+    return stringValue;
   };
 
   return (
