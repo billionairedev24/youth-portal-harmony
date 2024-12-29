@@ -30,7 +30,10 @@ export function Navbar() {
   return (
     <header className="w-full bg-gradient-to-r from-gold-50/50 to-gold-100/50 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex-1" /> {/* Spacer */}
+        <div className="flex items-center gap-2">
+          <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
+          <span className="font-bold text-xl text-gold-900">Youth Group</span>
+        </div>
         
         <div className="flex items-center gap-4">
           <DropdownMenu>
