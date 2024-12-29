@@ -7,24 +7,34 @@ import { PhotoUploadDialog } from "@/components/photos/photo-upload-dialog";
 import { PhotoGrid } from "@/components/photos/photo-grid";
 import { PhotoSlideshow } from "@/components/photos/photo-slideshow";
 import { Photo } from "@/components/photos/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { useEventsStore } from "@/stores/events-store";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [selectedEventId, setSelectedEventId] = useState("event1"); // Hardcoded for demo
+  const [selectedEventId, setSelectedEventId] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedEventPhotos, setSelectedEventPhotos] = useState<Photo[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  const events = useEventsStore((state) => state.events);
 
   const handleFileUpload = async (files: FileList, eventId: string) => {
     setIsUploading(true);
     try {
+      const selectedEvent = events.find(e => e.id === eventId);
+      if (!selectedEvent) {
+        toast.error("Please select an event first");
+        return;
+      }
+
       const newPhotos = Array.from(files).map((file) => ({
         id: Date.now().toString() + Math.random(),
         url: URL.createObjectURL(file),
         eventId: eventId,
-        eventName: "Sample Event", // In a real app, this would come from your events data
+        eventName: selectedEvent.title,
         date: new Date().toISOString(),
       }));
 
@@ -59,13 +69,21 @@ const PhotosPage = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Photo Management</h1>
-          {photos.length > 0 && (
+          <div className="flex items-center gap-4">
+            <Input
+              placeholder="Search events..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-64"
+            />
             <PhotoUploadDialog
               onUpload={handleFileUpload}
               isUploading={isUploading}
               selectedEventId={selectedEventId}
+              onEventChange={setSelectedEventId}
+              events={events}
             />
-          )}
+          </div>
         </div>
 
         <Card>
@@ -73,25 +91,26 @@ const PhotosPage = () => {
             <CardTitle>Event Photos</CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[500px]">
-              {photos.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-96 space-y-4">
-                  <ImagePlus className="h-16 w-16 text-muted-foreground" />
-                  <p className="text-lg text-muted-foreground">No photos uploaded yet</p>
-                  <PhotoUploadDialog
-                    onUpload={handleFileUpload}
-                    isUploading={isUploading}
-                    selectedEventId={selectedEventId}
-                  />
-                </div>
-              ) : (
-                <PhotoGrid
-                  photos={photos}
-                  onStartSlideshow={startSlideshow}
-                  onDownload={downloadPhoto}
+            {photos.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-96 space-y-4">
+                <ImagePlus className="h-16 w-16 text-muted-foreground" />
+                <p className="text-lg text-muted-foreground">No photos uploaded yet</p>
+                <PhotoUploadDialog
+                  onUpload={handleFileUpload}
+                  isUploading={isUploading}
+                  selectedEventId={selectedEventId}
+                  onEventChange={setSelectedEventId}
+                  events={events}
                 />
-              )}
-            </ScrollArea>
+              </div>
+            ) : (
+              <PhotoGrid
+                photos={photos}
+                onStartSlideshow={startSlideshow}
+                onDownload={downloadPhoto}
+                searchTerm={searchTerm}
+              />
+            )}
           </CardContent>
         </Card>
 
