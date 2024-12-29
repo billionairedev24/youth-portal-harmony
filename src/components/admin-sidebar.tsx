@@ -31,12 +31,12 @@ export function AdminSidebar() {
         variant="ghost"
         size="icon"
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-4 top-7 z-50 h-8 w-8 rounded-full border-2 border-gold-300 bg-gradient-to-br from-gold-50 to-gold-100 shadow-lg hover:bg-gold-200/50 hover:shadow-xl transition-all"
+        className="absolute -right-5 top-20 z-50 h-10 w-10 rounded-full border-2 border-gold-300 bg-gradient-to-br from-gold-50 to-gold-100 shadow-lg hover:bg-gold-200/50 hover:shadow-xl transition-all"
       >
         {collapsed ? (
-          <ChevronRight className="h-5 w-5 text-gold-800" />
+          <ChevronRight className="h-6 w-6 text-gold-900" />
         ) : (
-          <ChevronLeft className="h-5 w-5 text-gold-800" />
+          <ChevronLeft className="h-6 w-6 text-gold-900" />
         )}
       </Button>
       <div className="flex h-full flex-col">

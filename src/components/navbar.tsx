@@ -28,7 +28,7 @@ export function Navbar() {
     .join("");
 
   return (
-    <header className="w-full bg-gradient-to-r from-gold-50 to-gold-100/90 backdrop-blur-sm">
+    <header className="w-full bg-gradient-to-r from-gold-50/50 to-gold-100/50 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex-1" /> {/* Spacer */}
         
@@ -40,7 +40,9 @@ export function Navbar() {
                 className="relative h-10 w-10 rounded-full hover:bg-gold-200/50"
               >
                 <Avatar className="h-10 w-10 border-2 border-gold-200">
-                  <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
+                  {mockUser.avatar ? (
+                    <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
+                  ) : null}
                   <AvatarFallback className="bg-gold-100 text-gold-900 font-semibold">
                     {userInitials}
                   </AvatarFallback>
