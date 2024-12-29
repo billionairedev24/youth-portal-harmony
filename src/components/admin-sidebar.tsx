@@ -6,6 +6,7 @@ import {
   Users,
   Vote,
   LayoutDashboard,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -43,6 +44,7 @@ export function AdminSidebar() {
     { icon: Calendar, label: "Events", href: "/admin/events" },
     { icon: Vote, label: "Polls", href: "/admin/polls" },
     { icon: Users, label: "Members", href: "/admin/members" },
+    { icon: MessageSquare, label: "Suggestions", href: "/admin/suggestions" },
   ];
 
   const handleNavigation = (href: string) => {
