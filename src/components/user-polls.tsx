@@ -11,6 +11,7 @@ import { Progress } from "./ui/progress";
 export function UserPolls() {
   const { polls, vote } = usePollsStore();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [editingPollId, setEditingPollId] = useState<string | null>(null);
 
   const activePollsExist = polls.some((poll) => poll.status === "active");
 
@@ -26,15 +27,16 @@ export function UserPolls() {
     
     // Check if user has already voted
     const poll = polls.find(p => p.id === pollId);
-    if (poll?.votes.some(v => v.userId === userId)) {
+    if (poll?.votes.some(v => v.userId === userId) && !editingPollId) {
       toast.error("You have already voted in this poll");
       return;
     }
 
     vote(pollId, userId, selectedOption);
-    toast.success("Vote submitted successfully!");
+    toast.success(editingPollId ? "Vote updated successfully!" : "Vote submitted successfully!");
     
-    // Clear the selection
+    // Clear the editing state and selection
+    setEditingPollId(null);
     setSelectedOptions(prev => ({
       ...prev,
       [pollId]: ""
@@ -59,6 +61,22 @@ export function UserPolls() {
     // In a real app, you'd get the actual user ID from auth
     const userId = "user-1";
     return poll.votes.some((vote: any) => vote.userId === userId);
+  };
+
+  const getUserVote = (poll: any) => {
+    // In a real app, you'd get the actual user ID from auth
+    const userId = "user-1";
+    const userVote = poll.votes.find((vote: any) => vote.userId === userId);
+    return userVote?.option || "";
+  };
+
+  const handleEditVote = (pollId: string) => {
+    const userVote = getUserVote(polls.find(p => p.id === pollId));
+    setSelectedOptions(prev => ({
+      ...prev,
+      [pollId]: userVote
+    }));
+    setEditingPollId(pollId);
   };
 
   if (!activePollsExist) {
@@ -96,9 +114,21 @@ export function UserPolls() {
                 {poll.startDate} - {poll.endDate}
               </div>
               
-              {hasUserVoted(poll) ? (
+              {hasUserVoted(poll) && editingPollId !== poll.id ? (
                 <div className="space-y-4">
-                  <div className="text-sm font-medium">Results:</div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium text-green-600">
+                      Thank you for participating! Your vote has been recorded.
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditVote(poll.id)}
+                    >
+                      Change Vote
+                    </Button>
+                  </div>
+                  <div className="text-sm font-medium">Current Results:</div>
                   {calculateResults(poll).results.map((result: any) => (
                     <div key={result.option} className="space-y-2">
                       <div className="flex justify-between text-sm">
@@ -114,6 +144,11 @@ export function UserPolls() {
                 </div>
               ) : (
                 <>
+                  {editingPollId === poll.id && (
+                    <div className="text-sm text-amber-600 mb-4">
+                      You're changing your previous vote. Select a new option and submit to update your vote.
+                    </div>
+                  )}
                   <RadioGroup
                     value={selectedOptions[poll.id]}
                     onValueChange={(value) =>
@@ -135,7 +170,7 @@ export function UserPolls() {
                     onClick={() => handleVote(poll.id)}
                     className="w-full"
                   >
-                    Submit Vote
+                    {editingPollId === poll.id ? "Update Vote" : "Submit Vote"}
                   </Button>
                 </>
               )}
