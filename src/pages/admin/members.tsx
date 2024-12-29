@@ -10,16 +10,20 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Eye, EyeOff, MoreHorizontal, MessageSquare, UserCog } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useMembersStore } from "@/stores/members-store";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Member, NotificationPreference } from "@/stores/members-store";
+import { MemberDialog } from "@/components/member-dialog";
+import { MessageMemberDialog } from "@/components/message-member-dialog";
 
 const MembersPage = () => {
   const { members, toggleRole } = useMembersStore();
-  const { toast } = useToast();
   const [hiddenEmails, setHiddenEmails] = useState<Record<string, boolean>>({});
   const [hiddenPhones, setHiddenPhones] = useState<Record<string, boolean>>({});
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
   const toggleEmailVisibility = (id: string) => {
     setHiddenEmails((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -65,7 +69,7 @@ const MembersPage = () => {
       header: "Email",
       cell: ({ row }) => {
         const member = row.original;
-        const isHidden = hiddenEmails[member.id];
+        const isHidden = hiddenEmails[member.id] ?? true; // Default to hidden
         return (
           <div className="flex items-center gap-2">
             <span>{isHidden ? maskEmail(member.email) : member.email}</span>
@@ -90,7 +94,7 @@ const MembersPage = () => {
       header: "Phone",
       cell: ({ row }) => {
         const member = row.original;
-        const isHidden = hiddenPhones[member.id];
+        const isHidden = hiddenPhones[member.id] ?? true; // Default to hidden
         return (
           <div className="flex items-center gap-2">
             <span>{isHidden ? maskPhone(member.phone) : member.phone}</span>
@@ -125,6 +129,16 @@ const MembersPage = () => {
       },
     },
     {
+      accessorKey: "role",
+      header: "Role",
+      cell: ({ row }) => {
+        const member = row.original;
+        return (
+          <span className="capitalize">{member.role}</span>
+        );
+      },
+    },
+    {
       id: "actions",
       cell: ({ row }) => {
         const member = row.original;
@@ -138,10 +152,8 @@ const MembersPage = () => {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => {
-                  toast({
-                    title: "View member",
-                    description: "This functionality will be implemented soon.",
-                  });
+                  setSelectedMember(member);
+                  setViewDialogOpen(true);
                 }}
               >
                 <Eye className="mr-2 h-4 w-4" />
@@ -149,10 +161,8 @@ const MembersPage = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  toast({
-                    title: "Message member",
-                    description: "This functionality will be implemented soon.",
-                  });
+                  setSelectedMember(member);
+                  setMessageDialogOpen(true);
                 }}
               >
                 <MessageSquare className="mr-2 h-4 w-4" />
@@ -161,10 +171,7 @@ const MembersPage = () => {
               <DropdownMenuItem
                 onClick={() => {
                   toggleRole(member.id);
-                  toast({
-                    title: "Role updated",
-                    description: `${member.firstName} ${member.lastName} is now a ${member.role === "admin" ? "member" : "admin"}.`,
-                  });
+                  toast.success(`${member.firstName}'s role updated to ${member.role === "admin" ? "member" : "admin"}`);
                 }}
               >
                 <UserCog className="mr-2 h-4 w-4" />
@@ -206,6 +213,18 @@ const MembersPage = () => {
           />
         )}
       </div>
+
+      <MemberDialog
+        member={selectedMember}
+        open={viewDialogOpen}
+        onOpenChange={setViewDialogOpen}
+      />
+
+      <MessageMemberDialog
+        member={selectedMember}
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+      />
     </AdminLayout>
   );
 };
