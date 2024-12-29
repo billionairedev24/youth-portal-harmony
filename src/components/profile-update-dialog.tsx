@@ -3,6 +3,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { mockUser } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -62,7 +63,7 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
           <DialogDescription>
@@ -70,129 +71,131 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex flex-col items-center gap-4">
-              <Avatar className="h-24 w-24 cursor-pointer relative group">
-                <AvatarImage src={imagePreview || mockUser.avatar} />
-                <AvatarFallback>{mockUser.name[0]}</AvatarFallback>
-                <label 
-                  htmlFor="profile-image" 
-                  className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                >
-                  <Camera className="h-8 w-8 text-white" />
-                </label>
-                <input
-                  id="profile-image"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </Avatar>
-              <div className="text-center">
-                <h3 className="font-semibold text-lg">{mockUser.name}</h3>
-                <p className="text-sm text-muted-foreground">{mockUser.email}</p>
+        <ScrollArea className="flex-1 pr-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="flex flex-col items-center gap-4">
+                <Avatar className="h-24 w-24 cursor-pointer relative group">
+                  <AvatarImage src={imagePreview || mockUser.avatar} />
+                  <AvatarFallback>{mockUser.name[0]}</AvatarFallback>
+                  <label 
+                    htmlFor="profile-image" 
+                    className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <Camera className="h-8 w-8 text-white" />
+                  </label>
+                  <input
+                    id="profile-image"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </Avatar>
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg">{mockUser.name}</h3>
+                  <p className="text-sm text-muted-foreground">{mockUser.email}</p>
+                </div>
               </div>
-            </div>
 
-            <FormField
-              control={form.control}
-              name="nickname"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nickname</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your nickname" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="nickname"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nickname</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your nickname" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
-                <LinkIcon className="h-4 w-4" />
-                Social Links
-              </h4>
-              <div className="grid gap-4">
-                <FormField
-                  control={form.control}
-                  name="twitter"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Twitter</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://twitter.com/username" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="linkedin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>LinkedIn</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://linkedin.com/in/username" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="github"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>GitHub</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://github.com/username" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="space-y-4">
+                <h4 className="font-medium flex items-center gap-2">
+                  <LinkIcon className="h-4 w-4" />
+                  Social Links
+                </h4>
+                <div className="grid gap-4">
+                  <FormField
+                    control={form.control}
+                    name="twitter"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Twitter</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://twitter.com/username" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="linkedin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>LinkedIn</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://linkedin.com/in/username" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="github"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>GitHub</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://github.com/username" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-            </div>
 
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your address" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="bio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bio</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Tell us about yourself" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bio</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Tell us about yourself" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="flex justify-end">
-              <Button type="submit" className="bg-gradient-to-r from-gold-400 to-gold-600 text-white">
-                Save changes
-              </Button>
-            </div>
-          </form>
-        </Form>
+              <div className="flex justify-end">
+                <Button type="submit" className="bg-gradient-to-r from-gold-400 to-gold-600 text-white">
+                  Save changes
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
