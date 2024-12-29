@@ -8,6 +8,7 @@ import AdminDashboard from "./pages/admin/Index";
 import UserDashboard from "./pages/dashboard/Index";
 import EventsPage from "./pages/admin/events";
 import PollsPage from "./pages/admin/polls";
+import MembersPage from "./pages/admin/members";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/admin/events" element={<EventsPage />} />
           <Route path="/admin/polls" element={<PollsPage />} />
+          <Route path="/admin/members" element={<MembersPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
