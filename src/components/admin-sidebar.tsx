@@ -59,9 +59,9 @@ export function AdminSidebar() {
   return (
     <aside
       className={cn(
-        "min-h-screen sticky top-0 flex-shrink-0 bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm transition-all duration-300 relative",
+        "sticky top-0 flex-shrink-0 h-screen bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm transition-all duration-300",
         collapsed ? "w-16" : "w-64",
-        isMobile && "w-16 h-[100dvh]"
+        isMobile && "fixed inset-y-0 left-0 w-16"
       )}
     >
       {!isMobile && (
