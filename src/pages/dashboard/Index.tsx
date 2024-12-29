@@ -1,41 +1,188 @@
 import { UserLayout } from "@/components/user-layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { useEventsStore } from "@/stores/events-store";
 import { useState } from "react";
-import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
-import { CalendarSection } from "@/components/dashboard/calendar-section";
-import { EventsSection } from "@/components/dashboard/events-section";
-import { PollsSection } from "@/components/dashboard/polls-section";
-import { MessageSquarePlus } from "lucide-react";
+import { format, isSameDay, parseISO } from "date-fns";
+import { CalendarDays, Clock, MapPin, MessageSquarePlus } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { UserPolls } from "@/components/user-polls";
 import { Button } from "@/components/ui/button";
+import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
 
 const UserDashboard = () => {
+  const { events } = useEventsStore();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [showSuggestionDialog, setShowSuggestionDialog] = useState(false);
+  
+  const activeEvents = events.filter(event => !event.archived);
+
+  const selectedDateEvents = activeEvents.filter(event => {
+    const eventDate = parseISO(event.date);
+    return date ? isSameDay(eventDate, date) : isSameDay(eventDate, new Date());
+  });
+
+  const eventDates = activeEvents.reduce((acc, event) => {
+    const eventDate = parseISO(event.date);
+    acc[format(eventDate, 'yyyy-MM-dd')] = event;
+    return acc;
+  }, {} as Record<string, typeof activeEvents[0]>);
+
+  const modifiers = {
+    hasEvent: (date: Date) => {
+      return format(date, 'yyyy-MM-dd') in eventDates;
+    }
+  };
+
+  const modifiersStyles = {
+    hasEvent: {
+      fontWeight: 'bold',
+      backgroundColor: 'rgba(234, 179, 8, 0.1)'
+    }
+  };
+
+  const renderEventTooltip = (date: Date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const event = eventDates[dateStr];
+    
+    if (!event) return null;
+
+    return (
+      <HoverCardContent className="w-80">
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">{event.title}</h4>
+          <p className="text-sm text-muted-foreground">{event.objectives}</p>
+          <div className="flex flex-col gap-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>{event.time}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>{event.location}</span>
+            </div>
+          </div>
+        </div>
+      </HoverCardContent>
+    );
+  };
 
   return (
     <UserLayout>
-      <div className="animate-fade-in">
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex justify-end">
+          <Button 
             onClick={() => setShowSuggestionDialog(true)}
-            size="lg"
-            className="bg-gradient-to-r from-gold-400 to-gold-600 text-white hover:from-gold-500 hover:to-gold-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 rounded-full p-4"
+            className="bg-gold-500 hover:bg-gold-600 text-white"
           >
-            <MessageSquarePlus className="w-6 h-6" />
+            <MessageSquarePlus className="w-4 h-4 mr-2" />
+            Create Suggestion
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4">
-          <div className="xl:col-span-1 bg-gradient-to-br from-gold-50/50 to-gold-100/30 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4">
-            <CalendarSection date={date} setDate={setDate} />
-          </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Calendar</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="relative">
+                {Object.entries(eventDates).map(([dateStr, event]) => {
+                  const eventDate = parseISO(dateStr);
+                  const dayOfMonth = eventDate.getDate();
+                  const weekOfMonth = Math.floor((dayOfMonth - 1) / 7);
+                  const dayOffset = dayOfMonth % 7;
+                  
+                  return (
+                    <HoverCard key={dateStr}>
+                      <HoverCardTrigger asChild>
+                        <button 
+                          className="absolute w-9 h-9 z-10"
+                          style={{
+                            left: `${(dayOffset * 40) + 16}px`,
+                            top: `${(weekOfMonth * 40) + 40}px`,
+                            opacity: 0,
+                          }}
+                        />
+                      </HoverCardTrigger>
+                      {renderEventTooltip(eventDate)}
+                    </HoverCard>
+                  );
+                })}
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  className="rounded-md border"
+                  modifiers={modifiers}
+                  modifiersStyles={modifiersStyles}
+                  classNames={{
+                    day_selected: "bg-gold-500 text-primary-foreground hover:bg-gold-500 hover:text-primary-foreground focus:bg-gold-500 focus:text-primary-foreground",
+                    day_today: "bg-accent text-accent-foreground",
+                  }}
+                />
+              </div>
+            </CardContent>
+          </Card>
           
-          <div className="md:col-span-2 xl:col-span-2 bg-gradient-to-br from-gold-50/50 to-gold-100/30 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4">
-            <EventsSection date={date} />
-          </div>
-          
-          <div className="md:col-span-2 xl:col-span-3 bg-gradient-to-br from-gold-50/50 to-gold-100/30 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4">
-            <PollsSection />
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {selectedDateEvents.length > 0 
+                  ? `Events on ${format(date || new Date(), 'MMMM d, yyyy')}`
+                  : "Upcoming Events"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[300px] pr-4">
+                <div className="space-y-4">
+                  {(selectedDateEvents.length > 0 ? selectedDateEvents : activeEvents)
+                    .map((event) => (
+                      <div
+                        key={event.id}
+                        className="p-4 rounded-lg bg-secondary/50 space-y-2"
+                      >
+                        <h3 className="font-semibold text-lg">{event.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {event.objectives}
+                        </p>
+                        <div className="flex flex-col gap-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <CalendarDays className="h-4 w-4" />
+                            <span>{format(parseISO(event.date), 'MMMM d, yyyy')}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            <span>{event.time}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            <span>{event.location}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  {(selectedDateEvents.length === 0 && activeEvents.length === 0) && (
+                    <p className="text-muted-foreground text-center py-4">
+                      No upcoming events
+                    </p>
+                  )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Polls</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UserPolls />
+            </CardContent>
+          </Card>
         </div>
 
         <CreateSuggestionDialog
