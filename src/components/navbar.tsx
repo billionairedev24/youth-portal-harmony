@@ -22,6 +22,7 @@ export function Navbar() {
   const location = useLocation();
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -35,12 +36,19 @@ export function Navbar() {
     .map((n) => n[0])
     .join("");
 
-  const handleProfileDialogChange = (open: boolean) => {
-    setShowProfileDialog(open);
+  const handleProfileClick = () => {
+    setIsDropdownOpen(false);
+    setShowProfileDialog(true);
   };
 
-  const handleSettingsDialogChange = (open: boolean) => {
-    setShowSettingsDialog(open);
+  const handleSettingsClick = () => {
+    setIsDropdownOpen(false);
+    setShowSettingsDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setShowProfileDialog(false);
+    setShowSettingsDialog(false);
   };
 
   return (
@@ -58,7 +66,7 @@ export function Navbar() {
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
-            <DropdownMenu>
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -93,20 +101,14 @@ export function Navbar() {
                 <DropdownMenuGroup>
                   <DropdownMenuItem 
                     className="hover:bg-gold-200/50"
-                    onSelect={(event) => {
-                      event.preventDefault();
-                      handleProfileDialogChange(true);
-                    }}
+                    onSelect={handleProfileClick}
                   >
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className="hover:bg-gold-200/50"
-                    onSelect={(event) => {
-                      event.preventDefault();
-                      handleSettingsDialogChange(true);
-                    }}
+                    onSelect={handleSettingsClick}
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
@@ -128,12 +130,12 @@ export function Navbar() {
 
       <ProfileUpdateDialog 
         open={showProfileDialog} 
-        onOpenChange={handleProfileDialogChange}
+        onOpenChange={handleDialogClose}
       />
 
       <SettingsDialog
         open={showSettingsDialog}
-        onOpenChange={handleSettingsDialogChange}
+        onOpenChange={handleDialogClose}
       />
     </>
   );
