@@ -10,7 +10,9 @@ import { PhotosContent } from "@/components/photos/photos-content";
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const events = useEventsStore((state) => state.events.filter(event => !event.archived));
-  const defaultEventId = useMemo(() => events[0]?.id || "", [events]);
+  
+  // Use useMemo to prevent unnecessary recalculations
+  const defaultEventId = useMemo(() => events[0]?.id || "", []);
   const [selectedEventId, setSelectedEventId] = useState(defaultEventId);
   const [isUploading, setIsUploading] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
@@ -29,7 +31,7 @@ const PhotosPage = () => {
         date: new Date().toISOString(),
       }));
 
-      setPhotos([...photos, ...newPhotos]);
+      setPhotos(prev => [...prev, ...newPhotos]);
       toast.success("Photos uploaded successfully");
     } catch (error) {
       toast.error("Failed to upload photos");
