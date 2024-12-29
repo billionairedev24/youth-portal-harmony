@@ -69,7 +69,7 @@ export function AdminSidebar() {
           variant="ghost"
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-4 top-20 z-50 bg-gradient-to-br from-gold-50 to-gold-100 hover:bg-gold-200/50 transition-all"
+          className="absolute -right-4 top-20 z-50 hover:bg-transparent"
         >
           {collapsed ? (
             <ChevronRight className="h-6 w-6 text-gold-900" />
