@@ -1,73 +1,43 @@
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Spinner } from "@/components/ui/spinner";
 import { Event } from "@/stores/events-store";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 interface EventDialogProps {
   event: Event | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave?: (event: Partial<Event>) => void;
+  onSave: (event: Event) => void;
   mode: "view" | "edit";
 }
 
 export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDialogProps) {
-  const [formData, setFormData] = useState<Partial<Event>>({});
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (event) {
-      setFormData(event);
+      setEditingEvent({ ...event });
     }
   }, [event]);
 
-  if (!event) return null;
+  if (!editingEvent) return null;
 
-  const handleSave = () => {
-    onSave?.(formData);
-    onOpenChange(false);
-  };
-
-  const renderField = (label: string, value: string | undefined, fieldName: keyof Event) => {
-    return (
-      <div className="grid gap-2">
-        <label htmlFor={fieldName} className="text-sm font-medium text-muted-foreground">
-          {label}
-        </label>
-        {mode === "edit" ? (
-          fieldName === "objectives" ? (
-            <Textarea
-              id={fieldName}
-              value={formData[fieldName] || ""}
-              onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
-              className="resize-none min-h-[100px] bg-secondary/50 border-0 focus-visible:ring-0"
-              placeholder={`Enter ${label.toLowerCase()}`}
-            />
-          ) : (
-            <Input
-              id={fieldName}
-              type={fieldName === "date" ? "date" : fieldName === "time" ? "time" : "text"}
-              value={formData[fieldName] || ""}
-              onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
-              className="bg-secondary/50 border-0 focus-visible:ring-0"
-              placeholder={`Enter ${label.toLowerCase()}`}
-            />
-          )
-        ) : (
-          <div className="text-sm bg-secondary/50 p-3 rounded-md min-h-[2.5rem] flex items-center">
-            {value || "N/A"}
-          </div>
-        )}
-      </div>
-    );
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      await onSave(editingEvent);
+      toast.success("Event updated successfully");
+      onOpenChange(false);
+    } catch (error) {
+      toast.error("Failed to update event");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -75,28 +45,111 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
       <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            {mode === "edit" ? "Edit Event" : "Event Details"}
+            {mode === "view" ? "Event Details" : "Edit Event"}
           </DialogTitle>
+          {mode === "edit" && (
+            <DialogDescription>
+              Make changes to your event here. Click save when you're done.
+            </DialogDescription>
+          )}
         </DialogHeader>
-        
+
         <ScrollArea className="flex-1 pr-4">
           <div className="grid gap-6 py-4">
-            {renderField("Title", event.title, "title")}
-            {renderField("Objectives", event.objectives, "objectives")}
-            {renderField("Personnel", event.personnel, "personnel")}
-            {renderField("Location", event.location, "location")}
-            
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={editingEvent.title}
+                onChange={(e) =>
+                  setEditingEvent({ ...editingEvent, title: e.target.value })
+                }
+                readOnly={mode === "view"}
+                className="bg-secondary/50 border-0 focus-visible:ring-0"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="objectives">Objectives</Label>
+              <Input
+                id="objectives"
+                value={editingEvent.objectives}
+                onChange={(e) =>
+                  setEditingEvent({ ...editingEvent, objectives: e.target.value })
+                }
+                readOnly={mode === "view"}
+                className="bg-secondary/50 border-0 focus-visible:ring-0"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="personnel">Personnel</Label>
+              <Input
+                id="personnel"
+                value={editingEvent.personnel}
+                onChange={(e) =>
+                  setEditingEvent({ ...editingEvent, personnel: e.target.value })
+                }
+                readOnly={mode === "view"}
+                className="bg-secondary/50 border-0 focus-visible:ring-0"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={editingEvent.location}
+                onChange={(e) =>
+                  setEditingEvent({ ...editingEvent, location: e.target.value })
+                }
+                readOnly={mode === "view"}
+                className="bg-secondary/50 border-0 focus-visible:ring-0"
+              />
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {renderField("Date", event.date, "date")}
-              {renderField("Time", event.time, "time")}
+              <div>
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={editingEvent.date}
+                  onChange={(e) =>
+                    setEditingEvent({ ...editingEvent, date: e.target.value })
+                  }
+                  readOnly={mode === "view"}
+                  className="bg-secondary/50 border-0 focus-visible:ring-0"
+                />
+              </div>
+              <div>
+                <Label htmlFor="time">Time</Label>
+                <Input
+                  id="time"
+                  type="time"
+                  value={editingEvent.time}
+                  onChange={(e) =>
+                    setEditingEvent({ ...editingEvent, time: e.target.value })
+                  }
+                  readOnly={mode === "view"}
+                  className="bg-secondary/50 border-0 focus-visible:ring-0"
+                />
+              </div>
             </div>
           </div>
         </ScrollArea>
 
         {mode === "edit" && (
           <DialogFooter className="mt-6">
-            <Button onClick={handleSave} className="w-full sm:w-auto">
-              Save changes
+            <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
+              {isSaving ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" />
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                "Save changes"
+              )}
             </Button>
           </DialogFooter>
         )}

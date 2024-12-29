@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Spinner } from "@/components/ui/spinner";
 import { Poll } from "@/stores/polls-store";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -132,7 +133,14 @@ export function EditPollDialog({ poll, open, onOpenChange, onSave }: EditPollDia
 
         <DialogFooter className="mt-6">
           <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
-            {isSaving ? "Saving..." : "Save changes"}
+            {isSaving ? (
+              <div className="flex items-center gap-2">
+                <Spinner size="sm" />
+                <span>Saving...</span>
+              </div>
+            ) : (
+              "Save changes"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
