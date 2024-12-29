@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ProfileImageUpload } from "./profile/profile-image-upload";
 import { SocialLinksSection } from "./profile/social-links-section";
 import { profileFormSchema, type ProfileFormValues } from "./profile/profile-form-schema";
+import { getMockAddressSuggestions } from "@/lib/mock-addresses";
 
 interface ProfileUpdateDialogProps {
   open: boolean;
@@ -19,6 +20,8 @@ interface ProfileUpdateDialogProps {
 
 export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -41,6 +44,18 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleAddressInput = (value: string, onChange: (...event: any[]) => void) => {
+    onChange(value);
+    const suggestions = getMockAddressSuggestions(value);
+    setAddressSuggestions(suggestions);
+    setShowSuggestions(suggestions.length > 0);
+  };
+
+  const handleAddressSelect = (address: string, onChange: (...event: any[]) => void) => {
+    onChange(address);
+    setShowSuggestions(false);
   };
 
   const onSubmit = (data: ProfileFormValues) => {
@@ -91,14 +106,29 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
                 control={form.control}
                 name="address"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="relative">
                     <FormLabel>Address</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Enter your address" 
-                        {...field} 
+                        {...field}
+                        onChange={(e) => handleAddressInput(e.target.value, field.onChange)}
+                        onFocus={() => setShowSuggestions(addressSuggestions.length > 0)}
                       />
                     </FormControl>
+                    {showSuggestions && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+                        {addressSuggestions.map((suggestion, index) => (
+                          <div
+                            key={index}
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleAddressSelect(suggestion, field.onChange)}
+                          >
+                            {suggestion}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
