@@ -1,11 +1,11 @@
 import { UserLayout } from "@/components/user-layout";
-import { Button } from "@/components/ui/button";
-import { MessageSquarePlus, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
 import { CalendarSection } from "@/components/dashboard/calendar-section";
 import { EventsSection } from "@/components/dashboard/events-section";
 import { PollsSection } from "@/components/dashboard/polls-section";
+import { MessageSquarePlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const UserDashboard = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -13,32 +13,29 @@ const UserDashboard = () => {
 
   return (
     <UserLayout>
-      <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gold-900 flex items-center gap-2">
-            <Sparkles className="h-8 w-8 text-gold-500" />
-            Your Dashboard
-          </h1>
-          <Button 
+      <div className="animate-fade-in">
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
             onClick={() => setShowSuggestionDialog(true)}
-            className="bg-gradient-to-r from-gold-400 to-gold-600 text-white hover:from-gold-500 hover:to-gold-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            size="lg"
+            className="bg-gradient-to-r from-gold-400 to-gold-600 text-white hover:from-gold-500 hover:to-gold-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 rounded-full p-4"
           >
-            <MessageSquarePlus className="w-4 h-4 mr-2" />
-            Share Your Ideas
+            <MessageSquarePlus className="w-6 h-6" />
           </Button>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4">
+          <div className="xl:col-span-1 bg-gradient-to-br from-gold-50/50 to-gold-100/30 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4">
             <CalendarSection date={date} setDate={setDate} />
           </div>
-          <div className="lg:col-span-1 xl:col-span-2">
+          
+          <div className="md:col-span-2 xl:col-span-2 bg-gradient-to-br from-gold-50/50 to-gold-100/30 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4">
             <EventsSection date={date} />
           </div>
-        </div>
-
-        <div className="grid gap-6">
-          <PollsSection />
+          
+          <div className="md:col-span-2 xl:col-span-3 bg-gradient-to-br from-gold-50/50 to-gold-100/30 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4">
+            <PollsSection />
+          </div>
         </div>
 
         <CreateSuggestionDialog
