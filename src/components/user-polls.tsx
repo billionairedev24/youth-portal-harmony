@@ -6,13 +6,11 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
-import { PollDetailsDialog } from "./poll-details-dialog";
+import { Progress } from "./ui/progress";
 
 export function UserPolls() {
   const { polls, vote } = usePollsStore();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
-  const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
-  const [showResults, setShowResults] = useState(false);
 
   const activePollsExist = polls.some((poll) => poll.status === "active");
 
@@ -41,10 +39,26 @@ export function UserPolls() {
       ...prev,
       [pollId]: ""
     }));
+  };
 
-    // Show results dialog
-    setSelectedPollId(pollId);
-    setShowResults(true);
+  const calculateResults = (poll: any) => {
+    const totalVotes = poll.votes.length;
+    const results = poll.options.map((option: string) => {
+      const optionVotes = poll.votes.filter((vote: any) => vote.option === option).length;
+      const percentage = totalVotes === 0 ? 0 : (optionVotes / totalVotes) * 100;
+      return {
+        option,
+        votes: optionVotes,
+        percentage: Math.round(percentage)
+      };
+    });
+    return { results, totalVotes };
+  };
+
+  const hasUserVoted = (poll: any) => {
+    // In a real app, you'd get the actual user ID from auth
+    const userId = "user-1";
+    return poll.votes.some((vote: any) => vote.userId === userId);
   };
 
   if (!activePollsExist) {
@@ -81,38 +95,53 @@ export function UserPolls() {
               <div className="text-sm text-muted-foreground">
                 {poll.startDate} - {poll.endDate}
               </div>
-              <RadioGroup
-                value={selectedOptions[poll.id]}
-                onValueChange={(value) =>
-                  setSelectedOptions((prev) => ({
-                    ...prev,
-                    [poll.id]: value,
-                  }))
-                }
-                className="space-y-2"
-              >
-                {poll.options.map((option) => (
-                  <div key={option} className="flex items-center space-x-2">
-                    <RadioGroupItem value={option} id={`${poll.id}-${option}`} />
-                    <Label htmlFor={`${poll.id}-${option}`}>{option}</Label>
+              
+              {hasUserVoted(poll) ? (
+                <div className="space-y-4">
+                  <div className="text-sm font-medium">Results:</div>
+                  {calculateResults(poll).results.map((result: any) => (
+                    <div key={result.option} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>{result.option}</span>
+                        <span>{result.percentage}% ({result.votes} votes)</span>
+                      </div>
+                      <Progress value={result.percentage} className="h-2" />
+                    </div>
+                  ))}
+                  <div className="text-sm text-muted-foreground text-center mt-4">
+                    Total votes: {calculateResults(poll).totalVotes}
                   </div>
-                ))}
-              </RadioGroup>
-              <Button
-                onClick={() => handleVote(poll.id)}
-                className="w-full"
-              >
-                Submit Vote
-              </Button>
+                </div>
+              ) : (
+                <>
+                  <RadioGroup
+                    value={selectedOptions[poll.id]}
+                    onValueChange={(value) =>
+                      setSelectedOptions((prev) => ({
+                        ...prev,
+                        [poll.id]: value,
+                      }))
+                    }
+                    className="space-y-2"
+                  >
+                    {poll.options.map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option} id={`${poll.id}-${option}`} />
+                        <Label htmlFor={`${poll.id}-${option}`}>{option}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                  <Button
+                    onClick={() => handleVote(poll.id)}
+                    className="w-full"
+                  >
+                    Submit Vote
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         ))}
-
-      <PollDetailsDialog
-        pollId={selectedPollId}
-        open={showResults}
-        onOpenChange={setShowResults}
-      />
     </div>
   );
 }
