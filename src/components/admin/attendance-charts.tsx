@@ -45,11 +45,15 @@ export function AttendanceCharts() {
             >
               <XAxis 
                 dataKey="month"
-                tick={{ fill: 'currentColor', transform: 'rotate(-90)' }}
-                height={80}
-                axisLine={{ stroke: 'currentColor' }}
+                angle={-90}
                 textAnchor="end"
+                height={100}
                 interval={0}
+                tick={{
+                  fill: 'currentColor',
+                  dy: 40,
+                }}
+                axisLine={{ stroke: 'currentColor' }}
               />
               <YAxis
                 tick={{ fill: 'currentColor' }}
@@ -63,8 +67,8 @@ export function AttendanceCharts() {
                 verticalAlign="bottom" 
                 height={36}
                 wrapperStyle={{
-                  paddingTop: '20px',
-                  marginTop: '20px'
+                  paddingTop: '40px',
+                  marginTop: '40px'
                 }}
               />
               <Bar
