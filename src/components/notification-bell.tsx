@@ -33,10 +33,16 @@ export function NotificationBell() {
         align="end"
         className="w-80 bg-gradient-to-br from-gold-50 to-gold-100"
       >
-        <ScrollArea className="h-[300px]">
+        <ScrollArea className={notifications.length === 0 ? "h-auto" : "max-h-[300px]"}>
           {notifications.length === 0 ? (
-            <div className="p-4 text-center text-sm text-gold-600">
-              No notifications
+            <div className="p-8 text-center">
+              <Bell className="h-8 w-8 text-gold-400 mx-auto mb-3" />
+              <p className="text-sm font-medium text-gold-900 mb-1">
+                No notifications yet
+              </p>
+              <p className="text-xs text-gold-600">
+                We'll notify you when something important happens
+              </p>
             </div>
           ) : (
             notifications.map((notification) => (
