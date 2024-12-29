@@ -1,12 +1,14 @@
 import { AdminLayout } from "@/components/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockEvents, mockMembers, mockPolls } from "@/lib/utils";
+import { AttendanceCharts } from "@/components/admin/attendance-charts";
 
 const AdminDashboard = () => {
   return (
     <AdminLayout>
       <div className="space-y-6 animate-fade-in">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader>
@@ -36,6 +38,8 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        <AttendanceCharts />
       </div>
     </AdminLayout>
   );
