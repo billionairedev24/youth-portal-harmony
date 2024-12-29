@@ -72,14 +72,14 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             {mode === "edit" ? "Edit Event" : "Event Details"}
           </DialogTitle>
         </DialogHeader>
         
-        <ScrollArea className="flex-1 px-1">
+        <ScrollArea className="flex-1 pr-4">
           <div className="grid gap-6 py-4">
             {renderField("Title", event.title, "title")}
             {renderField("Objectives", event.objectives, "objectives")}
