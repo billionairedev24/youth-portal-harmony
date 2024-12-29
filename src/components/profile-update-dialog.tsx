@@ -69,6 +69,10 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     if (!open) {
       resetForm();
     }
+    return () => {
+      // Cleanup function to ensure states are reset when component unmounts
+      resetForm();
+    };
   }, [open, resetForm]);
 
   const onSubmit = async (data: ProfileFormValues) => {
@@ -95,7 +99,10 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
         onOpenChange(value);
       }}
     >
-      <DialogContent className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background">
+      <DialogContent 
+        className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
+        onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+      >
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
           <DialogDescription>

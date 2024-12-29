@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Bell, Mail, MessageSquare, Calendar, Settings2 } from "lucide-react";
 import * as z from "zod";
@@ -47,6 +47,16 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     defaultValues,
   });
 
+  useEffect(() => {
+    if (!open) {
+      form.reset(defaultValues);
+    }
+    return () => {
+      // Cleanup function to ensure form is reset when component unmounts
+      form.reset(defaultValues);
+    };
+  }, [open, form]);
+
   const onSubmit = async (data: SettingsFormValues) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -61,7 +71,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background">
+      <DialogContent 
+        className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
+        onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings2 className="h-5 w-5" />
