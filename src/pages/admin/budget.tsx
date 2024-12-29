@@ -60,6 +60,11 @@ const BudgetPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newEntry.date || !newEntry.description || !newEntry.amount) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     const entry: BudgetEntry = {
       id: Date.now().toString(),
       date: newEntry.date,
@@ -67,10 +72,16 @@ const BudgetPage = () => {
       amount: parseFloat(newEntry.amount),
       type: newEntry.type as "income" | "expense",
     };
+
     setEntries([...entries, entry]);
     setIsDialogOpen(false);
     toast.success("Budget entry added successfully");
-    setNewEntry({ date: "", description: "", amount: "", type: "expense" });
+    setNewEntry({
+      date: "",
+      description: "",
+      amount: "",
+      type: "expense",
+    });
   };
 
   const totalIncome = entries
