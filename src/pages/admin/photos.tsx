@@ -13,7 +13,7 @@ import { useEventsStore } from "@/stores/events-store";
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const events = useEventsStore((state) => state.events.filter(event => !event.archived));
-  const defaultEventId = useMemo(() => events[0]?.id || "", []);
+  const defaultEventId = useMemo(() => events[0]?.id || "", [events]);
   const [selectedEventId, setSelectedEventId] = useState(defaultEventId);
   const [isUploading, setIsUploading] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
@@ -67,11 +67,12 @@ const PhotosPage = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Photo Management</h1>
-          {photos.length > 0 && (
+          {events.length > 0 && (
             <PhotoUploadDialog
               onUpload={handleFileUpload}
               isUploading={isUploading}
               selectedEventId={selectedEventId}
+              onEventChange={setSelectedEventId}
             />
           )}
         </div>
@@ -86,11 +87,14 @@ const PhotosPage = () => {
                 <div className="flex flex-col items-center justify-center h-96 space-y-4">
                   <ImagePlus className="h-16 w-16 text-muted-foreground" />
                   <p className="text-lg text-muted-foreground">No photos uploaded yet</p>
-                  <PhotoUploadDialog
-                    onUpload={handleFileUpload}
-                    isUploading={isUploading}
-                    selectedEventId={selectedEventId}
-                  />
+                  {events.length > 0 && (
+                    <PhotoUploadDialog
+                      onUpload={handleFileUpload}
+                      isUploading={isUploading}
+                      selectedEventId={selectedEventId}
+                      onEventChange={setSelectedEventId}
+                    />
+                  )}
                 </div>
               ) : (
                 <PhotoGrid

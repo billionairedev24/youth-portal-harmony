@@ -17,26 +17,26 @@ interface PhotoUploadDialogProps {
   onUpload: (files: FileList, eventId: string) => void;
   isUploading: boolean;
   selectedEventId: string;
+  onEventChange: (eventId: string) => void;
 }
 
 export const PhotoUploadDialog = ({
   onUpload,
   isUploading,
   selectedEventId,
+  onEventChange,
 }: PhotoUploadDialogProps) => {
   const events = useEventsStore((state) => 
     state.events.filter(event => !event.archived)
   );
-  
-  const [eventId, setEventId] = useState(selectedEventId || events[0]?.id || "");
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || !eventId) {
+    if (!files || !selectedEventId) {
       toast.error("Please select files and an event");
       return;
     }
-    onUpload(files, eventId);
+    onUpload(files, selectedEventId);
   };
 
   if (events.length === 0) {
@@ -46,8 +46,8 @@ export const PhotoUploadDialog = ({
   return (
     <div className="flex gap-4 items-center">
       <Select 
-        value={eventId} 
-        onValueChange={setEventId}
+        value={selectedEventId} 
+        onValueChange={onEventChange}
       >
         <SelectTrigger className="w-48">
           <SelectValue placeholder="Select Event" />
@@ -76,7 +76,7 @@ export const PhotoUploadDialog = ({
         accept="image/*"
         className="hidden"
         onChange={handleFileUpload}
-        disabled={isUploading || !eventId}
+        disabled={isUploading || !selectedEventId}
       />
     </div>
   );
