@@ -1,82 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { format, parseISO, subMonths, startOfMonth, eachMonthOfInterval } from "date-fns";
-import { Users } from "lucide-react";
 import { useEventsStore } from "@/stores/events-store";
-
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-background/95 p-4 border rounded-lg shadow-lg backdrop-blur-sm">
-        <div className="flex items-center gap-2 mb-3 pb-2 border-b">
-          <Users className="h-4 w-4 text-muted-foreground" />
-          <p className="font-semibold">{label}</p>
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Men</span>
-            <span className="text-sm font-medium">{payload[0].value}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Women</span>
-            <span className="text-sm font-medium">{payload[1].value}</span>
-          </div>
-        </div>
-        <div className="mt-3 pt-2 border-t">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-foreground">Total</span>
-            <span className="text-sm font-bold">{payload[0].value + payload[1].value}</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
+import { AttendanceTooltip } from "./attendance-tooltip";
+import { processAttendanceData } from "@/utils/attendance-utils";
 
 export function AttendanceCharts() {
   const { events } = useEventsStore();
+  const attendanceData = processAttendanceData(events);
   
-  // Filter events with attendance records
-  const eventsWithAttendance = events.filter(event => event.attendance);
-  
-  // If no attendance records, don't show the chart
-  if (eventsWithAttendance.length === 0) {
+  if (attendanceData.length === 0) {
     return null;
   }
-
-  // Get the last 12 months
-  const today = new Date();
-  const last12Months = eachMonthOfInterval({
-    start: startOfMonth(subMonths(today, 11)),
-    end: startOfMonth(today)
-  });
-
-  // Create a map of existing attendance data
-  const attendanceMap = eventsWithAttendance.reduce((acc, event) => {
-    const monthKey = format(parseISO(event.date), 'yyyy-MM');
-    if (!acc[monthKey]) {
-      acc[monthKey] = { men: 0, women: 0 };
-    }
-    acc[monthKey].men += event.attendance?.men || 0;
-    acc[monthKey].women += event.attendance?.women || 0;
-    return acc;
-  }, {} as Record<string, { men: number; women: number }>);
-
-  // Generate attendance data for all months
-  const attendanceData = last12Months.map(date => {
-    const monthKey = format(date, 'yyyy-MM');
-    const monthData = attendanceMap[monthKey] || { men: 0, women: 0 };
-    
-    return {
-      date,
-      month: format(date, 'MMM yyyy'),
-      men: monthData.men,
-      women: monthData.women,
-      total: monthData.men + monthData.women,
-    };
-  });
 
   return (
     <Card>
@@ -108,7 +43,7 @@ export function AttendanceCharts() {
                 axisLine={{ stroke: 'currentColor' }}
               />
               <Tooltip 
-                content={<CustomTooltip />}
+                content={<AttendanceTooltip />}
                 cursor={false}
               />
               <Legend 
