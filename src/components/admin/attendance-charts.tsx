@@ -36,12 +36,12 @@ export function AttendanceCharts() {
       <CardHeader>
         <CardTitle>Monthly Attendance Distribution</CardTitle>
       </CardHeader>
-      <CardContent className="pl-0">
+      <CardContent className="pl-2">
         <ChartContainer className="h-[400px] w-full" config={{}}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={monthlyAttendanceData}
-              margin={{ top: 40, right: 20, left: -20, bottom: 20 }}
+              margin={{ top: 40, right: 20, left: 0, bottom: 20 }}
             >
               <XAxis 
                 dataKey="month"
@@ -52,6 +52,7 @@ export function AttendanceCharts() {
                 tick={{
                   fill: 'currentColor',
                   dy: 0,
+                  dx: -8
                 }}
                 axisLine={{ stroke: 'currentColor' }}
               />
