@@ -1,7 +1,7 @@
 import { AdminLayout } from "@/components/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImagePlus } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { PhotoUploadDialog } from "@/components/photos/photo-upload-dialog";
 import { PhotoGrid } from "@/components/photos/photo-grid";
@@ -13,7 +13,8 @@ import { useEventsStore } from "@/stores/events-store";
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const events = useEventsStore((state) => state.events.filter(event => !event.archived));
-  const [selectedEventId, setSelectedEventId] = useState<string>("");
+  const defaultEventId = useMemo(() => events[0]?.id || "", [events]);
+  const [selectedEventId, setSelectedEventId] = useState(defaultEventId);
   const [isUploading, setIsUploading] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);

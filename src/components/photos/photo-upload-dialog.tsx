@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
   Select,
@@ -28,7 +28,15 @@ export const PhotoUploadDialog = ({
     state.events.filter(event => !event.archived)
   );
   
-  const [eventId, setEventId] = useState(selectedEventId || (events[0]?.id || ""));
+  const [eventId, setEventId] = useState(selectedEventId);
+
+  useEffect(() => {
+    if (selectedEventId && events.some(e => e.id === selectedEventId)) {
+      setEventId(selectedEventId);
+    } else if (events.length > 0 && !eventId) {
+      setEventId(events[0].id);
+    }
+  }, [selectedEventId, events]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -38,6 +46,10 @@ export const PhotoUploadDialog = ({
     }
     onUpload(files, eventId);
   };
+
+  if (events.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex gap-4 items-center">
