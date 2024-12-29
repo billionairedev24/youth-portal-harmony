@@ -23,7 +23,7 @@ export const PhotoUploadDialog = ({
   isUploading,
   selectedEventId,
   onEventChange,
-  events,
+  events = [], // Provide default empty array
 }: PhotoUploadDialogProps) => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -32,7 +32,8 @@ export const PhotoUploadDialog = ({
     e.target.value = ''; // Reset the input after upload
   };
 
-  if (events.length === 0) {
+  // Only render if we have events
+  if (!events || events.length === 0) {
     return null;
   }
 
