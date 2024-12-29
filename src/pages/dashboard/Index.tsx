@@ -71,8 +71,7 @@ const UserDashboard = () => {
   return (
     <UserLayout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gold-900">Dashboard</h1>
+        <div className="flex justify-end">
           <Button 
             onClick={() => setShowSuggestionDialog(true)}
             className="bg-gold-500 hover:bg-gold-600 text-white"
