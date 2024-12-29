@@ -52,6 +52,11 @@ export function SuggestionDialog({
               <h3 className="font-medium mb-2">Status</h3>
               <Badge
                 variant={suggestion.status === "new" ? "default" : "secondary"}
+                className={`px-3 py-1 text-sm font-medium rounded-full ${
+                  suggestion.status === "new"
+                    ? "bg-gold-100 text-gold-800 border border-gold-300"
+                    : "bg-gold-50 text-gold-600 border border-gold-200"
+                }`}
               >
                 {suggestion.status}
               </Badge>
@@ -81,7 +86,7 @@ export function SuggestionDialog({
                   placeholder="Add a comment about how this suggestion was handled..."
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  className="min-h-[100px]"
+                  className="min-h-[100px] resize-none bg-gold-50/50 border-gold-200 focus:border-gold-300 focus:ring-gold-200/50 focus:ring-offset-0 placeholder:text-gold-500/70"
                 />
               </div>
             )}
