@@ -28,15 +28,13 @@ export const PhotoUploadDialog = ({
     state.events.filter(event => !event.archived)
   );
   
-  const [eventId, setEventId] = useState(selectedEventId);
+  const [eventId, setEventId] = useState<string>("");
 
   useEffect(() => {
-    if (selectedEventId && events.some(e => e.id === selectedEventId)) {
-      setEventId(selectedEventId);
-    } else if (events.length > 0 && !eventId) {
-      setEventId(events[0].id);
+    if (!eventId) {
+      setEventId(selectedEventId || events[0]?.id || "");
     }
-  }, [selectedEventId, events]);
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
