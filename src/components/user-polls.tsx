@@ -6,10 +6,13 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { PollDetailsDialog } from "./poll-details-dialog";
 
 export function UserPolls() {
   const { polls, vote } = usePollsStore();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
+  const [showResults, setShowResults] = useState(false);
 
   const activePollsExist = polls.some((poll) => poll.status === "active");
 
@@ -38,6 +41,10 @@ export function UserPolls() {
       ...prev,
       [pollId]: ""
     }));
+
+    // Show results dialog
+    setSelectedPollId(pollId);
+    setShowResults(true);
   };
 
   if (!activePollsExist) {
@@ -100,6 +107,12 @@ export function UserPolls() {
             </CardContent>
           </Card>
         ))}
+
+      <PollDetailsDialog
+        pollId={selectedPollId}
+        open={showResults}
+        onOpenChange={setShowResults}
+      />
     </div>
   );
 }
