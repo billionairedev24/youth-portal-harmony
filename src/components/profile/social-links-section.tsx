@@ -21,7 +21,7 @@ export function SocialLinksSection({ form }: SocialLinksSectionProps) {
           name="x"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>X (formerly Twitter)</FormLabel>
+              <FormLabel>X</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="https://x.com/username" 
