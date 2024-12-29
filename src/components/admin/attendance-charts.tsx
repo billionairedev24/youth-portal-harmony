@@ -26,12 +26,12 @@ export function AttendanceCharts() {
       <CardHeader>
         <CardTitle>Monthly Attendance Distribution</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ChartContainer className="h-[400px]" config={{}}>
+      <CardContent className="pl-0">
+        <ChartContainer className="h-[400px] w-full" config={{}}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={monthlyAttendanceData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
             >
               <XAxis 
                 dataKey="month"
