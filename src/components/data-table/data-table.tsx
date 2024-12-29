@@ -10,6 +10,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type Table as TableType,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -27,6 +28,13 @@ import { downloadCSV } from "./csv-utils";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+}
+
+// Define the extended TableMeta type
+declare module '@tanstack/table-core' {
+  interface TableMeta<TData extends unknown> {
+    onExport?: () => void;
+  }
 }
 
 export function DataTable<TData, TValue>({
@@ -61,12 +69,12 @@ export function DataTable<TData, TValue>({
     ...userColumns,
   ], [userColumns]);
 
-  const handleExport = React.useCallback(() => {
+  const handleExport = React.useCallback((tableInstance: TableType<TData>) => {
     const visibleColumns = columns
       .filter((column) => 
         column.id !== "select" && 
         column.id !== "actions" && 
-        table.getColumn(column.id)?.getIsVisible()
+        tableInstance.getColumn(column.id)?.getIsVisible()
       );
     
     const headers = visibleColumns
@@ -75,8 +83,8 @@ export function DataTable<TData, TValue>({
         return typeof header === 'string' ? header : column.id;
       });
     
-    const selectedRows = table.getFilteredSelectedRowModel().rows;
-    const allRows = table.getFilteredRowModel().rows;
+    const selectedRows = tableInstance.getFilteredSelectedRowModel().rows;
+    const allRows = tableInstance.getFilteredRowModel().rows;
     const rowsToExport = Object.keys(rowSelection).length > 0 ? selectedRows : allRows;
 
     const rows = rowsToExport.map((row) =>
@@ -89,7 +97,7 @@ export function DataTable<TData, TValue>({
     );
 
     downloadCSV(headers, rows);
-  }, [columns, rowSelection, table]);
+  }, [columns, rowSelection]);
 
   const table = useReactTable({
     data,
@@ -109,7 +117,7 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
     meta: {
-      onExport: handleExport,
+      onExport: () => handleExport(table),
     },
   });
 

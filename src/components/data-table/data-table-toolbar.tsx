@@ -34,8 +34,9 @@ export function DataTableToolbar<TData>({
           size="sm"
           className="ml-auto"
           onClick={() => {
-            // Export functionality will be handled by parent
-            table.options.meta?.onExport?.();
+            if (table.options.meta?.onExport) {
+              table.options.meta.onExport();
+            }
           }}
         >
           <Download className="mr-2 h-4 w-4" />
