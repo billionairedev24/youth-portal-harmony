@@ -23,23 +23,30 @@ export function AdminSidebar() {
   return (
     <div
       className={cn(
-        "min-h-screen border-r bg-background shadow-lg transition-all duration-300",
+        "min-h-screen bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm transition-all duration-300 relative",
         collapsed ? "w-16" : "w-64"
       )}
     >
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setCollapsed(!collapsed)}
+        className="absolute -right-3 top-7 z-50 h-6 w-6 rounded-full border border-gold-200 bg-gradient-to-br from-gold-50 to-gold-100 shadow-md hover:bg-gold-200/50"
+      >
+        {collapsed ? (
+          <ChevronRight className="h-4 w-4 text-gold-600" />
+        ) : (
+          <ChevronLeft className="h-4 w-4 text-gold-600" />
+        )}
+      </Button>
       <div className="flex h-full flex-col">
-        <div className="flex h-16 items-center justify-end border-b p-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-          >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
+        <div className="flex h-16 items-center px-4">
+          <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
+          {!collapsed && (
+            <span className="ml-2 font-bold text-xl text-gold-900">
+              Youth Group
+            </span>
+          )}
         </div>
         <nav className="flex-1 space-y-2 p-2">
           {menuItems.map((item) => (
@@ -47,7 +54,7 @@ export function AdminSidebar() {
               key={item.label}
               href={item.href}
               className={cn(
-                "flex items-center space-x-2 rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100",
+                "flex items-center space-x-2 rounded-lg px-3 py-2 text-gold-800 transition-colors hover:bg-gold-200/50",
                 collapsed && "justify-center"
               )}
             >

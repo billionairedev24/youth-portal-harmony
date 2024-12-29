@@ -10,28 +10,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getGreeting, mockUser } from "@/lib/utils";
-import { Settings, User, LogOut, Menu, X } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { Settings, User, LogOut } from "lucide-react";
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gold-200 bg-gradient-to-r from-gold-50/90 to-gold-100/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-40 w-full bg-gradient-to-r from-gold-50 to-gold-100/90 backdrop-blur-sm">
+      <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            className="md:hidden hover:bg-gold-100/50"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-          <a href="/" className="flex items-center space-x-2">
-            <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
-            <span className="font-bold text-xl text-gold-900">Youth Group</span>
-          </a>
+          <span className="text-lg font-semibold text-gold-900">
+            {getGreeting()}
+          </span>
         </div>
         
         <div className="flex items-center gap-4">
@@ -39,9 +27,9 @@ export function Navbar() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-10 w-10 rounded-full hover:bg-gold-100/50"
+                className="relative h-10 w-10 rounded-full hover:bg-gold-200/50"
               >
-                <Avatar className="h-10 w-10 border-2 border-gold-300">
+                <Avatar className="h-10 w-10 border-2 border-gold-200">
                   <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
                   <AvatarFallback className="bg-gold-100 text-gold-900">
                     {mockUser.name
@@ -52,30 +40,34 @@ export function Navbar() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent 
+              className="w-56 bg-gradient-to-br from-gold-50 to-gold-100" 
+              align="end" 
+              forceMount
+            >
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {getGreeting()}, {mockUser.name}
+                  <p className="text-sm font-medium leading-none text-gold-900">
+                    {mockUser.name}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-xs leading-none text-gold-600">
                     {mockUser.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="bg-gold-200" />
               <DropdownMenuGroup>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-gold-200/50">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-gold-200/50">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuSeparator className="bg-gold-200" />
+              <DropdownMenuItem className="text-red-600 hover:bg-gold-200/50">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
