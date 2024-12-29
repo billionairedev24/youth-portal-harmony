@@ -12,8 +12,8 @@ import { useEventsStore } from "@/stores/events-store";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const events = useEventsStore((state) => state.events);
-  const [selectedEventId, setSelectedEventId] = useState(events[0]?.id || "");
+  const events = useEventsStore((state) => state.events.filter(event => !event.archived));
+  const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
