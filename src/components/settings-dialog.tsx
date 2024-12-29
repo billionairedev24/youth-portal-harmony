@@ -45,23 +45,13 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     }
   };
 
-  const handleDialogInteraction = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
     <Dialog 
       open={open} 
-      onOpenChange={(value) => {
-        if (!value) {
-          form.reset(defaultValues);
-        }
-        onOpenChange(value);
-      }}
+      onOpenChange={onOpenChange}
     >
       <DialogContent 
         className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
-        onClick={handleDialogInteraction}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

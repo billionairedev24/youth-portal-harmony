@@ -47,9 +47,6 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     if (!open) {
       resetForm();
     }
-    return () => {
-      resetForm();
-    };
   }, [open, resetForm]);
 
   const onSubmit = async (data: ProfileFormValues) => {
@@ -66,23 +63,13 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
     }
   };
 
-  const handleDialogInteraction = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
     <Dialog 
       open={open} 
-      onOpenChange={(value) => {
-        if (!value) {
-          resetForm();
-        }
-        onOpenChange(value);
-      }}
+      onOpenChange={onOpenChange}
     >
       <DialogContent 
         className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
-        onClick={handleDialogInteraction}
       >
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
