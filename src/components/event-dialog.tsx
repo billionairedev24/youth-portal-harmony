@@ -63,7 +63,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
           )
         ) : (
           <div className="text-sm bg-secondary/50 p-3 rounded-md min-h-[2.5rem] flex items-center">
-            {event[fieldName] || "N/A"}
+            {value ?? "N/A"}
           </div>
         )}
       </div>
