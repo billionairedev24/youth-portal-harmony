@@ -35,9 +35,9 @@ export function AdminSidebar() {
   ];
 
   return (
-    <div
+    <aside
       className={cn(
-        "min-h-screen bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm transition-all duration-300 relative",
+        "h-screen sticky top-0 flex-shrink-0 bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm transition-all duration-300 relative",
         collapsed ? "w-16" : "w-64",
         isMobile && "w-16"
       )}
@@ -71,12 +71,12 @@ export function AdminSidebar() {
               )}
               title={collapsed || isMobile ? item.label : undefined}
             >
-              <item.icon className="h-5 w-5" />
-              {!collapsed && !isMobile && <span>{item.label}</span>}
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && !isMobile && <span className="truncate">{item.label}</span>}
             </a>
           ))}
         </nav>
       </div>
-    </div>
+    </aside>
   );
 }
