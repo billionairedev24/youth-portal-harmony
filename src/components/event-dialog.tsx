@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Event } from "@/stores/events-store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface EventDialogProps {
   event: Event | null;
@@ -21,7 +21,13 @@ interface EventDialogProps {
 }
 
 export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDialogProps) {
-  const [formData, setFormData] = useState<Partial<Event>>(event || {});
+  const [formData, setFormData] = useState<Partial<Event>>({});
+
+  useEffect(() => {
+    if (event) {
+      setFormData(event);
+    }
+  }, [event]);
 
   if (!event) return null;
 
@@ -40,7 +46,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
           fieldName === "objectives" ? (
             <Textarea
               id={fieldName}
-              value={value || ""}
+              value={formData[fieldName] || ""}
               onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
               className="resize-none min-h-[100px] bg-secondary/50 border-0 focus-visible:ring-0"
               placeholder={`Enter ${label.toLowerCase()}`}
@@ -49,7 +55,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
             <Input
               id={fieldName}
               type={fieldName === "date" ? "date" : fieldName === "time" ? "time" : "text"}
-              value={value || ""}
+              value={formData[fieldName] || ""}
               onChange={(e) => setFormData({ ...formData, [fieldName]: e.target.value })}
               className="bg-secondary/50 border-0 focus-visible:ring-0"
               placeholder={`Enter ${label.toLowerCase()}`}
@@ -57,7 +63,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
           )
         ) : (
           <div className="text-sm bg-secondary/50 p-3 rounded-md min-h-[2.5rem] flex items-center">
-            {value || "N/A"}
+            {event[fieldName] || "N/A"}
           </div>
         )}
       </div>
@@ -75,14 +81,14 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
         
         <ScrollArea className="flex-1 px-1">
           <div className="grid gap-6 py-4">
-            {renderField("Title", formData.title, "title")}
-            {renderField("Objectives", formData.objectives, "objectives")}
-            {renderField("Personnel", formData.personnel, "personnel")}
-            {renderField("Location", formData.location, "location")}
+            {renderField("Title", event.title, "title")}
+            {renderField("Objectives", event.objectives, "objectives")}
+            {renderField("Personnel", event.personnel, "personnel")}
+            {renderField("Location", event.location, "location")}
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {renderField("Date", formData.date, "date")}
-              {renderField("Time", formData.time, "time")}
+              {renderField("Date", event.date, "date")}
+              {renderField("Time", event.time, "time")}
             </div>
           </div>
         </ScrollArea>
