@@ -15,7 +15,7 @@ export interface Poll {
 
 interface PollsStore {
   polls: Poll[];
-  addPoll: (poll: Omit<Poll, "id" | "votes">) => void;
+  addPoll: (poll: Poll) => void;
   updatePoll: (id: string, updates: Partial<Poll>) => Promise<void>;
   vote: (pollId: string, userId: string, option: string) => void;
 }
@@ -44,10 +44,7 @@ export const usePollsStore = create<PollsStore>((set) => ({
   ],
   addPoll: (poll) =>
     set((state) => ({
-      polls: [
-        ...state.polls,
-        { ...poll, id: Math.random().toString(), votes: [] },
-      ],
+      polls: [...state.polls, poll],
     })),
   updatePoll: async (id, updates) => {
     // Optimistically update the UI

@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Eye, MoreHorizontal, Pencil, XSquare, VoteIcon } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, XSquare, VoteIcon, Plus } from "lucide-react";
 import { PollDetailsDialog } from "@/components/poll-details-dialog";
 import { EditPollDialog } from "@/components/edit-poll-dialog";
 import { useState } from "react";
@@ -16,34 +16,40 @@ import { useToast } from "@/components/ui/use-toast";
 import { usePollsStore } from "@/stores/polls-store";
 
 const PollsPage = () => {
-  const { polls, updatePoll } = usePollsStore();
+  const { polls, updatePoll, addPoll } = usePollsStore();
   const { toast } = useToast();
   const [selectedPoll, setSelectedPoll] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-500";
-      case "closed":
-        return "bg-red-500";
-      default:
-        return "bg-yellow-500";
-    }
-  };
-
-  const handleEdit = (poll: any) => {
-    setSelectedPoll(poll.id);
+  const handleCreatePoll = () => {
+    setSelectedPoll(null);
+    setIsCreating(true);
     setEditDialogOpen(true);
   };
 
-  const handleSaveEdit = (updatedPoll: any) => {
-    updatePoll(updatedPoll.id, updatedPoll);
-    toast({
-      title: "Poll updated",
-      description: "The poll has been successfully updated.",
-    });
+  const handleSaveEdit = async (updatedPoll: any) => {
+    if (isCreating) {
+      const newPoll = {
+        ...updatedPoll,
+        id: Math.random().toString(),
+        status: "draft",
+        votes: [],
+      };
+      addPoll(newPoll);
+      toast({
+        title: "Poll created",
+        description: "The poll has been successfully created.",
+      });
+    } else {
+      await updatePoll(updatedPoll.id, updatedPoll);
+      toast({
+        title: "Poll updated",
+        description: "The poll has been successfully updated.",
+      });
+    }
+    setIsCreating(false);
   };
 
   const columns = [
@@ -128,15 +134,27 @@ const PollsPage = () => {
       <p className="text-sm text-muted-foreground max-w-sm text-center">
         There are no polls available at the moment. Create a new poll to start gathering feedback from your community.
       </p>
+      <Button onClick={handleCreatePoll} variant="outline" className="flex items-center gap-2">
+        <Plus className="h-4 w-4" />
+        Create your first poll
+      </Button>
     </div>
   );
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Polls</h1>
-          <p className="text-muted-foreground">Manage your polls</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Polls</h1>
+            <p className="text-muted-foreground">Manage your polls</p>
+          </div>
+          {polls.length > 0 && (
+            <Button onClick={handleCreatePoll} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create Poll
+            </Button>
+          )}
         </div>
 
         {polls.length === 0 ? (
@@ -152,9 +170,20 @@ const PollsPage = () => {
         />
 
         <EditPollDialog
-          poll={selectedPollData}
+          poll={isCreating ? {
+            id: "",
+            title: "",
+            startDate: "",
+            endDate: "",
+            options: [""],
+            status: "draft",
+            votes: []
+          } : polls.find(p => p.id === selectedPoll) || null}
           open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
+          onOpenChange={(open) => {
+            setEditDialogOpen(open);
+            if (!open) setIsCreating(false);
+          }}
           onSave={handleSaveEdit}
         />
       </div>

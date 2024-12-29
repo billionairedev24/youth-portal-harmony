@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Eye, MoreHorizontal, Pencil, Trash, Calendar, Archive } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, Trash, Calendar, Archive, Plus } from "lucide-react";
 import { EventDialog } from "@/components/event-dialog";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -18,11 +18,42 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { type Event } from "@/stores/events-store";
 
 const EventsPage = () => {
-  const { events, updateEvent, deleteEvent, toggleArchive } = useEventsStore();
+  const { events, updateEvent, deleteEvent, toggleArchive, addEvent } = useEventsStore();
   const { toast } = useToast();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [dialogMode, setDialogMode] = useState<"view" | "edit">("view");
+  const [dialogMode, setDialogMode] = useState<"view" | "edit" | "create">("view");
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleCreateEvent = () => {
+    setSelectedEvent({
+      id: Math.random().toString(),
+      title: "",
+      objectives: "",
+      personnel: "",
+      location: "",
+      date: "",
+      time: "",
+      archived: false,
+    });
+    setDialogMode("create");
+    setDialogOpen(true);
+  };
+
+  const handleSave = async (event: Event) => {
+    if (dialogMode === "create") {
+      addEvent(event);
+      toast({
+        title: "Event created",
+        description: "The event has been successfully created.",
+      });
+    } else {
+      updateEvent(event.id, event);
+      toast({
+        title: "Event updated",
+        description: "The event has been successfully updated.",
+      });
+    }
+  };
 
   const columns: ColumnDef<Event>[] = [
     {
@@ -107,10 +138,6 @@ const EventsPage = () => {
     },
   ];
 
-  const handleSave = async (event: Event) => {
-    updateEvent(event.id, event);
-  };
-
   const EmptyState = ({ type }: { type: "scheduled" | "archived" }) => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4">
       {type === "scheduled" ? (
@@ -132,11 +159,17 @@ const EventsPage = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Events</h1>
-          <p className="text-muted-foreground">
-            Manage your youth group events
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Events</h1>
+            <p className="text-muted-foreground">
+              Manage your youth group events
+            </p>
+          </div>
+          <Button onClick={handleCreateEvent} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Create Event
+          </Button>
         </div>
 
         <Tabs defaultValue="scheduled" className="space-y-4">
@@ -171,7 +204,7 @@ const EventsPage = () => {
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           onSave={handleSave}
-          mode={dialogMode}
+          mode={dialogMode === "view" ? "view" : "edit"}
         />
       </div>
     </AdminLayout>
