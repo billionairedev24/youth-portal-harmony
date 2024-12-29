@@ -28,6 +28,20 @@ const generateLastTwelveMonthsData = () => {
   return data;
 };
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background/95 p-3 border rounded-lg shadow-lg">
+        <p className="font-semibold mb-2">{label}</p>
+        <p className="text-sm">Men: {payload[0].value}</p>
+        <p className="text-sm">Women: {payload[1].value}</p>
+        <p className="text-sm font-medium mt-1 border-t pt-1">Total: {payload[0].value + payload[1].value}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function AttendanceCharts() {
   const monthlyAttendanceData = generateLastTwelveMonthsData();
 
@@ -61,7 +75,7 @@ export function AttendanceCharts() {
                 axisLine={{ stroke: 'currentColor' }}
               />
               <Tooltip 
-                content={<ChartTooltipContent />}
+                content={<CustomTooltip />}
                 cursor={false}
               />
               <Legend 
