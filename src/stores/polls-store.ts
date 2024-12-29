@@ -54,7 +54,12 @@ export const usePollsStore = create<PollsStore>((set) => ({
         poll.id === pollId
           ? {
               ...poll,
-              votes: [...poll.votes, { userId, option }],
+              votes: [
+                // Remove any existing vote by this user
+                ...poll.votes.filter((vote) => vote.userId !== userId),
+                // Add the new/updated vote
+                { userId, option }
+              ],
             }
           : poll
       ),
