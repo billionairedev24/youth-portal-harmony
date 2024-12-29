@@ -73,12 +73,9 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      // Simulate API call with delay to avoid race conditions
       await new Promise(resolve => setTimeout(resolve, 500));
-      
       console.log("Profile update data:", data);
       console.log("New profile image:", imagePreview);
-      
       toast.success("Profile updated successfully!");
       resetForm();
       onOpenChange(false);
@@ -91,12 +88,14 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
   return (
     <Dialog 
       open={open} 
-      onOpenChange={onOpenChange}
+      onOpenChange={(value) => {
+        if (!value) {
+          resetForm();
+        }
+        onOpenChange(value);
+      }}
     >
-      <DialogContent 
-        className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <DialogContent className="sm:max-w-[500px] h-[90vh] flex flex-col overflow-hidden bg-background">
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
           <DialogDescription>
@@ -146,7 +145,7 @@ export function ProfileUpdateDialog({ open, onOpenChange }: ProfileUpdateDialogP
                       />
                     </FormControl>
                     {showSuggestions && (
-                      <div className="absolute z-[60] w-full mt-1 bg-background border border-input rounded-md shadow-lg">
+                      <div className="absolute w-full mt-1 bg-background border border-input rounded-md shadow-lg">
                         {addressSuggestions.map((suggestion, index) => (
                           <div
                             key={index}
