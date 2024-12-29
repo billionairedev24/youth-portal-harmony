@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
-import { Upload, Download, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Upload, Download, ChevronLeft, ChevronRight, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 
 type Photo = {
@@ -83,33 +83,35 @@ const PhotosPage = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Photo Management</h1>
-          <div className="flex gap-4">
-            <Input
-              type="text"
-              placeholder="Select Event"
-              value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-              className="w-48"
-            />
-            <Label
-              htmlFor="photo-upload"
-              className={`cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ${
-                isUploading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Photos
-            </Label>
-            <Input
-              id="photo-upload"
-              type="file"
-              multiple
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileUpload}
-              disabled={isUploading || !selectedEventId}
-            />
-          </div>
+          {photos.length > 0 && (
+            <div className="flex gap-4">
+              <Input
+                type="text"
+                placeholder="Select Event"
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
+                className="w-48"
+              />
+              <Label
+                htmlFor="photo-upload"
+                className={`cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ${
+                  isUploading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Upload Photos
+              </Label>
+              <Input
+                id="photo-upload"
+                type="file"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileUpload}
+                disabled={isUploading || !selectedEventId}
+              />
+            </div>
+          )}
         </div>
 
         <Card>
@@ -118,36 +120,59 @@ const PhotosPage = () => {
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-[500px]">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="relative group rounded-lg overflow-hidden"
+              {photos.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-96 space-y-4">
+                  <ImagePlus className="h-16 w-16 text-muted-foreground" />
+                  <p className="text-lg text-muted-foreground">No photos uploaded yet</p>
+                  <Label
+                    htmlFor="photo-upload-empty"
+                    className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
                   >
-                    <img
-                      src={photo.url}
-                      alt={`Event photo ${photo.id}`}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => startSlideshow(photo.eventId)}
-                      >
-                        View
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => downloadPhoto(photo)}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Your First Photo
+                  </Label>
+                  <Input
+                    id="photo-upload-empty"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                    disabled={isUploading}
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {photos.map((photo) => (
+                    <div
+                      key={photo.id}
+                      className="relative group rounded-lg overflow-hidden"
+                    >
+                      <img
+                        src={photo.url}
+                        alt={`Event photo ${photo.id}`}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => startSlideshow(photo.eventId)}
+                        >
+                          View
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => downloadPhoto(photo)}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </ScrollArea>
           </CardContent>
         </Card>
