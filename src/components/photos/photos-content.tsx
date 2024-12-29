@@ -11,8 +11,6 @@ interface PhotosContentProps {
   isUploading: boolean;
   selectedEventId: string;
   onEventChange: (eventId: string) => void;
-  onStartSlideshow: (eventId: string) => void;
-  onDownload: (photo: Photo) => void;
   onDelete: (photoId: string) => void;
 }
 
@@ -23,8 +21,6 @@ export const PhotosContent = ({
   isUploading,
   selectedEventId,
   onEventChange,
-  onStartSlideshow,
-  onDownload,
   onDelete,
 }: PhotosContentProps) => {
   return (
@@ -45,8 +41,6 @@ export const PhotosContent = ({
           ) : (
             <PhotoGrid
               photos={photos}
-              onStartSlideshow={onStartSlideshow}
-              onDownload={onDownload}
               onDelete={onDelete}
             />
           )}
