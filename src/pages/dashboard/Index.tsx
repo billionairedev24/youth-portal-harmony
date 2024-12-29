@@ -14,8 +14,9 @@ const UserDashboard = () => {
   
   const activeEvents = events.filter(event => !event.archived);
 
+  // Fix: Use exact date matching for selected date events
   const selectedDateEvents = activeEvents.filter(
-    event => event.date === format(date || new Date(), 'yyyy-MM-dd')
+    event => event.date === (date ? format(date, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'))
   );
 
   const eventDates = activeEvents.reduce((acc, event) => {
@@ -32,8 +33,8 @@ const UserDashboard = () => {
 
   const modifiersStyles = {
     hasEvent: {
-      backgroundColor: 'rgba(234, 179, 8, 0.1)',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      backgroundColor: 'rgba(234, 179, 8, 0.1)'
     }
   };
 
@@ -74,21 +75,28 @@ const UserDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="relative">
-                {Object.entries(eventDates).map(([dateStr, event]) => (
-                  <HoverCard key={dateStr}>
-                    <HoverCardTrigger asChild>
-                      <button 
-                        className="absolute w-9 h-9 z-10"
-                        style={{
-                          left: `${new Date(dateStr).getDate() * 40}px`,
-                          top: `${Math.floor((new Date(dateStr).getDate() - 1) / 7) * 40}px`,
-                          opacity: 0,
-                        }}
-                      />
-                    </HoverCardTrigger>
-                    {renderEventTooltip(new Date(dateStr))}
-                  </HoverCard>
-                ))}
+                {Object.entries(eventDates).map(([dateStr, event]) => {
+                  const eventDate = new Date(dateStr);
+                  const dayOfMonth = eventDate.getDate();
+                  const weekOfMonth = Math.floor((dayOfMonth - 1) / 7);
+                  const dayOffset = dayOfMonth % 7;
+                  
+                  return (
+                    <HoverCard key={dateStr}>
+                      <HoverCardTrigger asChild>
+                        <button 
+                          className="absolute w-9 h-9 z-10"
+                          style={{
+                            left: `${(dayOffset * 40) + 16}px`,
+                            top: `${(weekOfMonth * 40) + 40}px`,
+                            opacity: 0,
+                          }}
+                        />
+                      </HoverCardTrigger>
+                      {renderEventTooltip(eventDate)}
+                    </HoverCard>
+                  );
+                })}
                 <Calendar
                   mode="single"
                   selected={date}
