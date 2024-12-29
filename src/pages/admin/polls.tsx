@@ -29,6 +29,22 @@ const PollsPage = () => {
     setEditDialogOpen(true);
   };
 
+  const handleEdit = (poll: any) => {
+    setSelectedPoll(poll.id);
+    setEditDialogOpen(true);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-green-500";
+      case "closed":
+        return "bg-red-500";
+      default:
+        return "bg-yellow-500";
+    }
+  };
+
   const handleSaveEdit = async (updatedPoll: any) => {
     if (isCreating) {
       const newPoll = {
@@ -124,8 +140,6 @@ const PollsPage = () => {
       },
     },
   ];
-
-  const selectedPollData = polls.find((p) => p.id === selectedPoll) || null;
 
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4">
