@@ -4,23 +4,33 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { format, subMonths } from "date-fns";
 
-const monthlyAttendanceData = [
-  { month: "Jan", total: 45, men: 20, women: 25 },
-  { month: "Feb", total: 52, men: 24, women: 28 },
-  { month: "Mar", total: 48, men: 22, women: 26 },
-  { month: "Apr", total: 55, men: 25, women: 30 },
-  { month: "May", total: 50, men: 23, women: 27 },
-  { month: "Jun", total: 58, men: 28, women: 30 },
-  { month: "Jul", total: 53, men: 25, women: 28 },
-  { month: "Aug", total: 60, men: 28, women: 32 },
-  { month: "Sep", total: 56, men: 26, women: 30 },
-  { month: "Oct", total: 54, men: 25, women: 29 },
-  { month: "Nov", total: 52, men: 24, women: 28 },
-  { month: "Dec", total: 50, men: 23, women: 27 },
-];
+const generateLastTwelveMonthsData = () => {
+  const data = [];
+  const currentDate = new Date();
+
+  for (let i = 11; i >= 0; i--) {
+    const date = subMonths(currentDate, i);
+    // Generate some random data for demonstration
+    const men = Math.floor(Math.random() * 30) + 15;
+    const women = Math.floor(Math.random() * 30) + 15;
+    
+    data.push({
+      date,
+      month: format(date, 'MMM yyyy'),
+      total: men + women,
+      men,
+      women,
+    });
+  }
+
+  return data;
+};
 
 export function AttendanceCharts() {
+  const monthlyAttendanceData = generateLastTwelveMonthsData();
+
   return (
     <Card>
       <CardHeader>
