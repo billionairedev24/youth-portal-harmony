@@ -4,14 +4,17 @@ import { Calendar } from "@/components/ui/calendar";
 import { useEventsStore } from "@/stores/events-store";
 import { useState } from "react";
 import { format, isSameDay, parseISO } from "date-fns";
-import { CalendarDays, Clock, MapPin } from "lucide-react";
+import { CalendarDays, Clock, MapPin, MessageSquarePlus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { UserPolls } from "@/components/user-polls";
+import { Button } from "@/components/ui/button";
+import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [showSuggestionDialog, setShowSuggestionDialog] = useState(false);
   
   const activeEvents = events.filter(event => !event.archived);
 
@@ -68,6 +71,17 @@ const UserDashboard = () => {
   return (
     <UserLayout>
       <div className="space-y-6 animate-fade-in">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gold-900">Dashboard</h1>
+          <Button 
+            onClick={() => setShowSuggestionDialog(true)}
+            className="bg-gold-500 hover:bg-gold-600 text-white"
+          >
+            <MessageSquarePlus className="w-4 h-4 mr-2" />
+            Create Suggestion
+          </Button>
+        </div>
+
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
@@ -171,9 +185,14 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        <CreateSuggestionDialog
+          open={showSuggestionDialog}
+          onOpenChange={setShowSuggestionDialog}
+        />
       </div>
     </UserLayout>
   );
-}
+};
 
 export default UserDashboard;
