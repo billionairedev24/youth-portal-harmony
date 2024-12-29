@@ -11,16 +11,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getGreeting, mockUser } from "@/lib/utils";
 import { Settings, User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // In a real app, this would clear auth tokens/state
+    localStorage.removeItem('user');
+    navigate('/');
+  };
+
+  const userInitials = mockUser.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+
   return (
-    <header className="sticky top-0 z-40 w-full bg-gradient-to-r from-gold-50 to-gold-100/90 backdrop-blur-sm">
+    <header className="w-full bg-gradient-to-r from-gold-50 to-gold-100/90 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-4">
-          <span className="text-lg font-semibold text-gold-900">
-            {getGreeting()}
-          </span>
-        </div>
+        <div className="flex-1" /> {/* Spacer */}
         
         <div className="flex items-center gap-4">
           <DropdownMenu>
@@ -31,11 +41,8 @@ export function Navbar() {
               >
                 <Avatar className="h-10 w-10 border-2 border-gold-200">
                   <AvatarImage src={mockUser.avatar} alt={mockUser.name} />
-                  <AvatarFallback className="bg-gold-100 text-gold-900">
-                    {mockUser.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                  <AvatarFallback className="bg-gold-100 text-gold-900 font-semibold">
+                    {userInitials}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -48,7 +55,7 @@ export function Navbar() {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none text-gold-900">
-                    {mockUser.name}
+                    {getGreeting()}, {mockUser.name}
                   </p>
                   <p className="text-xs leading-none text-gold-600">
                     {mockUser.email}
@@ -67,7 +74,10 @@ export function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator className="bg-gold-200" />
-              <DropdownMenuItem className="text-red-600 hover:bg-gold-200/50">
+              <DropdownMenuItem 
+                className="text-red-600 hover:bg-gold-200/50"
+                onClick={handleLogout}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
