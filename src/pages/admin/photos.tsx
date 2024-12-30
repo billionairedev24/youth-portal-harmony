@@ -6,12 +6,16 @@ import { PhotoGrid } from "@/components/photos/photo-grid";
 import { Input } from "@/components/ui/input";
 import { useEventsStore } from "@/stores/events-store";
 import { Photo } from "@/components/photos/types";
+import { PhotoSlideshow } from "@/components/photos/photo-slideshow";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [selectedEventId, setSelectedEventId] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [slideshowOpen, setSlideshowOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentEventPhotos, setCurrentEventPhotos] = useState<Photo[]>([]);
   
   const events = useEventsStore((state) => state.events);
 
@@ -42,18 +46,31 @@ const PhotosPage = () => {
   };
 
   const startSlideshow = (eventId: string) => {
-    // Implement slideshow functionality
-    console.log("Starting slideshow for event:", eventId);
+    const eventPhotos = photos.filter(photo => photo.eventId === eventId);
+    setCurrentEventPhotos(eventPhotos);
+    setCurrentSlide(0);
+    setSlideshowOpen(true);
   };
 
   const downloadPhoto = (photo: Photo) => {
-    const link = document.createElement("a");
-    link.href = photo.url;
-    link.download = `photo-${photo.id}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("Photo downloaded successfully");
+    fetch(photo.url)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        // Extract file extension from URL or default to .jpg
+        const extension = photo.url.split('.').pop()?.toLowerCase() || 'jpg';
+        link.download = `photo-${photo.id}.${extension}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        toast.success("Photo downloaded successfully");
+      })
+      .catch(() => {
+        toast.error("Failed to download photo");
+      });
   };
 
   return (
@@ -89,6 +106,16 @@ const PhotosPage = () => {
             />
           </CardContent>
         </Card>
+
+        <PhotoSlideshow
+          isOpen={slideshowOpen}
+          onClose={() => setSlideshowOpen(false)}
+          photos={currentEventPhotos}
+          currentSlide={currentSlide}
+          onPrevSlide={() => setCurrentSlide(prev => (prev > 0 ? prev - 1 : currentEventPhotos.length - 1))}
+          onNextSlide={() => setCurrentSlide(prev => (prev < currentEventPhotos.length - 1 ? prev + 1 : 0))}
+          onDownload={downloadPhoto}
+        />
       </div>
     </AdminLayout>
   );
