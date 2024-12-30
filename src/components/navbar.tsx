@@ -15,7 +15,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { NotificationBell } from "./notification-bell";
 import { ProfileUpdateDialog } from "./profile-update-dialog";
 import { SettingsDialog } from "./settings-dialog";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useTheme } from "@/contexts/theme-context";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -23,19 +24,7 @@ export function Navbar() {
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     localStorage.removeItem('user');
