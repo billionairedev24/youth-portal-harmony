@@ -10,13 +10,17 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { UserPolls } from "@/components/user-polls";
 import { Button } from "@/components/ui/button";
 import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
+import { UserPhotoViewer } from "@/components/photos/user-photo-viewer";
+import { Photo } from "@/components/photos/types";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [showSuggestionDialog, setShowSuggestionDialog] = useState(false);
+  const [photos] = useState<Photo[]>([]); // In a real app, this would be fetched from your backend
   
   const activeEvents = events.filter(event => !event.archived);
+  const selectedEvent = activeEvents.find(event => date && isSameDay(parseISO(event.date), date));
 
   const selectedDateEvents = activeEvents.filter(event => {
     const eventDate = parseISO(event.date);
@@ -188,6 +192,13 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {selectedEvent && (
+          <UserPhotoViewer
+            photos={photos}
+            selectedEventId={selectedEvent.id}
+          />
+        )}
 
         <div>
           <Card className="dark:bg-gold-900/50 dark:border-gold-700">
