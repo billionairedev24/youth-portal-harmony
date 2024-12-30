@@ -19,12 +19,24 @@ export function AuthForm() {
     // Mock authentication
     if (isLogin) {
       if (email === "admin@example.com" && password === "admin") {
+        const user = {
+          email: "admin@example.com",
+          role: "admin",
+          name: "Admin User"
+        };
+        localStorage.setItem('user', JSON.stringify(user));
         toast({
           title: "Welcome back, Admin!",
           description: "Successfully logged in as administrator.",
         });
         navigate("/admin");
       } else if (email === "user@example.com" && password === "user") {
+        const user = {
+          email: "user@example.com",
+          role: "user",
+          name: "Regular User"
+        };
+        localStorage.setItem('user', JSON.stringify(user));
         toast({
           title: "Welcome back!",
           description: "Successfully logged in.",

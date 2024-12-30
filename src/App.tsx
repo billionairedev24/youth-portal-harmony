@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import Index from "./pages/Index";
 import AdminDashboard from "./pages/admin/Index";
 import UserDashboard from "./pages/dashboard/Index";
@@ -24,15 +25,82 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/admin/events" element={<EventsPage />} />
-          <Route path="/admin/polls" element={<PollsPage />} />
-          <Route path="/admin/members" element={<MembersPage />} />
-          <Route path="/admin/suggestions" element={<SuggestionsPage />} />
-          <Route path="/admin/announcements" element={<AnnouncementsPage />} />
-          <Route path="/admin/budget" element={<BudgetPage />} />
-          <Route path="/admin/photos" element={<PhotosPage />} />
+          
+          {/* Protected Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/events"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <EventsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/polls"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PollsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/members"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <MembersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/suggestions"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <SuggestionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/announcements"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AnnouncementsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/budget"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <BudgetPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/photos"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <PhotosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected User Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute requiredRole="user">
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
