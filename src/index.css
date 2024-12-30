@@ -71,7 +71,12 @@
     @apply border-border;
   }
 
+  html {
+    @apply overflow-hidden;
+  }
+
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground transition-colors duration-300 overflow-hidden;
+    overscroll-behavior: none;
   }
 }
