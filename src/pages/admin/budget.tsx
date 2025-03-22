@@ -18,6 +18,7 @@ import { BudgetEmptyState } from "@/components/budget/budget-empty-state";
 import { BudgetSummary } from "@/components/budget/budget-summary";
 import { BudgetEntryForm } from "@/components/budget/budget-entry-form";
 import { BudgetRowActions } from "@/components/budget/budget-row-actions";
+import { BudgetChart } from "@/components/budget/budget-chart";
 import { useBudgetStore } from "@/stores/budget-store";
 import { BudgetEntry, BudgetCategory, NewBudgetEntry } from "@/types/budget";
 
@@ -184,6 +185,9 @@ const BudgetPage = () => {
               totalExpenses={totalExpenses}
               categoryBreakdown={categoryBreakdown}
             />
+            
+            <BudgetChart />
+            
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Budget Entries</CardTitle>
