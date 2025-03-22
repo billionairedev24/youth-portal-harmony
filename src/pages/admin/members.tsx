@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Eye, EyeOff, MoreHorizontal, MessageSquare, UserCog } from "lucide-react";
+import { Eye, EyeOff, MoreHorizontal, MessageSquare, UserCog, Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useMembersStore } from "@/stores/members-store";
@@ -16,6 +16,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { Member, NotificationPreference } from "@/stores/members-store";
 import { MemberDialog } from "@/components/member-dialog";
 import { MessageMemberDialog } from "@/components/message-member-dialog";
+import { EditMemberDialog } from "@/components/edit-member-dialog";
 import { format } from "date-fns";
 
 const MembersPage = () => {
@@ -25,6 +26,7 @@ const MembersPage = () => {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const toggleEmailVisibility = (id: string) => {
     setHiddenEmails((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -171,6 +173,15 @@ const MembersPage = () => {
               <DropdownMenuItem
                 onClick={() => {
                   setSelectedMember(member);
+                  setEditDialogOpen(true);
+                }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit member
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedMember(member);
                   setMessageDialogOpen(true);
                 }}
               >
@@ -227,6 +238,12 @@ const MembersPage = () => {
         member={selectedMember}
         open={viewDialogOpen}
         onOpenChange={setViewDialogOpen}
+      />
+
+      <EditMemberDialog
+        member={selectedMember}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
       />
 
       <MessageMemberDialog
