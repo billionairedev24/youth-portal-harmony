@@ -1,7 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Download, Settings2 } from "lucide-react";
+import { Download, Settings2, Search } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -19,22 +19,17 @@ export function DataTableToolbar<TData>({
   table,
   hasRowSelection,
 }: DataTableToolbarProps<TData>) {
-  // Get the first filterable column
-  const firstFilterableColumn = table.getAllColumns().find(
-    column => column.getCanFilter()
-  );
-
   return (
     <div className="flex items-center justify-between">
-      <Input
-        placeholder="Filter..."
-        value={(firstFilterableColumn?.getFilterValue() as string) ?? ""}
-        onChange={(event) =>
-          firstFilterableColumn?.setFilterValue(event.target.value)
-        }
-        className="max-w-sm"
-        disabled={!firstFilterableColumn}
-      />
+      <div className="flex items-center gap-2 max-w-sm">
+        <Search className="h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search all columns..."
+          value={table.getState().globalFilter || ""}
+          onChange={(event) => table.setGlobalFilter(event.target.value)}
+          className="w-full"
+        />
+      </div>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
