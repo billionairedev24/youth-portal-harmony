@@ -1,3 +1,4 @@
+
 import { AdminLayout } from "@/components/admin-layout";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
@@ -62,14 +63,17 @@ const MembersPage = () => {
     {
       accessorKey: "firstName",
       header: "First Name",
+      enableGlobalFilter: true,
     },
     {
       accessorKey: "lastName",
       header: "Last Name",
+      enableGlobalFilter: true,
     },
     {
       accessorKey: "email",
       header: "Email",
+      enableGlobalFilter: true,
       cell: ({ row }) => {
         const member = row.original;
         const isHidden = hiddenEmails[member.id] ?? true; // Default to hidden
@@ -95,6 +99,7 @@ const MembersPage = () => {
     {
       accessorKey: "phone",
       header: "Phone",
+      enableGlobalFilter: true, 
       cell: ({ row }) => {
         const member = row.original;
         const isHidden = hiddenPhones[member.id] ?? true; // Default to hidden
@@ -128,6 +133,7 @@ const MembersPage = () => {
     {
       accessorKey: "address",
       header: "Address",
+      enableGlobalFilter: true,
     },
     {
       accessorKey: "notificationPreference",

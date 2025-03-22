@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download, Settings2 } from "lucide-react";
@@ -18,15 +19,21 @@ export function DataTableToolbar<TData>({
   table,
   hasRowSelection,
 }: DataTableToolbarProps<TData>) {
+  // Get the first filterable column
+  const firstFilterableColumn = table.getAllColumns().find(
+    column => column.getCanFilter()
+  );
+
   return (
     <div className="flex items-center justify-between">
       <Input
-        placeholder="Filter all columns..."
-        value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+        placeholder="Filter..."
+        value={(firstFilterableColumn?.getFilterValue() as string) ?? ""}
         onChange={(event) =>
-          table.getColumn("title")?.setFilterValue(event.target.value)
+          firstFilterableColumn?.setFilterValue(event.target.value)
         }
         className="max-w-sm"
+        disabled={!firstFilterableColumn}
       />
       <div className="flex items-center gap-2">
         <Button

@@ -5,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Member, useMembersStore } from "@/stores/members-store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -38,16 +38,16 @@ export function EditMemberDialog({ member, open, onOpenChange }: EditMemberDialo
     },
   });
 
-  // Update form values when member changes
-  useState(() => {
-    if (member) {
+  // Update form values when member changes or dialog opens
+  useEffect(() => {
+    if (member && open) {
       form.reset({
         email: member.email,
         phone: member.phone,
         address: member.address,
       });
     }
-  });
+  }, [member, open, form]);
 
   const onSubmit = (data: EditMemberFormValues) => {
     if (!member) return;
