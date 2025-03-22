@@ -1,100 +1,148 @@
+
 import { AdminLayout } from "@/components/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, FileBarChart } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState, useMemo } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { BudgetEmptyState } from "@/components/budget/budget-empty-state";
 import { BudgetSummary } from "@/components/budget/budget-summary";
-import { BudgetActions } from "@/components/budget/budget-actions";
 import { BudgetEntryForm } from "@/components/budget/budget-entry-form";
+import { BudgetRowActions } from "@/components/budget/budget-row-actions";
+import { useBudgetStore } from "@/stores/budget-store";
+import { BudgetEntry, BudgetCategory, NewBudgetEntry } from "@/types/budget";
 
-type BudgetEntry = {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  type: "income" | "expense";
+// Map category values to display names
+const categoryDisplayNames: Record<BudgetCategory, string> = {
+  salary: "Salary",
+  donation: "Donation",
+  investment: "Investment",
+  other_income: "Other Income",
+  ministry: "Ministry",
+  utilities: "Utilities",
+  maintenance: "Maintenance",
+  supplies: "Supplies",
+  events: "Events",
+  staff: "Staff",
+  missions: "Missions",
+  other_expense: "Other Expense",
 };
 
-const columns: ColumnDef<BudgetEntry>[] = [
-  {
-    accessorKey: "date",
-    header: "Date",
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-    cell: ({ row }) => {
-      const amount = row.getValue("amount") as number;
-      const type = row.getValue("type") as string;
-      return (
-        <span className={type === "income" ? "text-green-600" : "text-red-600"}>
-          ${amount.toFixed(2)}
-        </span>
-      );
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => <BudgetActions row={row} />,
-  },
-];
-
 const BudgetPage = () => {
-  const [entries, setEntries] = useState<BudgetEntry[]>([]);
+  const { entries, addEntry, getTotalByType, getTotalByCategory } = useBudgetStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newEntry, setNewEntry] = useState({
-    date: "",
-    description: "",
-    amount: "",
-    type: "expense",
-  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Define table columns
+  const columns: ColumnDef<BudgetEntry>[] = [
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("date"));
+        return date.toLocaleDateString();
+      },
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+    },
+    {
+      accessorKey: "category",
+      header: "Category",
+      cell: ({ row }) => {
+        const category = row.getValue("category") as BudgetCategory;
+        return categoryDisplayNames[category] || category;
+      },
+    },
+    {
+      accessorKey: "type",
+      header: "Type",
+      cell: ({ row }) => {
+        const type = row.getValue("type") as string;
+        return type.charAt(0).toUpperCase() + type.slice(1);
+      },
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => {
+        const amount = row.getValue("amount") as number;
+        const type = row.getValue("type") as string;
+        return (
+          <span className={type === "income" ? "text-green-600" : "text-red-600"}>
+            ${amount.toFixed(2)}
+          </span>
+        );
+      },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => <BudgetRowActions row={row} />,
+    },
+  ];
+
+  const totalIncome = getTotalByType("income");
+  const totalExpenses = getTotalByType("expense");
+
+  // Calculate category breakdown for display in the summary
+  const categoryBreakdown = useMemo(() => {
+    const allCategories = [
+      ...Object.entries(categoryDisplayNames)
+        .filter(([key]) => 
+          key.includes("income") || ["salary", "donation", "investment"].includes(key))
+        .map(([key, value]) => ({ 
+          category: key as BudgetCategory, 
+          displayName: value, 
+          type: "income" as const 
+        })),
+      ...Object.entries(categoryDisplayNames)
+        .filter(([key]) => 
+          key.includes("expense") || 
+          ["ministry", "utilities", "maintenance", "supplies", "events", "staff", "missions"].includes(key))
+        .map(([key, value]) => ({ 
+          category: key as BudgetCategory, 
+          displayName: value, 
+          type: "expense" as const 
+        })),
+    ];
+    
+    return allCategories
+      .map(({ category, displayName, type }) => ({
+        category: displayName,
+        amount: getTotalByCategory(category),
+        type
+      }))
+      .filter(item => item.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
+  }, [entries, getTotalByCategory]);
+
+  const handleSubmit = (newEntry: NewBudgetEntry) => {
     if (!newEntry.date || !newEntry.description || !newEntry.amount) {
-      toast.error("Please fill in all fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    const entry: BudgetEntry = {
-      id: Date.now().toString(),
+    addEntry({
       date: newEntry.date,
       description: newEntry.description,
       amount: parseFloat(newEntry.amount),
-      type: newEntry.type as "income" | "expense",
-    };
-
-    setEntries([...entries, entry]);
+      type: newEntry.type,
+      category: newEntry.category,
+      notes: newEntry.notes
+    });
+    
     setIsDialogOpen(false);
     toast.success("Budget entry added successfully");
-    setNewEntry({
-      date: "",
-      description: "",
-      amount: "",
-      type: "expense",
-    });
   };
-
-  const totalIncome = entries
-    .filter((entry) => entry.type === "income")
-    .reduce((sum, entry) => sum + entry.amount, 0);
-
-  const totalExpenses = entries
-    .filter((entry) => entry.type === "expense")
-    .reduce((sum, entry) => sum + entry.amount, 0);
 
   return (
     <AdminLayout>
@@ -113,11 +161,7 @@ const BudgetPage = () => {
                 <DialogHeader>
                   <DialogTitle>Add Budget Entry</DialogTitle>
                 </DialogHeader>
-                <BudgetEntryForm
-                  newEntry={newEntry}
-                  setNewEntry={setNewEntry}
-                  onSubmit={handleSubmit}
-                />
+                <BudgetEntryForm onSubmit={handleSubmit} />
               </DialogContent>
             </Dialog>
           )}
@@ -125,15 +169,11 @@ const BudgetPage = () => {
 
         {entries.length === 0 ? (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Add Budget Entry</DialogTitle>
               </DialogHeader>
-              <BudgetEntryForm
-                newEntry={newEntry}
-                setNewEntry={setNewEntry}
-                onSubmit={handleSubmit}
-              />
+              <BudgetEntryForm onSubmit={handleSubmit} />
             </DialogContent>
             <BudgetEmptyState onCreateBudget={() => setIsDialogOpen(true)} />
           </Dialog>
@@ -142,10 +182,12 @@ const BudgetPage = () => {
             <BudgetSummary 
               totalIncome={totalIncome}
               totalExpenses={totalExpenses}
+              categoryBreakdown={categoryBreakdown}
             />
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Budget Entries</CardTitle>
+                <FileBarChart className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <DataTable columns={columns} data={entries} />
