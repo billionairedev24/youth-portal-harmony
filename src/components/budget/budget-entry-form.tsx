@@ -14,10 +14,8 @@ import { NewBudgetEntry, BudgetCategory } from "@/types/budget";
 import { useState } from "react";
 
 const INCOME_CATEGORIES: { value: BudgetCategory; label: string }[] = [
-  { value: "salary", label: "Salary" },
   { value: "donation", label: "Donation" },
-  { value: "investment", label: "Investment" },
-  { value: "other_income", label: "Other Income" },
+  { value: "grant", label: "Grant" },
 ];
 
 const EXPENSE_CATEGORIES: { value: BudgetCategory; label: string }[] = [
@@ -26,7 +24,6 @@ const EXPENSE_CATEGORIES: { value: BudgetCategory; label: string }[] = [
   { value: "maintenance", label: "Maintenance" },
   { value: "supplies", label: "Supplies" },
   { value: "events", label: "Events" },
-  { value: "staff", label: "Staff" },
   { value: "missions", label: "Missions" },
   { value: "other_expense", label: "Other Expense" },
 ];
@@ -80,7 +77,7 @@ export function BudgetEntryForm({
             onValueChange={(value) => {
               const newType = value as "income" | "expense";
               // Reset category when changing type
-              const newCategory = newType === "income" ? "other_income" : "other_expense";
+              const newCategory = newType === "income" ? "donation" : "other_expense";
               setEntry({ ...entry, type: newType, category: newCategory });
             }}
           >

@@ -18,6 +18,7 @@ export function BudgetSummary({
   categoryBreakdown = []
 }: BudgetSummaryProps) {
   const balance = totalIncome - totalExpenses;
+  const hasDeficit = balance < 0;
   
   return (
     <div className="space-y-6">
@@ -46,14 +47,16 @@ export function BudgetSummary({
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Balance</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {hasDeficit ? "Deficit" : "Surplus"}
+            </CardTitle>
             <DollarSign className={`h-4 w-4 ${balance >= 0 ? "text-green-600" : "text-red-600"}`} />
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${
               balance >= 0 ? "text-green-600" : "text-red-600"
             }`}>
-              ${Math.abs(balance).toFixed(2)} {balance < 0 && "(Deficit)"}
+              ${Math.abs(balance).toFixed(2)}
             </div>
           </CardContent>
         </Card>

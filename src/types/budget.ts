@@ -3,17 +3,14 @@ export type BudgetEntryType = "income" | "expense";
 
 export type BudgetCategory = 
   // Income categories
-  | "salary" 
   | "donation" 
-  | "investment" 
-  | "other_income"
+  | "grant" 
   // Expense categories
   | "ministry" 
   | "utilities" 
   | "maintenance" 
   | "supplies" 
   | "events" 
-  | "staff" 
   | "missions" 
   | "other_expense";
 

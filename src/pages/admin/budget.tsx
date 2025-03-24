@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { BudgetEmptyState } from "@/components/budget/budget-empty-state";
@@ -24,16 +25,13 @@ import { BudgetEntry, BudgetCategory, NewBudgetEntry } from "@/types/budget";
 
 // Map category values to display names
 const categoryDisplayNames: Record<BudgetCategory, string> = {
-  salary: "Salary",
   donation: "Donation",
-  investment: "Investment",
-  other_income: "Other Income",
+  grant: "Grant",
   ministry: "Ministry",
   utilities: "Utilities",
   maintenance: "Maintenance",
   supplies: "Supplies",
   events: "Events",
-  staff: "Staff",
   missions: "Missions",
   other_expense: "Other Expense",
 };
@@ -96,24 +94,20 @@ const BudgetPage = () => {
 
   // Calculate category breakdown for display in the summary
   const categoryBreakdown = useMemo(() => {
+    const incomeCategories = ["donation", "grant"];
+    const expenseCategories = ["ministry", "utilities", "maintenance", "supplies", "events", "missions", "other_expense"];
+    
     const allCategories = [
-      ...Object.entries(categoryDisplayNames)
-        .filter(([key]) => 
-          key.includes("income") || ["salary", "donation", "investment"].includes(key))
-        .map(([key, value]) => ({ 
-          category: key as BudgetCategory, 
-          displayName: value, 
-          type: "income" as const 
-        })),
-      ...Object.entries(categoryDisplayNames)
-        .filter(([key]) => 
-          key.includes("expense") || 
-          ["ministry", "utilities", "maintenance", "supplies", "events", "staff", "missions"].includes(key))
-        .map(([key, value]) => ({ 
-          category: key as BudgetCategory, 
-          displayName: value, 
-          type: "expense" as const 
-        })),
+      ...incomeCategories.map(category => ({ 
+        category: category as BudgetCategory, 
+        displayName: categoryDisplayNames[category as BudgetCategory], 
+        type: "income" as const 
+      })),
+      ...expenseCategories.map(category => ({ 
+        category: category as BudgetCategory, 
+        displayName: categoryDisplayNames[category as BudgetCategory], 
+        type: "expense" as const 
+      })),
     ];
     
     return allCategories
@@ -161,6 +155,9 @@ const BudgetPage = () => {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add Budget Entry</DialogTitle>
+                  <DialogDescription>
+                    Add a new budget entry for income or expenses
+                  </DialogDescription>
                 </DialogHeader>
                 <BudgetEntryForm onSubmit={handleSubmit} />
               </DialogContent>
@@ -173,6 +170,9 @@ const BudgetPage = () => {
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Add Budget Entry</DialogTitle>
+                <DialogDescription>
+                  Add a new budget entry for income or expenses
+                </DialogDescription>
               </DialogHeader>
               <BudgetEntryForm onSubmit={handleSubmit} />
             </DialogContent>
