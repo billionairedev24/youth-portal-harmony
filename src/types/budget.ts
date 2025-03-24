@@ -35,3 +35,9 @@ export interface NewBudgetEntry {
   category: BudgetCategory;
   notes?: string;
 }
+
+export interface BudgetSummaryItem {
+  category: string;
+  amount: number;
+  type: BudgetEntryType;
+}

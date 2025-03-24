@@ -41,6 +41,27 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState('');
 
+  // Custom global filter function that searches all string values
+  const globalFilterFn: FilterFn<TData> = (row, columnId, filterValue) => {
+    // Look through all column values for this row
+    const allValues = Object.entries(row.original as Record<string, any>);
+    return allValues.some(([key, value]) => {
+      // Skip non-string/number values or null/undefined
+      if (value === null || value === undefined) return false;
+      if (typeof value === 'object') {
+        // Try to stringify objects for searching
+        try {
+          value = JSON.stringify(value);
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      // Convert to string and check if it includes the filter value
+      return String(value).toLowerCase().includes(filterValue.toLowerCase());
+    });
+  };
+
   const columns = React.useMemo(() => [
     {
       id: "select",
@@ -76,7 +97,7 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: 'includesString',
+    globalFilterFn: globalFilterFn,  // Use our custom filter function
     state: {
       sorting,
       columnFilters,
