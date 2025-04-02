@@ -30,22 +30,27 @@ export function BudgetRowActions({ row }: BudgetRowActionsProps) {
   };
   
   const handleUpdate = (updatedEntry: any) => {
-    // Ensure type and category match
+    // Preserve the original type when updating
+    const updatedType = updatedEntry.type;
     let category = updatedEntry.category;
-    if (updatedEntry.type === "income" && !["donation", "grant"].includes(category)) {
+    
+    // Only validate and correct category if needed
+    if (updatedType === "income" && !["donation", "grant"].includes(category)) {
       category = "donation";
-    } else if (updatedEntry.type === "expense" && !["indoor", "outdoor"].includes(category)) {
+    } else if (updatedType === "expense" && !["indoor", "outdoor"].includes(category)) {
       category = "indoor";
     }
     
     console.log("Updating entry:", {
       ...updatedEntry,
+      type: updatedType,
       category,
       amount: parseFloat(updatedEntry.amount)
     });
     
     updateEntry(entry.id, {
       ...updatedEntry,
+      type: updatedType,
       category: category,
       amount: parseFloat(updatedEntry.amount),
     });

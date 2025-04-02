@@ -52,21 +52,14 @@ export function BudgetEntryForm({
     } else if (entry.type === "expense" && !["indoor", "outdoor"].includes(entry.category)) {
       setEntry(prev => ({ ...prev, category: "indoor" }));
     }
-  }, [entry.type, entry.category]);
+  }, [entry.type]);
   
   const categories = entry.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedEntry = { 
-      ...entry,
-      category: entry.type === "income" 
-        ? (["donation", "grant"].includes(entry.category) ? entry.category : "donation") 
-        : (["indoor", "outdoor"].includes(entry.category) ? entry.category : "indoor")
-    } as NewBudgetEntry;
     
-    console.log("Submitting entry:", updatedEntry);
-    onSubmit(updatedEntry);
+    onSubmit(entry);
   };
 
   const onDateSelect = (date: Date) => {

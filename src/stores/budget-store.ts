@@ -21,12 +21,14 @@ export const useBudgetStore = create<BudgetState>()(
       addEntry: (entry) => {
         console.log("Adding budget entry:", entry);
         
-        // Validate entry type and category match
+        // Preserve the entry type, only validate category
+        const entryType = entry.type;
         let category = entry.category;
-        if (entry.type === "income" && !["donation", "grant"].includes(category)) {
+        
+        if (entryType === "income" && !["donation", "grant"].includes(category)) {
           console.warn("Correcting category for income entry");
           category = "donation";
-        } else if (entry.type === "expense" && !["indoor", "outdoor"].includes(category)) {
+        } else if (entryType === "expense" && !["indoor", "outdoor"].includes(category)) {
           console.warn("Correcting category for expense entry");
           category = "indoor";
         }
@@ -34,6 +36,7 @@ export const useBudgetStore = create<BudgetState>()(
         set((state) => ({
           entries: [...state.entries, { 
             ...entry, 
+            type: entryType, // Ensure type is preserved
             category: category as BudgetCategory,
             id: crypto.randomUUID() 
           }]
@@ -43,24 +46,33 @@ export const useBudgetStore = create<BudgetState>()(
       updateEntry: (id, updatedEntry) => {
         console.log("Updating budget entry:", id, updatedEntry);
         
-        // Validate updated entry type and category match if both are present
-        if (updatedEntry.type && updatedEntry.category) {
-          const { type, category } = updatedEntry;
+        set((state) => {
+          const entries = state.entries.map((entry) => {
+            if (entry.id !== id) return entry;
+            
+            // For the matching entry, preserve type if not being explicitly changed
+            const updatedType = updatedEntry.type !== undefined ? updatedEntry.type : entry.type;
+            let updatedCategory = updatedEntry.category !== undefined ? updatedEntry.category : entry.category;
+            
+            // Only validate category if both type and category are present or type is changing
+            if (updatedType === "income" && !["donation", "grant"].includes(updatedCategory)) {
+              console.warn("Correcting category for income entry update");
+              updatedCategory = "donation";
+            } else if (updatedType === "expense" && !["indoor", "outdoor"].includes(updatedCategory)) {
+              console.warn("Correcting category for expense entry update");
+              updatedCategory = "indoor";
+            }
+            
+            return { 
+              ...entry, 
+              ...updatedEntry,
+              type: updatedType,
+              category: updatedCategory
+            };
+          });
           
-          if (type === "income" && !["donation", "grant"].includes(category)) {
-            console.warn("Correcting category for income entry update");
-            updatedEntry.category = "donation";
-          } else if (type === "expense" && !["indoor", "outdoor"].includes(category)) {
-            console.warn("Correcting category for expense entry update");
-            updatedEntry.category = "indoor";
-          }
-        }
-        
-        set((state) => ({
-          entries: state.entries.map((entry) => 
-            entry.id === id ? { ...entry, ...updatedEntry } : entry
-          )
-        }));
+          return { entries };
+        });
       },
       
       deleteEntry: (id) => set((state) => ({
