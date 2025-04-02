@@ -6,13 +6,8 @@ export type BudgetCategory =
   | "donation" 
   | "grant" 
   // Expense categories
-  | "ministry" 
-  | "utilities" 
-  | "maintenance" 
-  | "supplies" 
-  | "events" 
-  | "missions" 
-  | "other_expense";
+  | "indoor" 
+  | "outdoor";
 
 export interface BudgetEntry {
   id: string;

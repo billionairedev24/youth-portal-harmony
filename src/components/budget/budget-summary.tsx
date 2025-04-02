@@ -41,7 +41,6 @@ export function BudgetSummary({
             <Progress
               value={incomePercentage}
               className="h-2 mt-2 bg-green-100 dark:bg-green-900/20"
-              indicatorClassName="bg-green-500"
             />
           </CardContent>
         </Card>
@@ -57,7 +56,6 @@ export function BudgetSummary({
             <Progress
               value={expensePercentage}
               className="h-2 mt-2 bg-red-100 dark:bg-red-900/20"
-              indicatorClassName="bg-red-500"
             />
           </CardContent>
         </Card>
@@ -111,9 +109,6 @@ export function BudgetSummary({
                         ? "bg-green-100 dark:bg-green-900/20" 
                         : "bg-red-100 dark:bg-red-900/20"
                     }`}
-                    indicatorClassName={
-                      item.type === "income" ? "bg-green-500" : "bg-red-500"
-                    }
                   />
                 </div>
               ))}

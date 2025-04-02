@@ -21,13 +21,8 @@ const INCOME_CATEGORIES: { value: BudgetCategory; label: string }[] = [
 ];
 
 const EXPENSE_CATEGORIES: { value: BudgetCategory; label: string }[] = [
-  { value: "ministry", label: "Ministry" },
-  { value: "utilities", label: "Utilities" },
-  { value: "maintenance", label: "Maintenance" },
-  { value: "supplies", label: "Supplies" },
-  { value: "events", label: "Events" },
-  { value: "missions", label: "Missions" },
-  { value: "other_expense", label: "Other Expense" },
+  { value: "indoor", label: "Indoor" },
+  { value: "outdoor", label: "Outdoor" },
 ];
 
 interface BudgetEntryFormProps {
@@ -47,7 +42,7 @@ export function BudgetEntryForm({
       description: "",
       amount: "",
       type: "expense",
-      category: "other_expense",
+      category: "indoor",
       notes: "",
     }
   );
@@ -73,7 +68,7 @@ export function BudgetEntryForm({
             onValueChange={(value) => {
               const newType = value as "income" | "expense";
               // Reset category when changing type
-              const newCategory = newType === "income" ? "donation" : "other_expense";
+              const newCategory = newType === "income" ? "donation" : "indoor";
               setEntry({ ...entry, type: newType, category: newCategory });
             }}
           >

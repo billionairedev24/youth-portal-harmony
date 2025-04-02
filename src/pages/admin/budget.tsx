@@ -36,13 +36,8 @@ import {
 const categoryDisplayNames: Record<BudgetCategory, string> = {
   donation: "Donation",
   grant: "Grant",
-  ministry: "Ministry",
-  utilities: "Utilities",
-  maintenance: "Maintenance",
-  supplies: "Supplies",
-  events: "Events",
-  missions: "Missions",
-  other_expense: "Other Expense",
+  indoor: "Indoor",
+  outdoor: "Outdoor",
 };
 
 const BudgetPage = () => {
@@ -60,28 +55,32 @@ const BudgetPage = () => {
   // Define table columns
   const columns: ColumnDef<BudgetEntry>[] = [
     {
-      accessorKey: "date",
+      id: "date",
       header: "Date",
+      accessorFn: (row) => row.date,
       cell: ({ row }) => {
         const date = new Date(row.getValue("date"));
         return date.toLocaleDateString();
       },
     },
     {
-      accessorKey: "description",
+      id: "description",
       header: "Description",
+      accessorFn: (row) => row.description,
     },
     {
-      accessorKey: "category",
+      id: "category",
       header: "Category",
+      accessorFn: (row) => row.category,
       cell: ({ row }) => {
         const category = row.getValue("category") as BudgetCategory;
         return categoryDisplayNames[category] || category;
       },
     },
     {
-      accessorKey: "type",
+      id: "type",
       header: "Type",
+      accessorFn: (row) => row.type,
       cell: ({ row }) => {
         const type = row.getValue("type") as string;
         return (
@@ -92,8 +91,9 @@ const BudgetPage = () => {
       },
     },
     {
-      accessorKey: "amount",
+      id: "amount",
       header: "Amount",
+      accessorFn: (row) => row.amount,
       cell: ({ row }) => {
         const amount = row.getValue("amount") as number;
         const type = row.getValue("type") as string;
@@ -112,7 +112,7 @@ const BudgetPage = () => {
 
   // Filter columns based on visibleColumns state
   const filteredColumns = columns.filter(column => {
-    const id = column.id || column.accessorKey as string;
+    const id = column.id || "";
     return visibleColumns.includes(id);
   });
 
@@ -122,7 +122,7 @@ const BudgetPage = () => {
   // Calculate category breakdown for display in the summary
   const categoryBreakdown = useMemo(() => {
     const incomeCategories = ["donation", "grant"];
-    const expenseCategories = ["ministry", "utilities", "maintenance", "supplies", "events", "missions", "other_expense"];
+    const expenseCategories = ["indoor", "outdoor"];
     
     const allCategories = [
       ...incomeCategories.map(category => ({ 
@@ -195,7 +195,7 @@ const BudgetPage = () => {
                   <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {columns.map(column => {
-                    const id = column.id || column.accessorKey as string;
+                    const id = column.id || "";
                     const label = column.header as string || id;
                     
                     return (
@@ -292,8 +292,6 @@ const BudgetPage = () => {
                 <DataTable 
                   columns={filteredColumns} 
                   data={filteredEntries}
-                  searchColumn="description"
-                  searchPlaceholder="Search by description..."
                 />
               </CardContent>
             </Card>
