@@ -1,11 +1,10 @@
-
 import { AdminLayout } from "@/components/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus, FileBarChart, Filter, SlidersHorizontal } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -45,12 +44,18 @@ const BudgetPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [visibleColumns, setVisibleColumns] = useState<string[]>(["date", "description", "category", "type", "amount", "actions"]);
+  const [refresh, setRefresh] = useState(0); // Used to force refresh when entries change
+
+  // Force refresh when entries change
+  useEffect(() => {
+    setRefresh(prev => prev + 1);
+  }, [entries]);
 
   // Filter entries based on active tab
   const filteredEntries = useMemo(() => {
     if (activeTab === "all") return entries;
     return entries.filter(entry => entry.type === activeTab);
-  }, [entries, activeTab]);
+  }, [entries, activeTab, refresh]);
 
   // Define table columns
   const columns: ColumnDef<BudgetEntry>[] = [
@@ -145,7 +150,7 @@ const BudgetPage = () => {
       }))
       .filter(item => item.amount > 0)
       .sort((a, b) => b.amount - a.amount);
-  }, [entries, getTotalByCategory]);
+  }, [entries, getTotalByCategory, refresh]);
 
   const handleSubmit = (newEntry: NewBudgetEntry) => {
     if (!newEntry.date || !newEntry.description || !newEntry.amount) {
@@ -153,17 +158,34 @@ const BudgetPage = () => {
       return;
     }
 
+    // Ensure category matches type
+    let category = newEntry.category;
+    if (newEntry.type === "income" && !["donation", "grant"].includes(category)) {
+      category = "donation";
+    } else if (newEntry.type === "expense" && !["indoor", "outdoor"].includes(category)) {
+      category = "indoor";
+    }
+
+    console.log("Adding entry:", {
+      ...newEntry,
+      category,
+      amount: parseFloat(newEntry.amount)
+    });
+
     addEntry({
       date: newEntry.date,
       description: newEntry.description,
       amount: parseFloat(newEntry.amount),
       type: newEntry.type,
-      category: newEntry.category,
+      category: category as BudgetCategory,
       notes: newEntry.notes
     });
     
     setIsDialogOpen(false);
     toast.success(`${newEntry.type === "income" ? "Income" : "Expense"} entry added successfully`);
+    
+    // Force a refresh to update summaries
+    setRefresh(prev => prev + 1);
   };
 
   const toggleColumn = (columnId: string) => {

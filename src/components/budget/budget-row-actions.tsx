@@ -30,10 +30,26 @@ export function BudgetRowActions({ row }: BudgetRowActionsProps) {
   };
   
   const handleUpdate = (updatedEntry: any) => {
+    // Ensure type and category match
+    let category = updatedEntry.category;
+    if (updatedEntry.type === "income" && !["donation", "grant"].includes(category)) {
+      category = "donation";
+    } else if (updatedEntry.type === "expense" && !["indoor", "outdoor"].includes(category)) {
+      category = "indoor";
+    }
+    
+    console.log("Updating entry:", {
+      ...updatedEntry,
+      category,
+      amount: parseFloat(updatedEntry.amount)
+    });
+    
     updateEntry(entry.id, {
       ...updatedEntry,
+      category: category,
       amount: parseFloat(updatedEntry.amount),
     });
+    
     setIsEditDialogOpen(false);
     toast.success("Budget entry updated successfully");
   };

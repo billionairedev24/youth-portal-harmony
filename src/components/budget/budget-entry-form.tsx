@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +10,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { NewBudgetEntry, BudgetCategory } from "@/types/budget";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 import { PopoverCalendar } from "@/components/budget/popover-calendar";
 
@@ -47,11 +46,27 @@ export function BudgetEntryForm({
     }
   );
   
+  useEffect(() => {
+    if (entry.type === "income" && !["donation", "grant"].includes(entry.category)) {
+      setEntry(prev => ({ ...prev, category: "donation" }));
+    } else if (entry.type === "expense" && !["indoor", "outdoor"].includes(entry.category)) {
+      setEntry(prev => ({ ...prev, category: "indoor" }));
+    }
+  }, [entry.type, entry.category]);
+  
   const categories = entry.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(entry);
+    const updatedEntry = { 
+      ...entry,
+      category: entry.type === "income" 
+        ? (["donation", "grant"].includes(entry.category) ? entry.category : "donation") 
+        : (["indoor", "outdoor"].includes(entry.category) ? entry.category : "indoor")
+    } as NewBudgetEntry;
+    
+    console.log("Submitting entry:", updatedEntry);
+    onSubmit(updatedEntry);
   };
 
   const onDateSelect = (date: Date) => {
@@ -67,7 +82,6 @@ export function BudgetEntryForm({
             value={entry.type} 
             onValueChange={(value) => {
               const newType = value as "income" | "expense";
-              // Reset category when changing type
               const newCategory = newType === "income" ? "donation" : "indoor";
               setEntry({ ...entry, type: newType, category: newCategory });
             }}

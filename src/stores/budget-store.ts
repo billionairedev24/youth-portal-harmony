@@ -18,15 +18,50 @@ export const useBudgetStore = create<BudgetState>()(
     (set, get) => ({
       entries: [],
       
-      addEntry: (entry) => set((state) => ({
-        entries: [...state.entries, { ...entry, id: crypto.randomUUID() }]
-      })),
+      addEntry: (entry) => {
+        console.log("Adding budget entry:", entry);
+        
+        // Validate entry type and category match
+        let category = entry.category;
+        if (entry.type === "income" && !["donation", "grant"].includes(category)) {
+          console.warn("Correcting category for income entry");
+          category = "donation";
+        } else if (entry.type === "expense" && !["indoor", "outdoor"].includes(category)) {
+          console.warn("Correcting category for expense entry");
+          category = "indoor";
+        }
+        
+        set((state) => ({
+          entries: [...state.entries, { 
+            ...entry, 
+            category: category as BudgetCategory,
+            id: crypto.randomUUID() 
+          }]
+        }));
+      },
       
-      updateEntry: (id, updatedEntry) => set((state) => ({
-        entries: state.entries.map((entry) => 
-          entry.id === id ? { ...entry, ...updatedEntry } : entry
-        )
-      })),
+      updateEntry: (id, updatedEntry) => {
+        console.log("Updating budget entry:", id, updatedEntry);
+        
+        // Validate updated entry type and category match if both are present
+        if (updatedEntry.type && updatedEntry.category) {
+          const { type, category } = updatedEntry;
+          
+          if (type === "income" && !["donation", "grant"].includes(category)) {
+            console.warn("Correcting category for income entry update");
+            updatedEntry.category = "donation";
+          } else if (type === "expense" && !["indoor", "outdoor"].includes(category)) {
+            console.warn("Correcting category for expense entry update");
+            updatedEntry.category = "indoor";
+          }
+        }
+        
+        set((state) => ({
+          entries: state.entries.map((entry) => 
+            entry.id === id ? { ...entry, ...updatedEntry } : entry
+          )
+        }));
+      },
       
       deleteEntry: (id) => set((state) => ({
         entries: state.entries.filter((entry) => entry.id !== id)

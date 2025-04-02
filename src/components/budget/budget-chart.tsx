@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from "react";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
@@ -19,13 +18,8 @@ import { Progress } from "@/components/ui/progress";
 const categoryDisplayNames: Record<BudgetCategory, string> = {
   donation: "Donation",
   grant: "Grant",
-  ministry: "Ministry",
-  utilities: "Utilities",
-  maintenance: "Maintenance",
-  supplies: "Supplies",
-  events: "Events",
-  missions: "Missions",
-  other_expense: "Other Expense",
+  indoor: "Indoor",
+  outdoor: "Outdoor",
 };
 
 // Colors for the chart segments
