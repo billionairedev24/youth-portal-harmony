@@ -1,3 +1,4 @@
+import { api, ApiError } from '@/utils/axiosConfig';
 import { create } from 'zustand';
 
 export interface Announcement {
@@ -10,6 +11,7 @@ export interface Announcement {
 interface AnnouncementsStore {
   announcements: Announcement[];
   isLoading: boolean;
+  error: string | null;
   addAnnouncement: (announcement: Omit<Announcement, 'id' | 'createdAt'>) => Promise<void>;
   deleteAnnouncement: (id: string) => Promise<void>;
   updateAnnouncement: (id: string, details: string) => Promise<void>;
@@ -19,44 +21,77 @@ interface AnnouncementsStore {
 export const useAnnouncementsStore = create<AnnouncementsStore>((set, get) => ({
   announcements: [],
   isLoading: false,
-  addAnnouncement: async (announcement) => {
-    set({ isLoading: true });
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const newAnnouncement = {
-      ...announcement,
-      id: Math.random().toString(36).substr(2, 9),
-      createdAt: new Date().toISOString(),
-    };
-    set(state => ({
-      announcements: [...state.announcements, newAnnouncement],
-      isLoading: false
-    }));
-  },
-  deleteAnnouncement: async (id) => {
-    set({ isLoading: true });
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    set(state => ({
-      announcements: state.announcements.filter(a => a.id !== id),
-      isLoading: false
-    }));
-  },
-  updateAnnouncement: async (id, details) => {
-    set({ isLoading: true });
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    set(state => ({
-      announcements: state.announcements.map(a =>
-        a.id === id ? { ...a, details } : a
-      ),
-      isLoading: false
-    }));
-  },
+  error: null,
+
   fetchAnnouncements: async () => {
-    set({ isLoading: true });
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    set({ announcements: [], isLoading: false });
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.get<Announcement[]>('/announcements');
+      set({ announcements: data, isLoading: false });
+    } catch (error) {
+      handleApiError(error as ApiError, 'Failed to fetch announcements', set);
+    }
   },
+
+  addAnnouncement: async (announcement) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.post<Announcement>('/announcements', announcement);
+      set(state => ({
+        announcements: [...state.announcements, data],
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, 'Failed to add announcement', set);
+    }
+  },
+
+  deleteAnnouncement: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/announcements/${id}`);
+      set(state => ({
+        announcements: state.announcements.filter(a => a.id !== id),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, 'Failed to delete announcement', set);
+    }
+  },
+
+  updateAnnouncement: async (id, details) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.patch<Announcement>(`/announcements/${id}`, { details });
+      set(state => ({
+        announcements: state.announcements.map(a =>
+          a.id === id ? data : a
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, 'Failed to update announcement', set);
+    }
+  }
 }));
+
+function handleApiError(
+  error: ApiError,
+  defaultMessage: string,
+  set: (state: Partial<AnnouncementsStore>) => void
+) {
+  const errorMessage = error.response?.data?.message 
+    || error.message 
+    || defaultMessage;
+
+  set({ 
+    error: errorMessage,
+    isLoading: false 
+  });
+  
+  // Optional: Show toast notification
+  console.error(`${defaultMessage}:`, error);
+}
+
+// Initialize store
+useAnnouncementsStore.getState().fetchAnnouncements();

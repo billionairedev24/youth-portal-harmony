@@ -1,84 +1,162 @@
 import { create } from "zustand";
+import { api, ApiError } from "@/utils/axiosConfig";
+
+export type PollStatus = "draft" | "active" | "closed";
+
+export interface PollVote {
+  userId: string;
+  option: string;
+  timestamp?: string;
+}
 
 export interface Poll {
   id: string;
   title: string;
+  description?: string;
   startDate: string;
   endDate: string;
-  status: "draft" | "active" | "closed";
+  status: PollStatus;
   options: string[];
-  votes: {
-    userId: string;
-    option: string;
-  }[];
+  votes: PollVote[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface PollsStore {
   polls: Poll[];
-  addPoll: (poll: Poll) => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchPolls: () => Promise<void>;
+  getPollById: (id: string) => Poll | undefined;
+  addPoll: (poll: Omit<Poll, "id" | "votes" | "status">) => Promise<void>;
   updatePoll: (id: string, updates: Partial<Poll>) => Promise<void>;
-  deletePoll: (id: string) => void;
-  vote: (pollId: string, userId: string, option: string) => void;
+  deletePoll: (id: string) => Promise<void>;
+  vote: (pollId: string, userId: string, option: string) => Promise<void>;
+  changePollStatus: (id: string, status: PollStatus) => Promise<void>;
+  hasVoted: (pollId: string, userId: string) => boolean;
 }
 
-// Mock API call
-const mockUpdatePoll = async (id: string, updates: Partial<Poll>): Promise<void> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return Promise.resolve();
-};
+export const usePollsStore = create<PollsStore>((set, get) => ({
+  polls: [],
+  isLoading: false,
+  error: null,
 
-export const usePollsStore = create<PollsStore>((set) => ({
-  polls: [
-    {
-      id: "1",
-      title: "Next Event Theme",
-      startDate: "2024-03-20",
-      endDate: "2024-04-20",
-      status: "active",
-      options: ["Worship Night", "Game Night", "Movie Night"],
-      votes: [
-        { userId: "1", option: "Worship Night" },
-        { userId: "2", option: "Game Night" },
-      ],
-    },
-  ],
-  addPoll: (poll) =>
-    set((state) => ({
-      polls: [...state.polls, poll],
-    })),
-  updatePoll: async (id, updates) => {
-    set((state) => ({
-      polls: state.polls.map((poll) =>
-        poll.id === id ? { ...poll, ...updates } : poll
-      ),
-    }));
+  fetchPolls: async () => {
+    set({ isLoading: true, error: null });
     try {
-      await mockUpdatePoll(id, updates);
+      const { data } = await api.get<Poll[]>("/polls");
+      set({ polls: data, isLoading: false });
     } catch (error) {
-      console.error('Failed to update poll:', error);
-      set((state) => ({
-        polls: state.polls.map((poll) =>
-          poll.id === id ? { ...poll } : poll
-        ),
-      }));
+      handleApiError(error as ApiError, "Failed to fetch polls", set);
     }
   },
-  deletePoll: (id) =>
-    set((state) => ({
-      polls: state.polls.filter((poll) => poll.id !== id),
-    })),
-  vote: (pollId, userId, option) =>
-    set((state) => ({
-      polls: state.polls.map((poll) =>
-        poll.id === pollId
-          ? {
-              ...poll,
-              votes: [
-                ...poll.votes.filter((vote) => vote.userId !== userId),
-                { userId, option }
-              ],
-            }
-          : poll
-      ),
-    })),
+
+  getPollById: (id) => {
+    return get().polls.find(poll => poll.id === id);
+  },
+
+  addPoll: async (poll) => {
+    set({ isLoading: true, error: null });
+    try {
+      const newPoll = {
+        ...poll,
+        status: "draft" as const,
+        votes: []
+      };
+      const { data } = await api.post<Poll>("/polls", newPoll);
+      set(state => ({
+        polls: [...state.polls, data],
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to create poll", set);
+    }
+  },
+
+  updatePoll: async (id, updates) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.patch<Poll>(`/polls/${id}`, updates);
+      set(state => ({
+        polls: state.polls.map(poll => 
+          poll.id === id ? data : poll
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to update poll", set);
+      throw error; // Re-throw for component-level handling
+    }
+  },
+
+  deletePoll: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/polls/${id}`);
+      set(state => ({
+        polls: state.polls.filter(poll => poll.id !== id),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to delete poll", set);
+    }
+  },
+
+  vote: async (pollId, userId, option) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.post<Poll>(`/polls/${pollId}/vote`, { 
+        userId, 
+        option 
+      });
+      set(state => ({
+        polls: state.polls.map(poll => 
+          poll.id === pollId ? data : poll
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to submit vote", set);
+    }
+  },
+
+  changePollStatus: async (id, status) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.patch<Poll>(`/polls/${id}/status`, { status });
+      set(state => ({
+        polls: state.polls.map(poll => 
+          poll.id === id ? data : poll
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to change poll status", set);
+    }
+  },
+
+  hasVoted: (pollId, userId) => {
+    const poll = get().polls.find(p => p.id === pollId);
+    return poll ? poll.votes.some(vote => vote.userId === userId) : false;
+  }
 }));
+
+function handleApiError(
+  error: ApiError,
+  defaultMessage: string,
+  set: (state: Partial<PollsStore>) => void
+) {
+  const errorMessage = error.response?.data?.message 
+    || error.message 
+    || defaultMessage;
+
+  set({ 
+    error: errorMessage,
+    isLoading: false 
+  });
+  
+  console.error(`${defaultMessage}:`, error);
+}
+
+// Initialize store
+usePollsStore.getState().fetchPolls();

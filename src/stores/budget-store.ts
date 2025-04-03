@@ -1,13 +1,16 @@
-
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { BudgetEntry, BudgetEntryType, BudgetCategory } from "@/types/budget";
+import { api, ApiError } from "@/utils/axiosConfig";
 
 interface BudgetState {
   entries: BudgetEntry[];
-  addEntry: (entry: Omit<BudgetEntry, "id">) => void;
-  updateEntry: (id: string, entry: Partial<BudgetEntry>) => void;
-  deleteEntry: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  addEntry: (entry: Omit<BudgetEntry, "id">) => Promise<void>;
+  updateEntry: (id: string, entry: Partial<BudgetEntry>) => Promise<void>;
+  deleteEntry: (id: string) => Promise<void>;
+  fetchEntries: () => Promise<void>;
   getFilteredEntries: (type?: BudgetEntryType) => BudgetEntry[];
   getTotalByType: (type: BudgetEntryType) => number;
   getTotalByCategory: (category: BudgetCategory) => number;
@@ -17,90 +20,145 @@ export const useBudgetStore = create<BudgetState>()(
   persist(
     (set, get) => ({
       entries: [],
-      
-      addEntry: (entry) => {
-        console.log("Adding budget entry:", entry);
-        
-        // Preserve the entry type, only validate category
-        const entryType = entry.type;
-        let category = entry.category;
-        
-        if (entryType === "income" && !["donation", "grant"].includes(category)) {
-          console.warn("Correcting category for income entry");
-          category = "donation";
-        } else if (entryType === "expense" && !["indoor", "outdoor"].includes(category)) {
-          console.warn("Correcting category for expense entry");
-          category = "indoor";
+      isLoading: false,
+      error: null,
+
+      fetchEntries: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const { data } = await api.get<BudgetEntry[]>("/budget");
+          set({ entries: data, isLoading: false });
+        } catch (error) {
+          handleApiError(error as ApiError, "Failed to fetch budget entries", set);
         }
-        
-        set((state) => ({
-          entries: [...state.entries, { 
-            ...entry, 
-            type: entryType, // Ensure type is preserved
-            category: category as BudgetCategory,
-            id: crypto.randomUUID() 
-          }]
-        }));
       },
-      
-      updateEntry: (id, updatedEntry) => {
-        console.log("Updating budget entry:", id, updatedEntry);
-        
-        set((state) => {
-          const entries = state.entries.map((entry) => {
-            if (entry.id !== id) return entry;
-            
-            // For the matching entry, preserve type if not being explicitly changed
-            const updatedType = updatedEntry.type !== undefined ? updatedEntry.type : entry.type;
-            let updatedCategory = updatedEntry.category !== undefined ? updatedEntry.category : entry.category;
-            
-            // Only validate category if both type and category are present or type is changing
-            if (updatedType === "income" && !["donation", "grant"].includes(updatedCategory)) {
-              console.warn("Correcting category for income entry update");
-              updatedCategory = "donation";
-            } else if (updatedType === "expense" && !["indoor", "outdoor"].includes(updatedCategory)) {
-              console.warn("Correcting category for expense entry update");
-              updatedCategory = "indoor";
-            }
-            
-            return { 
-              ...entry, 
-              ...updatedEntry,
-              type: updatedType,
-              category: updatedCategory
-            };
-          });
+
+      addEntry: async (entry) => {
+        set({ isLoading: true, error: null });
+        try {
+          const validatedEntry = validateBudgetEntry(entry);
+          const { data } = await api.post<BudgetEntry>("/budget", validatedEntry);
+          set(state => ({
+            entries: [...state.entries, data],
+            isLoading: false
+          }));
+        } catch (error) {
+          handleApiError(error as ApiError, "Failed to add budget entry", set);
+        }
+      },
+
+      updateEntry: async (id, updatedEntry) => {
+        set({ isLoading: true, error: null });
+        try {
+          const currentEntry = get().entries.find(e => e.id === id);
+          if (!currentEntry) throw new Error("Entry not found");
+
+          const validatedUpdate = validateBudgetEntryUpdate(currentEntry, updatedEntry);
+          const { data } = await api.patch<BudgetEntry>(`/budget/${id}`, validatedUpdate);
           
-          return { entries };
-        });
+          set(state => ({
+            entries: state.entries.map(entry => 
+              entry.id === id ? data : entry
+            ),
+            isLoading: false
+          }));
+        } catch (error) {
+          handleApiError(error as ApiError, "Failed to update budget entry", set);
+        }
       },
-      
-      deleteEntry: (id) => set((state) => ({
-        entries: state.entries.filter((entry) => entry.id !== id)
-      })),
-      
+
+      deleteEntry: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+          await api.delete(`/budget/${id}`);
+          set(state => ({
+            entries: state.entries.filter(entry => entry.id !== id),
+            isLoading: false
+          }));
+        } catch (error) {
+          handleApiError(error as ApiError, "Failed to delete budget entry", set);
+        }
+      },
+
       getFilteredEntries: (type) => {
         const { entries } = get();
-        if (!type) return entries;
-        return entries.filter((entry) => entry.type === type);
+        return type ? entries.filter(entry => entry.type === type) : entries;
       },
-      
+
       getTotalByType: (type) => {
-        const { entries } = get();
-        return entries
-          .filter((entry) => entry.type === type)
+        return get()
+          .entries
+          .filter(entry => entry.type === type)
           .reduce((sum, entry) => sum + entry.amount, 0);
       },
-      
+
       getTotalByCategory: (category) => {
-        const { entries } = get();
-        return entries
-          .filter((entry) => entry.category === category)
+        return get()
+          .entries
+          .filter(entry => entry.category === category)
           .reduce((sum, entry) => sum + entry.amount, 0);
       },
     }),
     {
       name: "budget-storage",
+      partialize: (state) => ({ entries: state.entries }), // Only persist entries
     }
   )
 );
+
+// Helper functions
+function validateBudgetEntry(entry: Omit<BudgetEntry, "id">): Omit<BudgetEntry, "id"> {
+  let { type, category } = entry;
+  
+  if (type === "income" && !["donation", "grant"].includes(category)) {
+    category = "donation";
+  } else if (type === "expense" && !["indoor", "outdoor"].includes(category)) {
+    category = "indoor";
+  }
+
+  return {
+    ...entry,
+    type,
+    category: category as BudgetCategory
+  };
+}
+
+function validateBudgetEntryUpdate(
+  currentEntry: BudgetEntry,
+  update: Partial<BudgetEntry>
+): Partial<BudgetEntry> {
+  const type = update.type ?? currentEntry.type;
+  let category = update.category ?? currentEntry.category;
+
+  if (type === "income" && !["donation", "grant"].includes(category)) {
+    category = "donation";
+  } else if (type === "expense" && !["indoor", "outdoor"].includes(category)) {
+    category = "indoor";
+  }
+
+  return {
+    ...update,
+    type,
+    category: category as BudgetCategory
+  };
+}
+
+function handleApiError(
+  error: ApiError,
+  defaultMessage: string,
+  set: (state: Partial<BudgetState>) => void
+) {
+  const errorMessage = error.response?.data?.message 
+    || error.message 
+    || defaultMessage;
+
+  set({ 
+    error: errorMessage,
+    isLoading: false 
+  });
+  
+  console.error(`${defaultMessage}:`, error);
+}
+
+// Initialize store
+useBudgetStore.getState().fetchEntries();

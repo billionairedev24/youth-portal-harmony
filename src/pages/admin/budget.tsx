@@ -100,7 +100,7 @@ const BudgetPage = () => {
       header: "Amount",
       accessorFn: (row) => row.amount,
       cell: ({ row }) => {
-        const amount = row.getValue("amount") as number;
+        const amount = parseFloat(row.getValue("amount") as unknown as string);
         const type = row.getValue("type") as string;
         return (
           <span className={`font-medium ${type === "income" ? "text-green-600" : "text-red-600"}`}>
@@ -158,27 +158,28 @@ const BudgetPage = () => {
       return;
     }
 
+    // Convert amount to number
+    const amount = parseFloat(newEntry.amount.toString());
+    if (isNaN(amount)) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
     // Ensure category matches type
     let category = newEntry.category;
     if (newEntry.type === "income" && !["donation", "grant"].includes(category)) {
-      category = "donation";
+      category = "donation"; // default to donation for income
     } else if (newEntry.type === "expense" && !["indoor", "outdoor"].includes(category)) {
-      category = "indoor";
+      category = "indoor"; // default to indoor for expenses
     }
 
-    console.log("Adding entry:", {
-      ...newEntry,
-      category,
-      amount: parseFloat(newEntry.amount)
-    });
-
     addEntry({
-      date: newEntry.date,
+      date: new Date(newEntry.date).toISOString(), // ensure date is in proper format
       description: newEntry.description,
-      amount: parseFloat(newEntry.amount),
+      amount: amount,
       type: newEntry.type,
       category: category as BudgetCategory,
-      notes: newEntry.notes
+      notes: newEntry.notes || ""
     });
     
     setIsDialogOpen(false);

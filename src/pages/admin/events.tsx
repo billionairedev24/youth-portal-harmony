@@ -27,7 +27,6 @@ const EventsPage = () => {
 
   const handleCreateEvent = () => {
     setSelectedEvent({
-      id: Math.random().toString(),
       title: "",
       objectives: "",
       personnel: "",

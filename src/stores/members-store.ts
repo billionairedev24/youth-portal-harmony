@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { api, ApiError } from "@/utils/axiosConfig";
 
 export type NotificationPreference = "sms" | "whatsapp" | "email";
 export type Role = "admin" | "member";
@@ -18,54 +19,94 @@ export interface Member {
 
 interface MembersStore {
   members: Member[];
-  updateMember: (id: string, member: Member) => void;
-  deleteMember: (id: string) => void;
-  toggleRole: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchMembers: () => Promise<void>;
+  updateMember: (id: string, member: Partial<Member>) => Promise<void>;
+  deleteMember: (id: string) => Promise<void>;
+  toggleRole: (id: string) => Promise<void>;
 }
 
-export const useMembersStore = create<MembersStore>((set) => ({
-  members: [
-    {
-      id: "1",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-      firstName: "Jane",
-      lastName: "Doe",
-      email: "jane@example.com",
-      phone: "+1234567890",
-      address: "123 Main St, City, Country",
-      birthday: "1995-03-15",
-      notificationPreference: "email",
-      role: "member",
-    },
-    {
-      id: "2",
-      image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952",
-      firstName: "John",
-      lastName: "Smith",
-      email: "john@example.com",
-      phone: "+0987654321",
-      address: "456 Oak St, Town, Country",
-      birthday: "1992-07-22",
-      notificationPreference: "whatsapp",
-      role: "admin",
-    },
-  ],
-  updateMember: (id, updatedMember) =>
-    set((state) => ({
-      members: state.members.map((member) =>
-        member.id === id ? updatedMember : member
-      ),
-    })),
-  deleteMember: (id) =>
-    set((state) => ({
-      members: state.members.filter((member) => member.id !== id),
-    })),
-  toggleRole: (id) =>
-    set((state) => ({
-      members: state.members.map((member) =>
-        member.id === id
-          ? { ...member, role: member.role === "admin" ? "member" : "admin" }
-          : member
-      ),
-    })),
+export const useMembersStore = create<MembersStore>((set, get) => ({
+  members: [],
+  isLoading: false,
+  error: null,
+
+  fetchMembers: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.get<Member[]>("/members");
+      set({ members: data, isLoading: false });
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to fetch members", set);
+    }
+  },
+
+  updateMember: async (id, updatedMember) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await api.patch<Member>(`/members/${id}`, updatedMember);
+      set(state => ({
+        members: state.members.map(member => 
+          member.id === id ? data : member
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to update member", set);
+    }
+  },
+
+  deleteMember: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/members/${id}`);
+      set(state => ({
+        members: state.members.filter(member => member.id !== id),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to delete member", set);
+    }
+  },
+
+  toggleRole: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      const member = get().members.find(m => m.id === id);
+      if (!member) throw new Error("Member not found");
+
+      const newRole: Role = member.role === "admin" ? "member" : "admin";
+      const { data } = await api.patch<Member>(`/members/${id}/role`, { role: newRole });
+      
+      set(state => ({
+        members: state.members.map(member => 
+          member.id === id ? data : member
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      handleApiError(error as ApiError, "Failed to toggle role", set);
+    }
+  }
 }));
+
+function handleApiError(
+  error: ApiError,
+  defaultMessage: string,
+  set: (state: Partial<MembersStore>) => void
+) {
+  const errorMessage = error.response?.data?.message 
+    || error.message 
+    || defaultMessage;
+
+  set({ 
+    error: errorMessage,
+    isLoading: false 
+  });
+  
+  console.error(`${defaultMessage}:`, error);
+}
+
+// Initialize store
+useMembersStore.getState().fetchMembers();
