@@ -13,6 +13,19 @@ interface BudgetSummaryProps {
   }>;
 }
 
+// Format number function to convert large numbers to K, M, B format
+const formatCurrency = (value: number): string => {
+  if (Math.abs(value) >= 1_000_000_000) {
+    return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  } else if (Math.abs(value) >= 1_000_000) {
+    return `$${(value / 1_000_000).toFixed(1)}M`;
+  } else if (Math.abs(value) >= 1_000) {
+    return `$${(value / 1_000).toFixed(1)}K`;
+  } else {
+    return `$${value.toFixed(2)}`;
+  }
+};
+
 export function BudgetSummary({ 
   totalIncome, 
   totalExpenses,
@@ -35,8 +48,8 @@ export function BudgetSummary({
             <ArrowUpIcon className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              ${totalIncome.toFixed(2)}
+            <div className="text-2xl font-bold text-green-600 truncate">
+              {formatCurrency(totalIncome)}
             </div>
             <Progress
               value={incomePercentage}
@@ -50,8 +63,8 @@ export function BudgetSummary({
             <ArrowDownIcon className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              ${totalExpenses.toFixed(2)}
+            <div className="text-2xl font-bold text-red-600 truncate">
+              {formatCurrency(totalExpenses)}
             </div>
             <Progress
               value={expensePercentage}
@@ -71,10 +84,10 @@ export function BudgetSummary({
             <DollarSign className={`h-4 w-4 ${balance >= 0 ? "text-green-600" : "text-red-600"}`} />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${
+            <div className={`text-2xl font-bold truncate ${
               balance >= 0 ? "text-green-600" : "text-red-600"
             }`}>
-              ${Math.abs(balance).toFixed(2)}
+              {formatCurrency(Math.abs(balance))}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
               {hasDeficit 
@@ -99,7 +112,7 @@ export function BudgetSummary({
                     <span className={`text-sm font-medium ${
                       item.type === "income" ? "text-green-600" : "text-red-600"
                     }`}>
-                      ${item.amount.toFixed(2)}
+                      {formatCurrency(item.amount)}
                     </span>
                   </div>
                   <Progress 

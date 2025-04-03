@@ -22,9 +22,10 @@ interface MembersStore {
   isLoading: boolean;
   error: string | null;
   fetchMembers: () => Promise<void>;
-  updateMember: (id: string, member: Partial<Member>) => Promise<void>;
+  updateMember: (id: string, member: Partial<Member>) => Promise<Member>;
   deleteMember: (id: string) => Promise<void>;
-  toggleRole: (id: string) => Promise<void>;
+  toggleRole: (id: string) => Promise<Member>;
+  getMembersByPreference: (preference: NotificationPreference | "all") => Member[];
 }
 
 export const useMembersStore = create<MembersStore>((set, get) => ({
@@ -52,8 +53,10 @@ export const useMembersStore = create<MembersStore>((set, get) => ({
         ),
         isLoading: false
       }));
+      return data;
     } catch (error) {
       handleApiError(error as ApiError, "Failed to update member", set);
+      throw error;
     }
   },
 
@@ -67,6 +70,7 @@ export const useMembersStore = create<MembersStore>((set, get) => ({
       }));
     } catch (error) {
       handleApiError(error as ApiError, "Failed to delete member", set);
+      throw error;
     }
   },
 
@@ -85,9 +89,21 @@ export const useMembersStore = create<MembersStore>((set, get) => ({
         ),
         isLoading: false
       }));
+      return data;
     } catch (error) {
       handleApiError(error as ApiError, "Failed to toggle role", set);
+      throw error;
     }
+  },
+
+  getMembersByPreference: (preference) => {
+    const { members } = get();
+    if (preference === "all") {
+      return members;
+    }
+    return members.filter(
+      (member) => member.notificationPreference === preference
+    );
   }
 }));
 
@@ -108,5 +124,5 @@ function handleApiError(
   console.error(`${defaultMessage}:`, error);
 }
 
-// Initialize store
+// Initialize store (optional - can be called when needed)
 useMembersStore.getState().fetchMembers();

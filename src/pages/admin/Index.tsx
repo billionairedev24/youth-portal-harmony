@@ -1,4 +1,3 @@
-
 import { AdminLayout } from "@/components/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AttendanceCharts } from "@/components/admin/attendance-charts";
@@ -26,6 +25,18 @@ import { useBudgetStore } from "@/stores/budget-store";
 import { BudgetEntryType } from "@/types/budget";
 import { useAnnouncementsStore } from "@/stores/announcements-store";
 
+const formatCurrency = (value: number): string => {
+  if (Math.abs(value) >= 1_000_000_000) {
+    return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  } else if (Math.abs(value) >= 1_000_000) {
+    return `$${(value / 1_000_000).toFixed(1)}M`;
+  } else if (Math.abs(value) >= 1_000) {
+    return `$${(value / 1_000).toFixed(1)}K`;
+  } else {
+    return `$${value.toFixed(2)}`;
+  }
+};
+
 const AdminDashboard = () => {
   const { events } = useEventsStore();
   const { polls } = usePollsStore();
@@ -35,14 +46,12 @@ const AdminDashboard = () => {
   const { entries } = useBudgetStore();
   const navigate = useNavigate();
 
-  // Calculate budget summary data
   const incomeEntries = entries.filter(entry => entry.type === "income");
   const expenseEntries = entries.filter(entry => entry.type === "expense");
   
   const totalIncome = incomeEntries.reduce((sum, entry) => sum + entry.amount, 0);
   const totalExpenses = expenseEntries.reduce((sum, entry) => sum + entry.amount, 0);
 
-  // Create category breakdown for visualization
   const categoryBreakdown = Object.entries(
     entries.reduce((acc, entry) => {
       const category = entry.category;
@@ -58,7 +67,6 @@ const AdminDashboard = () => {
     }, {} as Record<string, { category: string; amount: number; type: BudgetEntryType }>)
   ).map(([_, value]) => value);
 
-  // Calculate activity stats
   const upcomingEvents = events.filter(event => 
     new Date(event.date) > new Date()).length;
   
@@ -73,10 +81,14 @@ const AdminDashboard = () => {
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-muted-foreground mt-1">Welcome to your church management dashboard</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={() => navigate("/admin/members")}>
               <Users className="mr-2 h-4 w-4" />
               Manage Members
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate("/admin/members")}>
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Communication Center
             </Button>
             <Button size="sm" onClick={() => navigate("/admin/events")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -85,7 +97,7 @@ const AdminDashboard = () => {
           </div>
         </div>
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
           <Card className="bg-gradient-to-br from-gold-50 to-gold-100 dark:from-gold-900/40 dark:to-gold-800/30">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Members</CardTitle>
@@ -222,10 +234,10 @@ const AdminDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="h-24 flex flex-col items-center justify-center gap-2"
-                  onClick={() => navigate("/admin/announcements")}
+                  onClick={() => navigate("/admin/members")}
                 >
-                  <Megaphone className="h-6 w-6 text-gold-600" />
-                  <span>Post Announcement</span>
+                  <MessageSquare className="h-6 w-6 text-gold-600" />
+                  <span>Communication Center</span>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -343,7 +355,7 @@ const AdminDashboard = () => {
                   </div>
                   <div className="border rounded-md p-4 text-center bg-muted/30">
                     <p className="text-sm font-medium mb-1">Budget</p>
-                    <p className="text-2xl font-bold text-gold-600">${(totalIncome - totalExpenses).toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-gold-600">{formatCurrency(totalIncome - totalExpenses)}</p>
                   </div>
                   <div className="border rounded-md p-4 text-center bg-muted/30">
                     <p className="text-sm font-medium mb-1">Photos</p>

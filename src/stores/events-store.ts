@@ -161,4 +161,4 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
 }));
 
 // Initialize store (optional - can be called when needed)
-// useEventsStore.getState().fetchEvents();
+useEventsStore.getState().fetchEvents();

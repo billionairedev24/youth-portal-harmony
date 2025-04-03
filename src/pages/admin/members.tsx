@@ -19,6 +19,9 @@ import { MemberDialog } from "@/components/member-dialog";
 import { MessageMemberDialog } from "@/components/message-member-dialog";
 import { EditMemberDialog } from "@/components/edit-member-dialog";
 import { format } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { CommunicationCenter } from "@/components/communication-center";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const MembersPage = () => {
   const { members, toggleRole } = useMembersStore();
@@ -28,6 +31,7 @@ const MembersPage = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const toggleEmailVisibility = (id: string) => {
     setHiddenEmails((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -46,116 +50,125 @@ const MembersPage = () => {
     return phone.replace(/(\d{3})\d{4}(\d{3})/, '$1****$2');
   };
 
-  const columns: ColumnDef<Member>[] = [
-    {
-      id: "image",
-      header: "Image",
-      cell: ({ row }) => {
-        const member = row.original;
-        return (
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={member.image} alt={`${member.firstName} ${member.lastName}`} />
-            <AvatarFallback>{member.firstName[0]}{member.lastName[0]}</AvatarFallback>
-          </Avatar>
-        );
+  const getResponsiveColumns = (): ColumnDef<Member>[] => {
+    // Base columns that always show
+    const baseColumns: ColumnDef<Member>[] = [
+      {
+        id: "image",
+        header: "Image",
+        cell: ({ row }) => {
+          const member = row.original;
+          return (
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={member.image} alt={`${member.firstName} ${member.lastName}`} />
+              <AvatarFallback>{member.firstName[0]}{member.lastName[0]}</AvatarFallback>
+            </Avatar>
+          );
+        },
       },
-    },
-    {
-      accessorKey: "firstName",
-      header: "First Name",
-      enableGlobalFilter: true,
-    },
-    {
-      accessorKey: "lastName",
-      header: "Last Name",
-      enableGlobalFilter: true,
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-      enableGlobalFilter: true,
-      cell: ({ row }) => {
-        const member = row.original;
-        const isHidden = hiddenEmails[member.id] ?? true; // Default to hidden
-        return (
-          <div className="flex items-center gap-2">
-            <span>{isHidden ? maskEmail(member.email) : member.email}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => toggleEmailVisibility(member.id)}
-              className="h-8 w-8"
-            >
-              {isHidden ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        );
+      {
+        accessorKey: "firstName",
+        header: "First Name",
+        enableGlobalFilter: true,
       },
-    },
-    {
-      accessorKey: "phone",
-      header: "Phone",
-      enableGlobalFilter: true, 
-      cell: ({ row }) => {
-        const member = row.original;
-        const isHidden = hiddenPhones[member.id] ?? true; // Default to hidden
-        return (
-          <div className="flex items-center gap-2">
-            <span>{isHidden ? maskPhone(member.phone) : member.phone}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => togglePhoneVisibility(member.id)}
-              className="h-8 w-8"
-            >
-              {isHidden ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        );
+      {
+        accessorKey: "lastName",
+        header: "Last Name",
+        enableGlobalFilter: true,
       },
-    },
-    {
-      accessorKey: "birthday",
-      header: "Birthday",
-      cell: ({ row }) => {
-        const member = row.original;
-        return format(new Date(member.birthday), 'MMMM do');
+    ];
+
+    // Additional columns for non-mobile views
+    const desktopColumns: ColumnDef<Member>[] = [
+      {
+        accessorKey: "email",
+        header: "Email",
+        enableGlobalFilter: true,
+        cell: ({ row }) => {
+          const member = row.original;
+          const isHidden = hiddenEmails[member.id] ?? true; // Default to hidden
+          return (
+            <div className="flex items-center gap-2">
+              <span>{isHidden ? maskEmail(member.email) : member.email}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => toggleEmailVisibility(member.id)}
+                className="h-8 w-8"
+              >
+                {isHidden ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          );
+        },
       },
-    },
-    {
-      accessorKey: "address",
-      header: "Address",
-      enableGlobalFilter: true,
-    },
-    {
-      accessorKey: "notificationPreference",
-      header: "Notification Preference",
-      cell: ({ row }) => {
-        const preference = row.getValue("notificationPreference") as NotificationPreference;
-        return (
-          <span className="capitalize">{preference}</span>
-        );
+      {
+        accessorKey: "phone",
+        header: "Phone",
+        enableGlobalFilter: true, 
+        cell: ({ row }) => {
+          const member = row.original;
+          const isHidden = hiddenPhones[member.id] ?? true; // Default to hidden
+          return (
+            <div className="flex items-center gap-2">
+              <span>{isHidden ? maskPhone(member.phone) : member.phone}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePhoneVisibility(member.id)}
+                className="h-8 w-8"
+              >
+                {isHidden ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          );
+        },
       },
-    },
-    {
-      accessorKey: "role",
-      header: "Role",
-      cell: ({ row }) => {
-        const member = row.original;
-        return (
-          <span className="capitalize">{member.role}</span>
-        );
+      {
+        accessorKey: "birthday",
+        header: "Birthday",
+        cell: ({ row }) => {
+          const member = row.original;
+          return format(new Date(member.birthday), 'MMMM do');
+        },
       },
-    },
-    {
+      {
+        accessorKey: "address",
+        header: "Address",
+        enableGlobalFilter: true,
+      },
+      {
+        accessorKey: "notificationPreference",
+        header: "Notification Preference",
+        cell: ({ row }) => {
+          const preference = row.getValue("notificationPreference") as NotificationPreference;
+          return (
+            <span className="capitalize">{preference}</span>
+          );
+        },
+      },
+      {
+        accessorKey: "role",
+        header: "Role",
+        cell: ({ row }) => {
+          const member = row.original;
+          return (
+            <span className="capitalize">{member.role}</span>
+          );
+        },
+      },
+    ];
+
+    // Actions column is always present
+    const actionsColumn: ColumnDef<Member> = {
       id: "actions",
       cell: ({ row }) => {
         const member = row.original;
@@ -207,8 +220,13 @@ const MembersPage = () => {
           </DropdownMenu>
         );
       },
-    },
-  ];
+    };
+
+    // Return either mobile or desktop columns
+    return isMobile 
+      ? [...baseColumns, actionsColumn]
+      : [...baseColumns, ...desktopColumns, actionsColumn];
+  };
 
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4">
@@ -230,14 +248,29 @@ const MembersPage = () => {
           </p>
         </div>
 
-        {members.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <DataTable
-            columns={columns}
-            data={members}
-          />
-        )}
+        <Tabs defaultValue="members" className="w-full">
+          <TabsList className="w-full mb-4">
+            <TabsTrigger value="members" className="flex-1">Members List</TabsTrigger>
+            <TabsTrigger value="communication" className="flex-1">Communication Center</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="members">
+            {members.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="bg-white dark:bg-black/10 rounded-lg shadow-sm overflow-hidden">
+                <DataTable
+                  columns={getResponsiveColumns()}
+                  data={members}
+                />
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="communication">
+            <CommunicationCenter />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <MemberDialog
