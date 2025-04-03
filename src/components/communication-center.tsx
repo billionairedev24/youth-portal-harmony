@@ -25,7 +25,8 @@ import {
   HelpCircle, 
   ChevronDown,
   ChevronUp,
-  Check
+  Check,
+  Users
 } from "lucide-react";
 import { useMembersStore, Member, NotificationPreference } from "@/stores/members-store";
 import { toast } from "sonner";
@@ -38,8 +39,8 @@ import {
 } from "@/components/ui/accordion";
 
 export function CommunicationCenter() {
-  const { members } = useMembersStore();
-  const [communicationType, setCommunicationType] = useState<NotificationPreference>("email");
+  const { members, getMembersByPreference } = useMembersStore();
+  const [communicationType, setCommunicationType] = useState<NotificationPreference | "all">("all");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
@@ -47,10 +48,8 @@ export function CommunicationCenter() {
   const [showGuide, setShowGuide] = useState(false);
   const isMobile = useIsMobile();
 
-  // Filter members based on their notification preference
-  const eligibleMembers = members.filter(
-    member => communicationType === "all" || member.notificationPreference === communicationType
-  );
+  // Get eligible members based on communication type
+  const eligibleMembers = getMembersByPreference(communicationType);
 
   const handleSelectAll = () => {
     if (selectAll) {
@@ -97,7 +96,9 @@ export function CommunicationCenter() {
     // In a real app, this would call an API to send the messages
     toast.success(
       `${communicationType === "email" ? "Email" : 
-        communicationType === "sms" ? "SMS" : "WhatsApp message"} sent to ${selectedMemberNames.join(", ")}`
+        communicationType === "sms" ? "SMS" : 
+        communicationType === "whatsapp" ? "WhatsApp message" :
+        "Message"} sent to ${selectedMemberNames.join(", ")}`
     );
 
     // Reset form
@@ -116,7 +117,7 @@ export function CommunicationCenter() {
       case "whatsapp":
         return <MessageSquare className="h-5 w-5" />;
       default:
-        return <Mail className="h-5 w-5" />;
+        return <Users className="h-5 w-5" />;
     }
   };
 
@@ -146,8 +147,9 @@ export function CommunicationCenter() {
                 <AccordionTrigger>Step 1: Select Communication Type</AccordionTrigger>
                 <AccordionContent>
                   <p className="text-sm">
-                    Choose between Email, SMS, or WhatsApp to send messages to your members.
-                    Only members who have this option set as their notification preference will be available.
+                    Choose between Email, SMS, WhatsApp, or All to send messages to your members.
+                    When you select a specific type, only members who have that option set as their notification preference will be available.
+                    Selecting "All" will show all members regardless of their preference.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -202,7 +204,7 @@ export function CommunicationCenter() {
             <Select
               value={communicationType}
               onValueChange={(value) => {
-                setCommunicationType(value as NotificationPreference);
+                setCommunicationType(value as NotificationPreference | "all");
                 setSelectedMembers([]);
                 setSelectAll(false);
               }}
@@ -211,6 +213,7 @@ export function CommunicationCenter() {
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All Members</SelectItem>
                 <SelectItem value="email">Email</SelectItem>
                 <SelectItem value="sms">SMS</SelectItem>
                 <SelectItem value="whatsapp">WhatsApp</SelectItem>
@@ -218,7 +221,7 @@ export function CommunicationCenter() {
             </Select>
           </div>
 
-          {communicationType === "email" && (
+          {(communicationType === "email" || communicationType === "all") && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Subject</label>
               <Input
@@ -235,18 +238,18 @@ export function CommunicationCenter() {
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={`Type your ${communicationType} message here...`}
+              placeholder={`Type your message here...`}
               className="min-h-[100px]"
               required
             />
-            {communicationType === "sms" && (
+            {(communicationType === "sms" || communicationType === "all") && (
               <p className="text-xs text-muted-foreground text-right">{message.length}/160 characters</p>
             )}
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">Recipients</label>
+              <label className="text-sm font-medium">Recipients ({eligibleMembers.length})</label>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -259,7 +262,7 @@ export function CommunicationCenter() {
             
             {eligibleMembers.length === 0 ? (
               <p className="text-sm text-muted-foreground py-2">
-                No members have selected {communicationType} as their notification preference.
+                No members found with the selected notification preference.
               </p>
             ) : (
               <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-3'} gap-2 max-h-[200px] overflow-y-auto p-1`}>
@@ -281,6 +284,9 @@ export function CommunicationCenter() {
                     <span className="text-sm truncate">
                       {member.firstName} {member.lastName}
                     </span>
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      {member.notificationPreference}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -294,7 +300,9 @@ export function CommunicationCenter() {
             className="w-full"
           >
             Send {communicationType === "email" ? "Email" : 
-                  communicationType === "sms" ? "SMS" : "WhatsApp Message"}
+                  communicationType === "sms" ? "SMS" : 
+                  communicationType === "whatsapp" ? "WhatsApp Message" :
+                  "Message"}
           </Button>
         </CardFooter>
       </Card>
