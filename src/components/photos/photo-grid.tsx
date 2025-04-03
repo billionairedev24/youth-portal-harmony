@@ -1,3 +1,4 @@
+
 import { PhotoUploadDialog } from "./photo-upload-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Photo } from "./types";
@@ -6,6 +7,7 @@ import { useState } from "react";
 import { PhotoCard } from "./photo-card";
 import { EmptyState } from "./empty-state";
 import { PhotoPagination } from "./photo-pagination";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PhotoGridProps {
   photos: Photo[];
@@ -31,7 +33,8 @@ export const PhotoGrid = ({
   events
 }: PhotoGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const isMobile = useIsMobile();
+  const itemsPerPage = isMobile ? 6 : 9;
 
   const filteredPhotos = photos.filter(photo => 
     photo.eventName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -77,12 +80,12 @@ export const PhotoGrid = ({
           events={events}
         />
       </div>
-      <ScrollArea className="h-[600px] pb-4">
+      <ScrollArea className="h-[calc(100vh-300px)] md:h-[600px] pb-4">
         <div className="space-y-8">
           {Object.entries(photosByEvent).map(([eventName, eventPhotos]) => (
             <div key={eventName} className="space-y-4">
-              <h2 className="text-xl font-semibold">{eventName}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <h2 className="text-xl font-semibold text-gold-800 dark:text-gold-200">{eventName}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {eventPhotos.map((photo) => (
                   <PhotoCard
                     key={photo.id}

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Photo } from "./types";
@@ -26,7 +27,7 @@ export const UserPhotoViewer = ({ photos, selectedEventId }: UserPhotoViewerProp
 
   if (eventPhotos.length === 0) {
     return (
-      <Card className="dark:bg-gold-900/50 dark:border-gold-700">
+      <Card className="dark:bg-gold-900/50 dark:border-gold-700 shadow-md">
         <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
           <ImagePlus className="h-16 w-16 text-muted-foreground dark:text-gold-400" />
           <div className="text-center space-y-2">
@@ -42,7 +43,7 @@ export const UserPhotoViewer = ({ photos, selectedEventId }: UserPhotoViewerProp
   }
 
   return (
-    <Card className="dark:bg-gold-900/50 dark:border-gold-700">
+    <Card className="dark:bg-gold-900/50 dark:border-gold-700 shadow-md">
       <CardHeader>
         <CardTitle className="dark:text-gold-100">Event Photos</CardTitle>
       </CardHeader>

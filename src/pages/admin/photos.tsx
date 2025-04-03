@@ -1,3 +1,4 @@
+
 import { AdminLayout } from "@/components/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useEventsStore } from "@/stores/events-store";
 import { Photo } from "@/components/photos/types";
 import { PhotoSlideshow } from "@/components/photos/photo-slideshow";
+import { Search } from "lucide-react";
 
 const PhotosPage = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -76,23 +78,24 @@ const PhotosPage = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Photo Management</h1>
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gold-800 dark:text-gold-200">Photo Gallery</h1>
+          <div className="relative w-full sm:w-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gold-500 dark:text-gold-400" />
             <Input
               placeholder="Search events..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-64"
+              className="pl-9 pr-4 py-2 w-full sm:w-64 border-gold-200 dark:border-gold-800 focus:ring-gold-400 dark:focus:ring-gold-500"
             />
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Event Photos</CardTitle>
+        <Card className="border-gold-200 dark:border-gold-800/50 bg-white/80 dark:bg-gold-900/30 backdrop-blur-sm shadow-md">
+          <CardHeader className="border-b border-gold-100 dark:border-gold-800/30 pb-4">
+            <CardTitle className="text-gold-800 dark:text-gold-200">Event Photos</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <PhotoGrid
               photos={photos}
               onStartSlideshow={startSlideshow}
