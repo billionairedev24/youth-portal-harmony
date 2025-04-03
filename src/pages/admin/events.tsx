@@ -1,79 +1,167 @@
-import { AdminLayout } from "@/components/admin-layout";
-import { DataTable } from "@/components/data-table/data-table";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import { useEventsStore } from '@/stores/events-store';
+import { AdminLayout } from '@/components/admin-layout';
+import { DataTable } from '@/components/data-table/data-table';
+import { Button } from '@/components/ui/button';
+import { Event } from "@/stores/events-store";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Eye, MoreHorizontal, Pencil, Trash, Calendar, Archive, Plus, UserPlus } from "lucide-react";
-import { EventDialog } from "@/components/event-dialog";
-import { RecordAttendanceDialog } from "@/components/admin/record-attendance-dialog";
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { useEventsStore } from "@/stores/events-store";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { type ColumnDef } from "@tanstack/react-table";
-import { type Event } from "@/stores/events-store";
+} from '@/components/ui/dropdown-menu';
+import { 
+  Eye, 
+  MoreHorizontal, 
+  Pencil, 
+  Trash, 
+  Calendar, 
+  Archive, 
+  Plus, 
+  UserPlus 
+} from 'lucide-react';
+import { EventDialog } from '@/components/event-dialog';
+import { RecordAttendanceDialog } from '@/components/admin/record-attendance-dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ColumnDef } from '@tanstack/react-table';
 
 const EventsPage = () => {
-  const { events, updateEvent, deleteEvent, toggleArchive, addEvent, recordAttendance } = useEventsStore();
+  const { 
+    events, 
+    addEvent, 
+    updateEvent, 
+    deleteEvent, 
+    toggleArchive, 
+    recordAttendance,
+    error,
+    loading
+  } = useEventsStore();
+  
   const { toast } = useToast();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [dialogMode, setDialogMode] = useState<"view" | "edit" | "create">("view");
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
 
   const handleCreateEvent = () => {
     setSelectedEvent({
-      title: "",
-      objectives: "",
-      personnel: "",
-      location: "",
-      date: "",
-      time: "",
+      id: '',
+      title: '',
+      objectives: '',
+      personnel: '',
+      location: '',
+      date: '',
+      time: '',
       archived: false,
     });
-    setDialogMode("create");
+    setDialogMode('create');
     setDialogOpen(true);
   };
 
-  const handleSave = async (event: Event) => {
-    if (dialogMode === "create") {
-      addEvent(event);
+  const handleSave = async (eventData: Event) => {
+    try {
+      if (dialogMode === 'create') {
+        await addEvent(eventData);
+        toast({
+          title: 'Success',
+          description: 'Event created successfully',
+          variant: 'default',
+        });
+      } else {
+        await updateEvent(eventData.id, eventData);
+        toast({
+          title: 'Success',
+          description: 'Event updated successfully',
+          variant: 'default',
+        });
+      }
+      setDialogOpen(false);
+    } catch (err) {
       toast({
-        title: "Event created",
-        description: "The event has been successfully created.",
+        title: 'Error',
+        description: error || 'Failed to save event',
+        variant: 'destructive',
       });
-    } else {
-      updateEvent(event.id, event);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteEvent(id);
       toast({
-        title: "Event updated",
-        description: "The event has been successfully updated.",
+        title: 'Success',
+        description: 'Event deleted successfully',
+        variant: 'default',
+      });
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: error || 'Failed to delete event',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleToggleArchive = async (id: string) => {
+    try {
+      const event = events.find(e => e.id === id);
+      await toggleArchive(id);
+      toast({
+        title: 'Success',
+        description: event?.archived ? 'Event restored' : 'Event archived',
+        variant: 'default',
+      });
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: error || 'Failed to toggle archive status',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleRecordAttendance = async (
+    eventId: string, 
+    menCount: number, 
+    womenCount: number
+  ) => {
+    try {
+      await recordAttendance(eventId, menCount, womenCount);
+      toast({
+        title: 'Success',
+        description: 'Attendance recorded successfully',
+        variant: 'default',
+      });
+      setAttendanceDialogOpen(false);
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: error || 'Failed to record attendance',
+        variant: 'destructive',
       });
     }
   };
 
   const columns: ColumnDef<Event>[] = [
     {
-      accessorKey: "title",
-      header: "Title",
+      accessorKey: 'title',
+      header: 'Title',
     },
     {
-      accessorKey: "date",
-      header: "Date",
+      accessorKey: 'date',
+      header: 'Date',
     },
     {
-      accessorKey: "time",
-      header: "Time",
+      accessorKey: 'time',
+      header: 'Time',
     },
     {
-      accessorKey: "location",
-      header: "Location",
+      accessorKey: 'location',
+      header: 'Location',
     },
     {
-      id: "actions",
+      id: 'actions',
       cell: ({ row }) => {
         const event = row.original;
         return (
@@ -87,7 +175,7 @@ const EventsPage = () => {
               <DropdownMenuItem
                 onClick={() => {
                   setSelectedEvent(event);
-                  setDialogMode("view");
+                  setDialogMode('view');
                   setDialogOpen(true);
                 }}
               >
@@ -97,7 +185,7 @@ const EventsPage = () => {
               <DropdownMenuItem
                 onClick={() => {
                   setSelectedEvent(event);
-                  setDialogMode("edit");
+                  setDialogMode('edit');
                   setDialogOpen(true);
                 }}
               >
@@ -114,28 +202,14 @@ const EventsPage = () => {
                 Record Attendance
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
-                  toggleArchive(event.id);
-                  toast({
-                    title: event.archived ? "Event restored" : "Event archived",
-                    description: event.archived
-                      ? "The event has been moved to active events."
-                      : "The event has been moved to archived events.",
-                  });
-                }}
+                onClick={() => handleToggleArchive(event.id)}
               >
                 <Archive className="mr-2 h-4 w-4" />
-                {event.archived ? "Restore" : "Archive"}
+                {event.archived ? 'Restore' : 'Archive'}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-600"
-                onClick={() => {
-                  deleteEvent(event.id);
-                  toast({
-                    title: "Event deleted",
-                    description: "The event has been permanently deleted.",
-                  });
-                }}
+                onClick={() => handleDelete(event.id)}
               >
                 <Trash className="mr-2 h-4 w-4" />
                 Delete
@@ -147,23 +221,27 @@ const EventsPage = () => {
     },
   ];
 
-  const EmptyState = ({ type }: { type: "scheduled" | "archived" }) => (
+  const EmptyState = ({ type }: { type: 'scheduled' | 'archived' }) => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-secondary/20 rounded-lg border-2 border-dashed border-secondary">
-      {type === "scheduled" ? (
+      {type === 'scheduled' ? (
         <Calendar className="h-12 w-12 text-muted-foreground" />
       ) : (
         <Archive className="h-12 w-12 text-muted-foreground" />
       )}
       <h3 className="text-lg font-semibold">
-        {type === "scheduled" ? "No Events Scheduled" : "No Archived Events"}
+        {type === 'scheduled' ? 'No Events Scheduled' : 'No Archived Events'}
       </h3>
       <p className="text-sm text-muted-foreground max-w-sm text-center">
-        {type === "scheduled"
-          ? "There are no upcoming events scheduled at the moment. Create a new event to get started."
-          : "No events have been archived yet. Events that are no longer active will appear here."}
+        {type === 'scheduled'
+          ? 'There are no upcoming events scheduled at the moment. Create a new event to get started.'
+          : 'No events have been archived yet. Events that are no longer active will appear here.'}
       </p>
-      {type === "scheduled" && (
-        <Button onClick={handleCreateEvent} variant="default" className="flex items-center gap-2">
+      {type === 'scheduled' && (
+        <Button 
+          onClick={handleCreateEvent} 
+          variant="default" 
+          className="flex items-center gap-2"
+        >
           <Plus className="h-4 w-4" />
           Create your first event
         </Button>
@@ -185,7 +263,10 @@ const EventsPage = () => {
             </p>
           </div>
           {activeEvents.length > 0 && (
-            <Button onClick={handleCreateEvent} className="flex items-center gap-2">
+            <Button 
+              onClick={handleCreateEvent} 
+              className="flex items-center gap-2"
+            >
               <Plus className="h-4 w-4" />
               Create Event
             </Button>
@@ -224,7 +305,8 @@ const EventsPage = () => {
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           onSave={handleSave}
-          mode={dialogMode === "view" ? "view" : "edit"}
+          mode={dialogMode === 'view' ? 'view' : 'edit'}
+          isLoading={loading}
         />
 
         {selectedEvent && (
@@ -232,7 +314,8 @@ const EventsPage = () => {
             event={selectedEvent}
             open={attendanceDialogOpen}
             onOpenChange={setAttendanceDialogOpen}
-            onSave={recordAttendance}
+            onSave={handleRecordAttendance}
+            isLoading={loading}
           />
         )}
       </div>

@@ -1,7 +1,7 @@
 import { ApiError, api } from '@/utils/axiosConfig';
 import { create } from 'zustand';
 
-type Event = {
+export type Event = {
   id: string;
   title: string;
   objectives: string;
@@ -21,12 +21,14 @@ type EventsStore = {
   events: Event[];
   loading: boolean;
   error: string | null;
-  fetchEvents: () => Promise<void>;
-  addEvent: (event: Omit<Event, 'id'>) => Promise<void>;
-  updateEvent: (id: string, event: Partial<Event>) => Promise<void>;
+  fetchEvents: () => Promise<Event[]>;
+  addEvent: (event: Omit<Event, 'id'>) => Promise<Event>;
+  updateEvent: (id: string, event: Partial<Event>) => Promise<Event>;
   deleteEvent: (id: string) => Promise<void>;
-  toggleArchive: (id: string) => Promise<void>;
-  recordAttendance: (eventId: string, menCount: number, womenCount: number) => Promise<void>;
+  toggleArchive: (id: string) => Promise<Event>;
+  recordAttendance: (eventId: string, menCount: number, womenCount: number) => Promise<Event>;
+  getEventById: (id: string) => Event | undefined;
+  getEventsByStatus: (archived: boolean) => Event[];
 };
 
 export const useEventsStore = create<EventsStore>((set, get) => ({
@@ -39,8 +41,12 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
     try {
       const { data } = await api.get<Event[]>('/event/findAll');
       set({ events: data, loading: false });
+      return data;
     } catch (error) {
-      handleApiError(error as ApiError, 'Failed to fetch events', set);
+      const err = error as ApiError;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch events';
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
     }
   },
 
@@ -48,12 +54,16 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const { data } = await api.post<Event>('/event/create', event);
-      set(state => ({ 
-        events: [...state.events, data], 
-        loading: false 
+      set(state => ({
+        events: [...state.events, data],
+        loading: false
       }));
+      return data;
     } catch (error) {
-      handleApiError(error as ApiError, 'Failed to add event', set);
+      const err = error as ApiError;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to add event';
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
     }
   },
 
@@ -63,12 +73,16 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
       const { data } = await api.patch<Event>(`/event/update/${id}`, updatedEvent);
       set(state => ({
         events: state.events.map(event => 
-          event.id === id ? data : event
+          event.id === id ? { ...event, ...data } : event
         ),
         loading: false
       }));
+      return data;
     } catch (error) {
-      handleApiError(error as ApiError, 'Failed to update event', set);
+      const err = error as ApiError;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to update event';
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
     }
   },
 
@@ -81,7 +95,10 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         loading: false
       }));
     } catch (error) {
-      handleApiError(error as ApiError, 'Failed to delete event', set);
+      const err = error as ApiError;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete event';
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
     }
   },
 
@@ -101,17 +118,22 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         ),
         loading: false
       }));
+      return data;
     } catch (error) {
-      handleApiError(error as ApiError, 'Failed to toggle archive', set);
+      const err = error as ApiError;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to toggle archive';
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
     }
   },
 
   recordAttendance: async (eventId, menCount, womenCount) => {
     set({ loading: true, error: null });
     try {
-      const { data } = await api.post<Event>(`/${eventId}/attendance`, {
+      const { data } = await api.post<Event>(`/event/${eventId}/attendance`, {
         men: menCount,
-        women: womenCount
+        women: womenCount,
+        date: new Date().toISOString()
       });
 
       set(state => ({
@@ -120,29 +142,23 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         ),
         loading: false
       }));
+      return data;
     } catch (error) {
-      handleApiError(error as ApiError, 'Failed to record attendance', set);
+      const err = error as ApiError;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to record attendance';
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
     }
+  },
+
+  getEventById: (id) => {
+    return get().events.find(event => event.id === id);
+  },
+
+  getEventsByStatus: (archived) => {
+    return get().events.filter(event => event.archived === archived);
   }
 }));
 
-function handleApiError(
-  error: ApiError,
-  defaultMessage: string,
-  set: (state: Partial<EventsStore>) => void
-) {
-  const errorMessage = error.response?.data?.message 
-    || error.message 
-    || defaultMessage;
-
-  set({ 
-    error: errorMessage,
-    loading: false 
-  });
-  
-  // Optional: Show toast notification
-  console.error(`${defaultMessage}:`, error);
-}
-
-// Initialize store
-useEventsStore.getState().fetchEvents();
+// Initialize store (optional - can be called when needed)
+// useEventsStore.getState().fetchEvents();

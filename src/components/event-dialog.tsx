@@ -14,6 +14,7 @@ interface EventDialogProps {
   onOpenChange: (open: boolean) => void;
   onSave: (event: Event) => void;
   mode: "view" | "edit";
+  isLoading: boolean
 }
 
 export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDialogProps) {

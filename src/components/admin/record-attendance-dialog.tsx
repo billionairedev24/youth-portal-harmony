@@ -11,6 +11,7 @@ interface RecordAttendanceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (eventId: string, menCount: number, womenCount: number) => void;
+  isLoading: boolean
 }
 
 export function RecordAttendanceDialog({
