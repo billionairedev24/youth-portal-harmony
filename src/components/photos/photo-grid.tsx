@@ -71,7 +71,7 @@ export const PhotoGrid = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      <div className="flex justify-center sm:justify-end w-full">
         <PhotoUploadDialog
           onUpload={onUpload}
           isUploading={isUploading}
