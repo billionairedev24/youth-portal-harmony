@@ -1,10 +1,11 @@
+
 import { UserLayout } from "@/components/user-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useEventsStore } from "@/stores/events-store";
 import { useState, useEffect } from "react";
 import { format, isSameDay, parseISO, addMonths, subMonths } from "date-fns";
-import { CalendarDays, Clock, MapPin, MessageSquarePlus, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, Clock, MapPin, MessageSquare, Users, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
@@ -33,7 +34,7 @@ const UserDashboard = () => {
 
   const selectedDateEvents = activeEvents.filter(event => {
     const eventDate = parseISO(event.date);
-    return date ? isSameDay(eventDate, date) : isSameDay(eventDate, new Date());
+    return date ? isSameDay(eventDate, date) : false;
   });
 
   const eventDates = activeEvents.reduce<Record<string, typeof activeEvents[number][]>>((acc, event) => {
@@ -79,22 +80,16 @@ const UserDashboard = () => {
     const dayEvents = eventDates[dateStr] || [];
     const isOutsideMonth = displayMonth && day.getMonth() !== displayMonth.getMonth();
     
-    if (!dayEvents.length) {
-      return <div className={`flex items-center justify-center w-full h-full ${isOutsideMonth ? "text-muted-foreground opacity-50" : ""}`}>
-        {day.getDate()}
-      </div>;
-    }
-    
     return (
       <TooltipProvider>
         <Tooltip delayDuration={300}>
           <TooltipTrigger asChild>
             <div className="relative flex items-center justify-center w-full h-full">
-              <div className={`flex items-center justify-center ${dayEvents.length > 0 ? 'animate-pulse-subtle font-bold text-gold-600' : ''} ${isOutsideMonth ? "text-muted-foreground opacity-50" : ""}`}>
+              <div className={`flex items-center justify-center w-9 h-9 ${dayEvents.length > 0 ? 'font-bold text-gold-600' : ''} ${isOutsideMonth ? "text-muted-foreground opacity-50" : ""}`}>
                 {day.getDate()}
               </div>
               {dayEvents.length > 1 && (
-                <span className="absolute -bottom-1 right-0 w-2 h-2 bg-gold-600 rounded-full" />
+                <span className="absolute bottom-0 right-0 w-2 h-2 bg-gold-600 rounded-full" />
               )}
             </div>
           </TooltipTrigger>
@@ -145,21 +140,27 @@ const UserDashboard = () => {
     <UserLayout>
       <div className="space-y-6 animate-fade-in">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gold-800 dark:text-gold-100">Welcome Back!</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-gold-600 to-gold-800 dark:from-gold-400 dark:to-gold-600 bg-clip-text text-transparent">
+            Welcome Back!
+          </h1>
           <Button 
             onClick={() => setShowSuggestionDialog(true)}
-            className="bg-gold-500 hover:bg-gold-600 text-white dark:bg-gold-600 dark:hover:bg-gold-700"
+            className="bg-gold-500 hover:bg-gold-600 text-white dark:bg-gold-600 dark:hover:bg-gold-700 animate-pulse-subtle shadow-lg hover:shadow-xl transition-all"
           >
-            <MessageSquarePlus className="w-4 h-4 mr-2" />
-            Create Suggestion
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Suggestion Box
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Calendar Card */}
+          <Card className="md:col-span-1 lg:col-span-1 dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
             <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
-              <CardTitle className="text-lg font-medium dark:text-gold-100">Calendar</CardTitle>
+              <CardTitle className="text-lg font-medium dark:text-gold-100 flex items-center">
+                <CalendarDays className="mr-2 h-5 w-5 text-gold-500" />
+                Calendar
+              </CardTitle>
               <div className="flex items-center gap-2">
                 <Button
                   variant="ghost"
@@ -206,14 +207,110 @@ const UserDashboard = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        {date && selectedEvent && (
-          <WeatherWidget 
-            date={date} 
-            location={selectedEvent.location} 
-          />
-        )}
+          {/* Upcoming Events Card */}
+          <Card className="md:col-span-1 lg:col-span-1 dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
+            <CardHeader className="relative z-10">
+              <CardTitle className="text-lg font-medium dark:text-gold-100 flex items-center">
+                <Clock className="mr-2 h-5 w-5 text-gold-500" />
+                Upcoming Events
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="relative z-10 pt-0">
+              <ScrollArea className="h-[280px] pr-4">
+                {activeEvents.length > 0 ? (
+                  <div className="space-y-3">
+                    {activeEvents.map((event) => {
+                      const eventDate = parseISO(event.date);
+                      const isToday = isSameDay(eventDate, new Date());
+                      const isSelected = date && isSameDay(eventDate, date);
+                      
+                      return (
+                        <div 
+                          key={event.id}
+                          className={`p-3 rounded-lg border dark:border-gold-700 transition-all cursor-pointer 
+                            ${isSelected ? 'bg-gold-100 dark:bg-gold-800/60 border-gold-300 dark:border-gold-600' : 
+                              'bg-white/60 hover:bg-gold-50 dark:bg-gold-900/40 dark:hover:bg-gold-800/30'}
+                            ${isToday ? 'ring-2 ring-gold-400 dark:ring-gold-600' : ''}
+                          `}
+                          onClick={() => setDate(eventDate)}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-medium text-sm">{event.title}</h3>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${isToday ? 'bg-gold-100 text-gold-800 border-gold-300' : 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700'}`}
+                            >
+                              {isToday ? 'Today' : format(eventDate, 'MMM d')}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                            {event.objectives}
+                          </div>
+                          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3 text-gold-500" />
+                              <span>{event.time}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-gold-500" />
+                              <span>{event.location}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Users className="h-3 w-3 text-gold-500" />
+                              <span>{event.personnel.split(',')[0]}{event.personnel.includes(',') && '...'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                    <AlertCircle className="h-10 w-10 text-gold-400 mb-2" />
+                    <h3 className="text-lg font-medium text-gold-600 mb-1">No Events Found</h3>
+                    <p className="text-sm text-muted-foreground">
+                      There are no upcoming events scheduled at this time.
+                    </p>
+                  </div>
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Weather Widget */}
+          <Card className="md:col-span-2 lg:col-span-1 dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
+            <CardHeader className="relative z-10 pb-2">
+              <CardTitle className="text-lg font-medium dark:text-gold-100">
+                {date && selectedEvent ? (
+                  <span className="flex items-center">
+                    <MapPin className="mr-2 h-5 w-5 text-gold-500" />
+                    Weather for {selectedEvent.location}
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <MapPin className="mr-2 h-5 w-5 text-gold-500" />
+                    Local Weather
+                  </span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="relative z-10 pt-2">
+              {date && selectedEvent ? (
+                <WeatherWidget 
+                  date={date} 
+                  location={selectedEvent.location} 
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[280px] text-center">
+                  <div className="text-muted-foreground mb-2">Select an event to see weather information</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         {selectedEvent && (
           <UserPhotoViewer
@@ -223,10 +320,13 @@ const UserDashboard = () => {
         )}
 
         <div>
-          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden">
+          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
             <CardHeader className="relative z-10">
-              <CardTitle className="text-lg font-medium dark:text-gold-100">Active Polls</CardTitle>
+              <CardTitle className="text-lg font-medium dark:text-gold-100 flex items-center">
+                <MessageSquare className="mr-2 h-5 w-5 text-gold-500" />
+                Active Polls
+              </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
               <UserPolls />
