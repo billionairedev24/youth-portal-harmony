@@ -1,10 +1,11 @@
+
 import { UserLayout } from "@/components/user-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { useEventsStore } from "@/stores/events-store";
-import { useState } from "react";
-import { format, isSameDay, parseISO } from "date-fns";
-import { CalendarDays, Clock, MapPin, MessageSquarePlus, Users } from "lucide-react";
+import { useState, useEffect } from "react";
+import { format, isSameDay, parseISO, addMonths, subMonths } from "date-fns";
+import { CalendarDays, Clock, MapPin, MessageSquarePlus, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
@@ -18,13 +19,15 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { UserPolls } from "@/components/user-polls";
-import { DayProps } from "react-day-picker";
+import { DayClickEventHandler, DayProps } from "react-day-picker";
+import { WeatherWidget } from "@/components/weather-widget";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [showSuggestionDialog, setShowSuggestionDialog] = useState(false);
   const [photos] = useState<Photo[]>([]); // In a real app, this would be fetched from your backend
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   
   const activeEvents = events.filter(event => !event.archived);
   const selectedEvent = activeEvents.find(event => date && isSameDay(parseISO(event.date), date));
@@ -47,6 +50,15 @@ const UserDashboard = () => {
     return acc;
   }, {});
 
+  // Handle month navigation
+  const goToPreviousMonth = () => {
+    setCurrentMonth(prevMonth => subMonths(prevMonth, 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(prevMonth => addMonths(prevMonth, 1));
+  };
+
   // Prepare data for the calendar modifiers
   const modifiers = {
     hasEvent: (day: Date) => {
@@ -64,12 +76,16 @@ const UserDashboard = () => {
   };
 
   // Custom day renderer for the calendar
-  const renderDay = (day: Date, dayProps: DayProps) => {
+  const renderDay = (props: DayProps) => {
+    const { date: day, displayMonth } = props;
+    if (!day) return null;
+    
     const dateStr = format(day, 'yyyy-MM-dd');
     const dayEvents = eventDates[dateStr] || [];
+    const isOutsideMonth = displayMonth && day.getMonth() !== displayMonth.getMonth();
     
     if (!dayEvents.length) {
-      return <div>{day.getDate()}</div>;
+      return <div className={isOutsideMonth ? "text-muted-foreground opacity-50" : ""}>{day.getDate()}</div>;
     }
     
     return (
@@ -77,7 +93,7 @@ const UserDashboard = () => {
         <Tooltip delayDuration={300}>
           <TooltipTrigger asChild>
             <div className="relative flex items-center justify-center w-full h-full">
-              <div className={`flex items-center justify-center ${dayEvents.length > 0 ? 'animate-pulse-subtle' : ''}`}>
+              <div className={`flex items-center justify-center ${dayEvents.length > 0 ? 'animate-pulse-subtle font-bold text-gold-600' : ''} ${isOutsideMonth ? "text-muted-foreground opacity-50" : ""}`}>
                 {day.getDate()}
               </div>
               {dayEvents.length > 1 && (
@@ -131,7 +147,8 @@ const UserDashboard = () => {
   return (
     <UserLayout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gold-800 dark:text-gold-100">Welcome Back!</h1>
           <Button 
             onClick={() => setShowSuggestionDialog(true)}
             className="bg-gold-500 hover:bg-gold-600 text-white dark:bg-gold-600 dark:hover:bg-gold-700"
@@ -142,16 +159,33 @@ const UserDashboard = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
+            <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
               <CardTitle className="text-lg font-medium dark:text-gold-100">Calendar</CardTitle>
-              {date && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={goToPreviousMonth}
+                  className="h-8 w-8 p-0 hover:bg-gold-100 dark:hover:bg-gold-800/50"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
                 <Badge variant="outline" className="bg-gold-100/50 text-gold-800 dark:bg-gold-800/50 dark:text-gold-100 dark:border-gold-700">
-                  {format(date, 'MMMM yyyy')}
+                  {format(currentMonth, 'MMMM yyyy')}
                 </Badge>
-              )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={goToNextMonth}
+                  className="h-8 w-8 p-0 hover:bg-gold-100 dark:hover:bg-gold-800/50"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="pt-4 relative z-10">
               <div className="relative flex justify-center">
                 <TooltipProvider>
                   <Calendar
@@ -161,8 +195,10 @@ const UserDashboard = () => {
                     className="rounded-md border mx-auto dark:bg-gold-900/50 dark:border-gold-700 dark:text-gold-100"
                     modifiers={modifiers}
                     modifiersStyles={modifiersStyles}
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
                     components={{
-                      Day: ({ date: dayDate, activeModifiers }) => renderDay(dayDate, activeModifiers),
+                      Day: (props) => renderDay(props),
                     }}
                     classNames={{
                       day_selected: "bg-gold-500 text-primary-foreground hover:bg-gold-500 hover:text-primary-foreground focus:bg-gold-500 focus:text-primary-foreground dark:bg-gold-600",
@@ -174,22 +210,23 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
           
-          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg">
-            <CardHeader className="pb-2">
+          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
+            <CardHeader className="pb-2 relative z-10">
               <CardTitle className="text-lg font-medium dark:text-gold-100">
                 {selectedDateEvents.length > 0 
                   ? `Events on ${format(date || new Date(), 'MMMM d, yyyy')}`
                   : "Upcoming Events"}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="pt-4 relative z-10">
               <ScrollArea className="h-[300px] pr-4">
                 <div className="space-y-4">
                   {(selectedDateEvents.length > 0 ? selectedDateEvents : activeEvents)
                     .map((event) => (
                       <div
                         key={event.id}
-                        className="p-4 rounded-lg bg-gold-50/80 dark:bg-gold-800/40 space-y-2 border border-gold-200/50 dark:border-gold-700/50 transition-all hover:shadow-md"
+                        className="p-4 rounded-lg bg-gold-50/80 dark:bg-gold-800/40 space-y-2 border border-gold-200/50 dark:border-gold-700/50 transition-all hover:shadow-md hover:scale-[1.01] duration-200"
                       >
                         <h3 className="font-semibold text-lg dark:text-gold-100">{event.title}</h3>
                         <p className="text-sm text-gold-700 dark:text-gold-400">
@@ -236,6 +273,14 @@ const UserDashboard = () => {
           </Card>
         </div>
 
+        {/* Weather widget for selected date */}
+        {date && selectedEvent && (
+          <WeatherWidget 
+            date={date} 
+            location={selectedEvent.location} 
+          />
+        )}
+
         {selectedEvent && (
           <UserPhotoViewer
             photos={photos}
@@ -244,11 +289,12 @@ const UserDashboard = () => {
         )}
 
         <div>
-          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg">
-            <CardHeader>
+          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
+            <CardHeader className="relative z-10">
               <CardTitle className="text-lg font-medium dark:text-gold-100">Active Polls</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <UserPolls />
             </CardContent>
           </Card>
