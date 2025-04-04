@@ -1,4 +1,3 @@
-
 import { UserLayout } from "@/components/user-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -18,6 +17,8 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { UserPolls } from "@/components/user-polls";
+import { DayProps } from "react-day-picker";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
@@ -63,7 +64,7 @@ const UserDashboard = () => {
   };
 
   // Custom day renderer for the calendar
-  const renderDay = (day: Date, activeModifiers: Record<string, boolean>) => {
+  const renderDay = (day: Date, dayProps: DayProps) => {
     const dateStr = format(day, 'yyyy-MM-dd');
     const dayEvents = eventDates[dateStr] || [];
     
