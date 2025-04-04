@@ -1,4 +1,3 @@
-
 import { UserLayout } from "@/components/user-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -37,7 +36,6 @@ const UserDashboard = () => {
     return date ? isSameDay(eventDate, date) : isSameDay(eventDate, new Date());
   });
 
-  // Build an object mapping each date to event data
   const eventDates = activeEvents.reduce<Record<string, typeof activeEvents[number][]>>((acc, event) => {
     const eventDate = parseISO(event.date);
     const dateStr = format(eventDate, 'yyyy-MM-dd');
@@ -50,7 +48,6 @@ const UserDashboard = () => {
     return acc;
   }, {});
 
-  // Handle month navigation
   const goToPreviousMonth = () => {
     setCurrentMonth(prevMonth => subMonths(prevMonth, 1));
   };
@@ -59,7 +56,6 @@ const UserDashboard = () => {
     setCurrentMonth(prevMonth => addMonths(prevMonth, 1));
   };
 
-  // Prepare data for the calendar modifiers
   const modifiers = {
     hasEvent: (day: Date) => {
       return format(day, 'yyyy-MM-dd') in eventDates;
@@ -75,7 +71,6 @@ const UserDashboard = () => {
     }
   };
 
-  // Custom day renderer for the calendar
   const renderDay = (props: DayProps) => {
     const { date: day, displayMonth } = props;
     if (!day) return null;
@@ -85,7 +80,9 @@ const UserDashboard = () => {
     const isOutsideMonth = displayMonth && day.getMonth() !== displayMonth.getMonth();
     
     if (!dayEvents.length) {
-      return <div className={isOutsideMonth ? "text-muted-foreground opacity-50" : ""}>{day.getDate()}</div>;
+      return <div className={`flex items-center justify-center w-full h-full ${isOutsideMonth ? "text-muted-foreground opacity-50" : ""}`}>
+        {day.getDate()}
+      </div>;
     }
     
     return (
@@ -209,71 +206,8 @@ const UserDashboard = () => {
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
-            <CardHeader className="pb-2 relative z-10">
-              <CardTitle className="text-lg font-medium dark:text-gold-100">
-                {selectedDateEvents.length > 0 
-                  ? `Events on ${format(date || new Date(), 'MMMM d, yyyy')}`
-                  : "Upcoming Events"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 relative z-10">
-              <ScrollArea className="h-[300px] pr-4">
-                <div className="space-y-4">
-                  {(selectedDateEvents.length > 0 ? selectedDateEvents : activeEvents)
-                    .map((event) => (
-                      <div
-                        key={event.id}
-                        className="p-4 rounded-lg bg-gold-50/80 dark:bg-gold-800/40 space-y-2 border border-gold-200/50 dark:border-gold-700/50 transition-all hover:shadow-md hover:scale-[1.01] duration-200"
-                      >
-                        <h3 className="font-semibold text-lg dark:text-gold-100">{event.title}</h3>
-                        <p className="text-sm text-gold-700 dark:text-gold-400">
-                          {event.objectives}
-                        </p>
-                        <div className="flex flex-col gap-2 text-sm">
-                          <div className="flex items-center gap-2 text-gold-600 dark:text-gold-300">
-                            <CalendarDays className="h-4 w-4" />
-                            <span>{format(parseISO(event.date), 'MMMM d, yyyy')}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gold-600 dark:text-gold-300">
-                            <Clock className="h-4 w-4" />
-                            <span>{event.time}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gold-600 dark:text-gold-300">
-                            <MapPin className="h-4 w-4" />
-                            <span>{event.location}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gold-600 dark:text-gold-300">
-                            <Users className="h-4 w-4" />
-                            <span>{event.personnel}</span>
-                          </div>
-                          {event.attendance && (
-                            <div className="flex items-center mt-2 gap-2">
-                              <Badge className="bg-gold-500/80 hover:bg-gold-500 dark:bg-gold-700/80 dark:hover:bg-gold-700">
-                                {event.attendance.men + event.attendance.women} Attended
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  {(selectedDateEvents.length === 0 && activeEvents.length === 0) && (
-                    <div className="flex flex-col items-center justify-center h-40 gap-3">
-                      <CalendarDays className="h-12 w-12 text-gold-300 dark:text-gold-700" />
-                      <p className="text-gold-500 dark:text-gold-400 text-center">
-                        No upcoming events
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Weather widget for selected date */}
         {date && selectedEvent && (
           <WeatherWidget 
             date={date} 
