@@ -2,7 +2,7 @@ import { ApiError, api } from '@/utils/axiosConfig';
 import { create } from 'zustand';
 
 export type Event = {
-  id: string;
+  id?: string; // Changed from 'any' to 'string' for type safety
   title: string;
   objectives: string;
   personnel: string;
@@ -21,12 +21,12 @@ type EventsStore = {
   events: Event[];
   loading: boolean;
   error: string | null;
-  fetchEvents: () => Promise<Event[]>;
-  addEvent: (event: Omit<Event, 'id'>) => Promise<Event>;
-  updateEvent: (id: string, event: Partial<Event>) => Promise<Event>;
+  fetchEvents: () => Promise<void>;
+  addEvent: (event: Omit<Event, 'id'>) => Promise<void>;
+  updateEvent: (id: string, event: Partial<Event>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
-  toggleArchive: (id: string) => Promise<Event>;
-  recordAttendance: (eventId: string, menCount: number, womenCount: number) => Promise<Event>;
+  toggleArchive: (id: string) => Promise<void>;
+  recordAttendance: (eventId: string, menCount: number, womenCount: number) => Promise<void>;
   getEventById: (id: string) => Event | undefined;
   getEventsByStatus: (archived: boolean) => Event[];
 };
@@ -41,12 +41,11 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
     try {
       const { data } = await api.get<Event[]>('/event/findAll');
       set({ events: data, loading: false });
-      return data;
     } catch (error) {
       const err = error as ApiError;
       const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch events';
       set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage);
+      throw error; // Re-throw to allow component to handle
     }
   },
 
@@ -58,12 +57,11 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         events: [...state.events, data],
         loading: false
       }));
-      return data;
     } catch (error) {
       const err = error as ApiError;
       const errorMessage = err.response?.data?.message || err.message || 'Failed to add event';
       set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage);
+      throw error;
     }
   },
 
@@ -77,12 +75,11 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         ),
         loading: false
       }));
-      return data;
     } catch (error) {
       const err = error as ApiError;
       const errorMessage = err.response?.data?.message || err.message || 'Failed to update event';
       set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage);
+      throw error;
     }
   },
 
@@ -98,7 +95,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
       const err = error as ApiError;
       const errorMessage = err.response?.data?.message || err.message || 'Failed to delete event';
       set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage);
+      throw error;
     }
   },
 
@@ -118,12 +115,11 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         ),
         loading: false
       }));
-      return data;
     } catch (error) {
       const err = error as ApiError;
       const errorMessage = err.response?.data?.message || err.message || 'Failed to toggle archive';
       set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage);
+      throw error;
     }
   },
 
@@ -142,12 +138,11 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         ),
         loading: false
       }));
-      return data;
     } catch (error) {
       const err = error as ApiError;
       const errorMessage = err.response?.data?.message || err.message || 'Failed to record attendance';
       set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage);
+      throw error;
     }
   },
 
@@ -160,5 +155,9 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   }
 }));
 
-// Initialize store (optional - can be called when needed)
-useEventsStore.getState().fetchEvents();
+// Optional: Export a function to initialize the store when needed
+export const initializeEventsStore = () => {
+  useEventsStore.getState().fetchEvents();
+};
+
+initializeEventsStore();

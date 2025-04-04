@@ -34,7 +34,6 @@ const EventsPage = () => {
     deleteEvent, 
     toggleArchive, 
     recordAttendance,
-    error,
     loading
   } = useEventsStore();
   
@@ -46,7 +45,6 @@ const EventsPage = () => {
 
   const handleCreateEvent = () => {
     setSelectedEvent({
-      id: '',
       title: '',
       objectives: '',
       personnel: '',
@@ -63,24 +61,15 @@ const EventsPage = () => {
     try {
       if (dialogMode === 'create') {
         await addEvent(eventData);
-        toast({
-          title: 'Success',
-          description: 'Event created successfully',
-          variant: 'default',
-        });
       } else {
         await updateEvent(eventData.id, eventData);
-        toast({
-          title: 'Success',
-          description: 'Event updated successfully',
-          variant: 'default',
-        });
       }
       setDialogOpen(false);
     } catch (err) {
+      const error = err as Error;
       toast({
         title: 'Error',
-        description: error || 'Failed to save event',
+        description: error.message || 'Failed to save event',
         variant: 'destructive',
       });
     }
@@ -89,15 +78,11 @@ const EventsPage = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteEvent(id);
-      toast({
-        title: 'Success',
-        description: 'Event deleted successfully',
-        variant: 'default',
-      });
     } catch (err) {
+      const error = err as Error;
       toast({
         title: 'Error',
-        description: error || 'Failed to delete event',
+        description: error.message || 'Failed to delete event',
         variant: 'destructive',
       });
     }
@@ -106,16 +91,13 @@ const EventsPage = () => {
   const handleToggleArchive = async (id: string) => {
     try {
       const event = events.find(e => e.id === id);
+      if (!event) throw new Error('Event not found');
       await toggleArchive(id);
-      toast({
-        title: 'Success',
-        description: event?.archived ? 'Event restored' : 'Event archived',
-        variant: 'default',
-      });
     } catch (err) {
+      const error = err as Error;
       toast({
         title: 'Error',
-        description: error || 'Failed to toggle archive status',
+        description: error.message || 'Failed to toggle archive status',
         variant: 'destructive',
       });
     }
@@ -135,9 +117,10 @@ const EventsPage = () => {
       });
       setAttendanceDialogOpen(false);
     } catch (err) {
+      const error = err as Error;
       toast({
         title: 'Error',
-        description: error || 'Failed to record attendance',
+        description: error.message || 'Failed to record attendance',
         variant: 'destructive',
       });
     }
