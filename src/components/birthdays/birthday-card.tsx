@@ -15,7 +15,7 @@ export function BirthdayCard({ member }: BirthdayCardProps) {
                  birthdayDate.getMonth() === new Date().getMonth();
   
   return (
-    <div className={`flex items-center p-2 rounded-lg transition-all hover:bg-gold-50/50 dark:hover:bg-gold-800/30 group ${isToday ? 'ring-1 ring-gold-300 dark:ring-gold-600 bg-gold-50/30 dark:bg-gold-800/20' : ''}`}>
+    <div className={`flex items-center p-3 group-hover:bg-gold-50/80 dark:group-hover:bg-gold-800/20 rounded-lg transition-all ${isToday ? 'ring-2 ring-gold-300 dark:ring-gold-600 bg-gold-50/50 dark:bg-gold-800/30' : ''}`}>
       <Avatar className="h-12 w-12 border-2 border-gold-100 dark:border-gold-800 shadow-sm group-hover:scale-105 transition-transform">
         <AvatarImage 
           src={member.image} 
@@ -40,7 +40,7 @@ export function BirthdayCard({ member }: BirthdayCardProps) {
         </div>
       </div>
       
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${isToday ? 'bg-gold-300 text-gold-900 dark:bg-gold-500 dark:text-gold-100' : 'bg-gold-100 dark:bg-gold-800 text-gold-800 dark:text-gold-200'}`}>
+      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${isToday ? 'bg-gold-300 text-gold-900 dark:bg-gold-500 dark:text-gold-100 shadow-md' : 'bg-gold-100 dark:bg-gold-800 text-gold-800 dark:text-gold-200 shadow-sm'}`}>
         {day}
       </div>
     </div>

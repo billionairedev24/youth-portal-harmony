@@ -43,7 +43,7 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
     if (!isValid) return;
 
     // In a real application, this would send the message through the appropriate channel
-    toast.success(`Birthday wishes sent to ${member.firstName} via ${member.notificationPreference === "email" ? "email" : member.notificationPreference === "sms" ? "SMS" : "WhatsApp"}`);
+    toast.success(`Birthday wishes sent to ${member.firstName} via ${member.notificationPreference === "email" ? "email" : "SMS"}`);
     setMessage("");
     setSubject("");
     onOpenChange(false);
@@ -62,25 +62,32 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
         return <Mail className="h-5 w-5 mr-2 text-gold-500" />;
       case 'sms':
         return <Phone className="h-5 w-5 mr-2 text-gold-500" />;
-      case 'whatsapp':
-        return <MessageSquare className="h-5 w-5 mr-2 text-gold-500" />;
       default:
         return <Mail className="h-5 w-5 mr-2 text-gold-500" />;
     }
   };
 
+  const getPreferenceName = () => {
+    switch(member.notificationPreference) {
+      case 'email':
+        return "Email";
+      case 'sms':
+        return "SMS";
+      default:
+        return "Email";
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gold-50 to-white dark:from-gold-900/80 dark:to-gold-950/90 border-gold-200 dark:border-gold-700">
+      <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gold-50 to-white dark:from-gold-900/80 dark:to-gold-950/90 border-gold-200 dark:border-gold-700 shadow-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             {getPreferenceIcon()}
             Send Birthday Wishes to {member.firstName} {member.lastName}
           </DialogTitle>
           <DialogDescription>
-            Send a message via {member.notificationPreference === "email" ? "Email" : 
-                              member.notificationPreference === "sms" ? "SMS" : 
-                              "WhatsApp"}
+            Send a message via {getPreferenceName()}
           </DialogDescription>
         </DialogHeader>
 
@@ -123,7 +130,7 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
           <Button 
             onClick={handleSend} 
             disabled={!isValid}
-            className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600"
+            className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600 shadow-md"
           >
             {getPreferenceIcon()}
             Send Birthday Wishes

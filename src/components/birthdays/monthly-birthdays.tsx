@@ -3,7 +3,7 @@ import { useMembersStore } from "@/stores/members-store";
 import { BirthdayCard } from "./birthday-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Cake, Gift, Mail, Phone, MessageSquare } from "lucide-react";
+import { Cake, Gift, Mail, Phone } from "lucide-react";
 import { useState } from "react";
 import { format, isSameMonth, parseISO } from "date-fns";
 import { MessageMemberDialog } from "@/components/message-member-dialog";
@@ -32,7 +32,7 @@ const mockMembers = [
     phone: "+1987654321",
     address: "456 Oak Ave",
     birthday: new Date(new Date().getFullYear(), new Date().getMonth(), 15).toISOString(),
-    notificationPreference: "whatsapp" as const,
+    notificationPreference: "sms" as const,
     role: "member" as const
   },
   {
@@ -44,7 +44,7 @@ const mockMembers = [
     phone: "+1122334455",
     address: "789 Pine St",
     birthday: new Date(new Date().getFullYear(), new Date().getMonth(), 25).toISOString(),
-    notificationPreference: "sms" as const,
+    notificationPreference: "email" as const,
     role: "member" as const
   },
 ];
@@ -68,17 +68,9 @@ export function MonthlyBirthdays() {
     return dayA - dayB;
   });
   
-  const getNotificationIcon = (preference) => {
-    switch(preference) {
-      case 'email':
-        return <Mail className="h-3.5 w-3.5" />;
-      case 'sms':
-        return <Phone className="h-3.5 w-3.5" />;
-      case 'whatsapp':
-        return <MessageSquare className="h-3.5 w-3.5" />;
-      default:
-        return <Mail className="h-3.5 w-3.5" />;
-    }
+  // Determine if a member has multiple notification methods
+  const hasMultipleNotificationOptions = (member) => {
+    return member.email && member.phone;
   };
   
   return (
@@ -99,22 +91,38 @@ export function MonthlyBirthdays() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-500"></div>
           </div>
         ) : birthdaysThisMonth.length > 0 ? (
-          <ScrollArea className="h-[220px] pr-4">
-            <div className="space-y-2">
+          <ScrollArea className="h-[220px] pr-4 -mr-4">
+            <div className="space-y-3 pr-2">
               {birthdaysThisMonth.map((member) => (
-                <div key={member.id} className="group relative shadow-sm hover:shadow-md rounded-lg transition-all">
-                  <BirthdayCard member={member} />
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                    <button 
-                      onClick={() => {
-                        setSelectedMember(member);
-                        setShowMessageDialog(true);
-                      }}
-                      className="p-1.5 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300"
-                      title={`Send birthday wishes via ${member.notificationPreference === "email" ? "email" : member.notificationPreference === "sms" ? "SMS" : "WhatsApp"}`}
-                    >
-                      {getNotificationIcon(member.notificationPreference)}
-                    </button>
+                <div key={member.id} className="group relative rounded-lg transition-all overflow-visible">
+                  <div className="bg-white/50 dark:bg-gold-900/40 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                    <BirthdayCard member={member} />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5">
+                      {member.email && (
+                        <button 
+                          onClick={() => {
+                            setSelectedMember({...member, notificationPreference: "email"});
+                            setShowMessageDialog(true);
+                          }}
+                          className="p-1.5 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300 shadow-sm"
+                          title="Send birthday wishes via email"
+                        >
+                          <Mail className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                      {member.phone && (
+                        <button 
+                          onClick={() => {
+                            setSelectedMember({...member, notificationPreference: "sms"});
+                            setShowMessageDialog(true);
+                          }}
+                          className="p-1.5 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300 shadow-sm"
+                          title="Send birthday wishes via SMS"
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
