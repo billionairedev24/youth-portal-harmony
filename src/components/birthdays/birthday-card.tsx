@@ -1,0 +1,46 @@
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { format } from "date-fns";
+import { Cake } from "lucide-react";
+import { Member } from "@/stores/members-store";
+
+interface BirthdayCardProps {
+  member: Member;
+}
+
+export function BirthdayCard({ member }: BirthdayCardProps) {
+  const birthdayDate = new Date(member.birthday);
+  const day = birthdayDate.getDate();
+  
+  return (
+    <div className="flex items-center p-2 rounded-lg transition-all hover:bg-gold-50/50 dark:hover:bg-gold-900/30 group">
+      <Avatar className="h-12 w-12 border-2 border-gold-100 dark:border-gold-800 shadow-sm group-hover:scale-105 transition-transform">
+        <AvatarImage 
+          src={member.image} 
+          alt={`${member.firstName} ${member.lastName}`}
+          className="object-cover"
+        />
+        <AvatarFallback className="bg-gold-100 text-gold-800 dark:bg-gold-800 dark:text-gold-100">
+          {member.firstName[0]}{member.lastName[0]}
+        </AvatarFallback>
+      </Avatar>
+      
+      <div className="ml-3 flex-1">
+        <p className="font-medium text-sm text-gold-900 dark:text-gold-100">
+          {member.firstName} {member.lastName}
+        </p>
+        <div className="flex items-center mt-1">
+          <Cake className="w-3 h-3 text-gold-500 mr-1" />
+          <p className="text-xs text-gold-600 dark:text-gold-400">
+            {format(birthdayDate, 'MMMM do')}
+          </p>
+        </div>
+      </div>
+      
+      <div className="w-8 h-8 rounded-full bg-gold-100 dark:bg-gold-800 flex items-center justify-center text-xs font-bold text-gold-800 dark:text-gold-200">
+        {day}
+      </div>
+    </div>
+  );
+}

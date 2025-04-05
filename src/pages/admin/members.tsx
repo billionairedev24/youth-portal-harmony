@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Eye, EyeOff, MoreHorizontal, MessageSquare, UserCog, Pencil } from "lucide-react";
+import { Eye, EyeOff, MoreHorizontal, MessageSquare, UserCog, Pencil, Cake } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useMembersStore } from "@/stores/members-store";
@@ -18,10 +18,13 @@ import type { Member, NotificationPreference } from "@/stores/members-store";
 import { MemberDialog } from "@/components/member-dialog";
 import { MessageMemberDialog } from "@/components/message-member-dialog";
 import { EditMemberDialog } from "@/components/edit-member-dialog";
-import { format } from "date-fns";
+import { format, isSameMonth } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { CommunicationCenter } from "@/components/communication-center";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MonthlyBirthdays } from "@/components/birthdays/monthly-birthdays";
 
 const MembersPage = () => {
   const { members, toggleRole } = useMembersStore();
@@ -251,6 +254,7 @@ const MembersPage = () => {
         <Tabs defaultValue="members" className="w-full">
           <TabsList className="w-full mb-4">
             <TabsTrigger value="members" className="flex-1">Members List</TabsTrigger>
+            <TabsTrigger value="birthdays" className="flex-1">Birthdays</TabsTrigger>
             <TabsTrigger value="communication" className="flex-1">Communication Center</TabsTrigger>
           </TabsList>
           
@@ -265,6 +269,75 @@ const MembersPage = () => {
                 />
               </div>
             )}
+          </TabsContent>
+          
+          <TabsContent value="birthdays">
+            <div className="grid gap-6 md:grid-cols-2">
+              <MonthlyBirthdays />
+              
+              <Card className="bg-gradient-to-br from-gold-50/80 to-gold-100/40 dark:from-gold-900/60 dark:to-gold-800/30 border-gold-200 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="text-lg font-medium flex items-center text-gold-800 dark:text-gold-100">
+                    <Cake className="mr-2 h-5 w-5 text-gold-500" />
+                    Birthday Statistics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-white/70 dark:bg-black/20 p-4 rounded-lg">
+                        <p className="text-sm text-muted-foreground mb-1">Total Birthdays</p>
+                        <p className="text-2xl font-bold text-gold-600">{members.length}</p>
+                      </div>
+                      
+                      <div className="bg-white/70 dark:bg-black/20 p-4 rounded-lg">
+                        <p className="text-sm text-muted-foreground mb-1">This Month</p>
+                        <p className="text-2xl font-bold text-gold-600">
+                          {members.filter(member => isSameMonth(new Date(member.birthday), new Date())).length}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/70 dark:bg-black/20 p-4 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">Upcoming Birthdays</p>
+                      <ScrollArea className="h-[140px]">
+                        <div className="space-y-2">
+                          {members
+                            .filter(member => {
+                              const birthday = new Date(member.birthday);
+                              const today = new Date();
+                              const thisYearBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+                              return thisYearBirthday >= today;
+                            })
+                            .sort((a, b) => {
+                              const birthdayA = new Date(a.birthday);
+                              const birthdayB = new Date(b.birthday);
+                              const today = new Date();
+                              const thisYearBirthdayA = new Date(today.getFullYear(), birthdayA.getMonth(), birthdayA.getDate());
+                              const thisYearBirthdayB = new Date(today.getFullYear(), birthdayB.getMonth(), birthdayB.getDate());
+                              return thisYearBirthdayA.getTime() - thisYearBirthdayB.getTime();
+                            })
+                            .slice(0, 5)
+                            .map(member => (
+                              <div key={member.id} className="flex items-center p-1">
+                                <Avatar className="h-8 w-8 mr-2">
+                                  <AvatarImage src={member.image} alt={`${member.firstName} ${member.lastName}`} />
+                                  <AvatarFallback>{member.firstName[0]}{member.lastName[0]}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="text-xs font-medium">{member.firstName} {member.lastName}</p>
+                                  <p className="text-xs text-muted-foreground">{format(new Date(member.birthday), 'MMMM do')}</p>
+                                </div>
+                              </div>
+                            ))
+                          }
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
           
           <TabsContent value="communication">

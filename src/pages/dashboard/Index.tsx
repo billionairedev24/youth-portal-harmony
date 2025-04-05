@@ -1,4 +1,3 @@
-
 import { UserLayout } from "@/components/user-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -22,6 +21,7 @@ import { UserPolls } from "@/components/user-polls";
 import { DayClickEventHandler, DayProps } from "react-day-picker";
 import { WeatherWidget } from "@/components/weather-widget";
 import { SuggestionBox } from "@/components/suggestion-box";
+import { MonthlyBirthdays } from "@/components/birthdays/monthly-birthdays";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
@@ -300,8 +300,18 @@ const UserDashboard = () => {
           </Card>
         </div>
         
-        {/* Suggestion Box */}
-        <SuggestionBox />
+        {/* Second row with Monthly Birthdays and Suggestion Box */}
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* Monthly Birthdays */}
+          <div className="md:col-span-2">
+            <MonthlyBirthdays />
+          </div>
+          
+          {/* Suggestion Box - Now more compact */}
+          <div className="md:col-span-1">
+            <SuggestionBox />
+          </div>
+        </div>
         
         {selectedEvent && (
           <UserPhotoViewer
