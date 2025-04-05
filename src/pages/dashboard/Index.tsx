@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useEventsStore } from "@/stores/events-store";
 import { useState, useEffect } from "react";
 import { format, isSameDay, parseISO, addMonths, subMonths } from "date-fns";
-import { CalendarDays, Clock, MapPin, MessageSquare, Users, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import { CalendarDays, Clock, MapPin, MessageSquare, Users, ChevronLeft, ChevronRight, AlertCircle, Zap } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { CreateSuggestionDialog } from "@/components/create-suggestion-dialog";
@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { UserPolls } from "@/components/user-polls";
 import { DayClickEventHandler, DayProps } from "react-day-picker";
 import { WeatherWidget } from "@/components/weather-widget";
+import { SuggestionBox } from "@/components/suggestion-box";
 
 const UserDashboard = () => {
   const { events } = useEventsStore();
@@ -139,19 +140,6 @@ const UserDashboard = () => {
   return (
     <UserLayout>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gold-600 to-gold-800 dark:from-gold-400 dark:to-gold-600 bg-clip-text text-transparent">
-            Welcome Back!
-          </h1>
-          <Button 
-            onClick={() => setShowSuggestionDialog(true)}
-            className="bg-gold-500 hover:bg-gold-600 text-white dark:bg-gold-600 dark:hover:bg-gold-700 animate-pulse-subtle shadow-lg hover:shadow-xl transition-all"
-          >
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Suggestion Box
-          </Button>
-        </div>
-
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Calendar Card */}
           <Card className="md:col-span-1 lg:col-span-1 dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
@@ -280,7 +268,7 @@ const UserDashboard = () => {
           </Card>
 
           {/* Weather Widget */}
-          <Card className="md:col-span-2 lg:col-span-1 dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+          <Card className="md:col-span-1 lg:col-span-1 dark:bg-gold-900/50 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gold-100/30 dark:to-gold-900/30 pointer-events-none rounded-lg" />
             <CardHeader className="relative z-10 pb-2">
               <CardTitle className="text-lg font-medium dark:text-gold-100">
@@ -298,20 +286,23 @@ const UserDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10 pt-2">
-              {date && selectedEvent ? (
+              {date ? (
                 <WeatherWidget 
                   date={date} 
-                  location={selectedEvent.location} 
+                  location={selectedEvent?.location || "Local"}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-[280px] text-center">
-                  <div className="text-muted-foreground mb-2">Select an event to see weather information</div>
+                  <div className="text-muted-foreground mb-2">Select a date to see weather information</div>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
-
+        
+        {/* Suggestion Box */}
+        <SuggestionBox />
+        
         {selectedEvent && (
           <UserPhotoViewer
             photos={photos}
