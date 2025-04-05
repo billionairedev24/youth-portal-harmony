@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { Member } from "@/stores/members-store";
 import { toast } from "sonner";
+import { Mail, Phone, MessageSquare } from "lucide-react";
 
 interface MessageMemberDialogProps {
   member: Member | null;
@@ -26,13 +27,23 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
     }
   }, [message, subject, member?.notificationPreference]);
 
+  // Set the default message for birthday wishes when the dialog opens
+  useEffect(() => {
+    if (open && member) {
+      setMessage(`Happy birthday, ${member.firstName}! Wishing you a wonderful celebration and a fantastic year ahead.`);
+      if (member.notificationPreference === "email") {
+        setSubject(`Happy Birthday ${member.firstName}!`);
+      }
+    }
+  }, [open, member]);
+
   if (!member) return null;
 
   const handleSend = () => {
     if (!isValid) return;
 
     // In a real application, this would send the message through the appropriate channel
-    toast.success(`Message sent to ${member.firstName} via ${member.notificationPreference}`);
+    toast.success(`Birthday wishes sent to ${member.firstName} via ${member.notificationPreference === "email" ? "email" : member.notificationPreference === "sms" ? "SMS" : "WhatsApp"}`);
     setMessage("");
     setSubject("");
     onOpenChange(false);
@@ -45,13 +56,31 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
     return null;
   };
 
+  const getPreferenceIcon = () => {
+    switch(member.notificationPreference) {
+      case 'email':
+        return <Mail className="h-5 w-5 mr-2 text-gold-500" />;
+      case 'sms':
+        return <Phone className="h-5 w-5 mr-2 text-gold-500" />;
+      case 'whatsapp':
+        return <MessageSquare className="h-5 w-5 mr-2 text-gold-500" />;
+      default:
+        return <Mail className="h-5 w-5 mr-2 text-gold-500" />;
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gold-50 to-white dark:from-gold-900/80 dark:to-gold-950/90 border-gold-200 dark:border-gold-700">
         <DialogHeader>
-          <DialogTitle>Message {member.firstName} {member.lastName}</DialogTitle>
+          <DialogTitle className="flex items-center">
+            {getPreferenceIcon()}
+            Send Birthday Wishes to {member.firstName} {member.lastName}
+          </DialogTitle>
           <DialogDescription>
-            Send a message via {member.notificationPreference}
+            Send a message via {member.notificationPreference === "email" ? "Email" : 
+                              member.notificationPreference === "sms" ? "SMS" : 
+                              "WhatsApp"}
           </DialogDescription>
         </DialogHeader>
 
@@ -64,6 +93,7 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
                 onChange={(e) => setSubject(e.target.value)}
                 required
                 aria-required="true"
+                className="border-gold-200 focus:border-gold-400 focus:ring-gold-400"
               />
               {subject.trim().length === 0 && (
                 <p className="text-sm text-destructive">Subject is required for email messages</p>
@@ -76,7 +106,7 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               maxLength={member.notificationPreference === "sms" ? 160 : undefined}
-              className="min-h-[100px]"
+              className="min-h-[100px] border-gold-200 focus:border-gold-400 focus:ring-gold-400"
               required
               aria-required="true"
             />
@@ -93,9 +123,10 @@ export function MessageMemberDialog({ member, open, onOpenChange }: MessageMembe
           <Button 
             onClick={handleSend} 
             disabled={!isValid}
+            className="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600"
           >
-            Send {member.notificationPreference === "email" ? "Email" : 
-                 member.notificationPreference === "sms" ? "SMS" : "WhatsApp Message"}
+            {getPreferenceIcon()}
+            Send Birthday Wishes
           </Button>
         </DialogFooter>
       </DialogContent>

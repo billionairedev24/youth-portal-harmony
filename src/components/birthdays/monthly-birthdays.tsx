@@ -3,8 +3,8 @@ import { useMembersStore } from "@/stores/members-store";
 import { BirthdayCard } from "./birthday-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Cake, Gift, Mail, Phone } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Cake, Gift, Mail, Phone, MessageSquare } from "lucide-react";
+import { useState } from "react";
 import { format, isSameMonth, parseISO } from "date-fns";
 import { MessageMemberDialog } from "@/components/message-member-dialog";
 import { toast } from "sonner";
@@ -68,6 +68,19 @@ export function MonthlyBirthdays() {
     return dayA - dayB;
   });
   
+  const getNotificationIcon = (preference) => {
+    switch(preference) {
+      case 'email':
+        return <Mail className="h-3.5 w-3.5" />;
+      case 'sms':
+        return <Phone className="h-3.5 w-3.5" />;
+      case 'whatsapp':
+        return <MessageSquare className="h-3.5 w-3.5" />;
+      default:
+        return <Mail className="h-3.5 w-3.5" />;
+    }
+  };
+  
   return (
     <Card className="bg-gradient-to-br from-gold-50/80 to-gold-100/40 dark:from-gold-900/60 dark:to-gold-800/30 border-gold-200 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
       <div className="absolute top-0 right-0 w-32 h-32 bg-gold-200/20 dark:bg-gold-600/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 z-0"></div>
@@ -89,7 +102,7 @@ export function MonthlyBirthdays() {
           <ScrollArea className="h-[220px] pr-4">
             <div className="space-y-2">
               {birthdaysThisMonth.map((member) => (
-                <div key={member.id} className="group relative">
+                <div key={member.id} className="group relative shadow-sm hover:shadow-md rounded-lg transition-all">
                   <BirthdayCard member={member} />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                     <button 
@@ -98,13 +111,9 @@ export function MonthlyBirthdays() {
                         setShowMessageDialog(true);
                       }}
                       className="p-1.5 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300"
-                      title={`Send ${member.notificationPreference === "email" ? "email" : member.notificationPreference === "sms" ? "SMS" : "WhatsApp message"}`}
+                      title={`Send birthday wishes via ${member.notificationPreference === "email" ? "email" : member.notificationPreference === "sms" ? "SMS" : "WhatsApp"}`}
                     >
-                      {member.notificationPreference === "email" ? (
-                        <Mail className="h-3.5 w-3.5" />
-                      ) : (
-                        <Phone className="h-3.5 w-3.5" />
-                      )}
+                      {getNotificationIcon(member.notificationPreference)}
                     </button>
                   </div>
                 </div>
