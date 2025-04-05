@@ -1,6 +1,5 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { Cake } from "lucide-react";
 import { Member } from "@/stores/members-store";
@@ -12,9 +11,11 @@ interface BirthdayCardProps {
 export function BirthdayCard({ member }: BirthdayCardProps) {
   const birthdayDate = new Date(member.birthday);
   const day = birthdayDate.getDate();
+  const isToday = day === new Date().getDate() && 
+                 birthdayDate.getMonth() === new Date().getMonth();
   
   return (
-    <div className="flex items-center p-2 rounded-lg transition-all hover:bg-gold-50/50 dark:hover:bg-gold-900/30 group">
+    <div className={`flex items-center p-2 rounded-lg transition-all hover:bg-gold-50/50 dark:hover:bg-gold-800/30 group ${isToday ? 'ring-1 ring-gold-300 dark:ring-gold-600 bg-gold-50/30 dark:bg-gold-800/20' : ''}`}>
       <Avatar className="h-12 w-12 border-2 border-gold-100 dark:border-gold-800 shadow-sm group-hover:scale-105 transition-transform">
         <AvatarImage 
           src={member.image} 
@@ -34,11 +35,12 @@ export function BirthdayCard({ member }: BirthdayCardProps) {
           <Cake className="w-3 h-3 text-gold-500 mr-1" />
           <p className="text-xs text-gold-600 dark:text-gold-400">
             {format(birthdayDate, 'MMMM do')}
+            {isToday && <span className="ml-1 text-gold-500 font-medium">(Today!)</span>}
           </p>
         </div>
       </div>
       
-      <div className="w-8 h-8 rounded-full bg-gold-100 dark:bg-gold-800 flex items-center justify-center text-xs font-bold text-gold-800 dark:text-gold-200">
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${isToday ? 'bg-gold-300 text-gold-900 dark:bg-gold-500 dark:text-gold-100' : 'bg-gold-100 dark:bg-gold-800 text-gold-800 dark:text-gold-200'}`}>
         {day}
       </div>
     </div>

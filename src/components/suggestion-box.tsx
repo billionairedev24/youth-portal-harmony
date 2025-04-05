@@ -13,22 +13,23 @@ export function SuggestionBox() {
       <CardHeader className="relative z-10 pb-2">
         <CardTitle className="text-lg font-medium flex items-center text-gold-800 dark:text-gold-100">
           <Lightbulb className="mr-2 h-5 w-5 text-gold-500" />
-          Suggestions
+          Have a suggestion?
         </CardTitle>
       </CardHeader>
       
       <CardContent className="relative z-10 pt-0">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gold-700 dark:text-gold-300 mr-4">
-            Have a suggestion? We'd love to hear from you!
+        <div className="space-y-3">
+          <p className="text-sm text-gold-700 dark:text-gold-300">
+            Share your ideas to help us improve the community experience.
           </p>
           <Button 
             onClick={() => setShowSuggestionDialog(true)}
             size="sm"
-            className="bg-white hover:bg-gold-50 text-gold-800 hover:text-gold-900 border border-gold-200 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-100 dark:border-gold-600 group whitespace-nowrap"
+            variant="outline"
+            className="w-full bg-white/70 hover:bg-gold-50 text-gold-800 hover:text-gold-900 border border-gold-200 dark:bg-gold-800/50 dark:hover:bg-gold-700 dark:text-gold-100 dark:border-gold-600 group"
           >
             <MessageSquare className="w-4 h-4 mr-2 text-gold-500 group-hover:text-gold-600 transition-colors" />
-            <span>Submit</span>
+            <span>Submit a suggestion</span>
           </Button>
         </div>
       </CardContent>
