@@ -26,7 +26,7 @@ import { parseISO, format, subMonths } from "date-fns";
 import { MonthlyBirthdays } from "@/components/birthdays/monthly-birthdays";
 
 const AdminDashboard = () => {
-  const { events } = useEventsStore();
+  const { events, recordAttendance } = useEventsStore();
   const { members } = useMembersStore();
   const { polls } = usePollsStore();
   const { entries } = useBudgetStore();
@@ -78,6 +78,15 @@ const AdminDashboard = () => {
     setSelectedEventId(eventId);
     setSelectedEvent(events.find(event => event.id === eventId));
     setShowAttendanceDialog(true);
+  };
+
+  const handleSaveAttendance = async (eventId, menCount, womenCount) => {
+    try {
+      await recordAttendance(eventId, menCount, womenCount);
+      setShowAttendanceDialog(false);
+    } catch (error) {
+      console.error("Failed to record attendance:", error);
+    }
   };
   
   return (
@@ -131,10 +140,10 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {polls.filter(poll => !poll.closed).length}
+                    {polls.filter(poll => poll.status === "active").length}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {polls.filter(poll => poll.closed).length} closed polls
+                    {polls.filter(poll => poll.status === "closed").length} closed polls
                   </p>
                 </CardContent>
               </Card>
@@ -231,7 +240,7 @@ const AdminDashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <AttendanceCharts events={events} />
+                  <AttendanceCharts />
                 </CardContent>
               </Card>
             </div>
@@ -274,6 +283,8 @@ const AdminDashboard = () => {
           open={showAttendanceDialog}
           onOpenChange={setShowAttendanceDialog}
           event={selectedEvent}
+          onSave={handleSaveAttendance}
+          isLoading={false}
         />
       )}
     </AdminLayout>
