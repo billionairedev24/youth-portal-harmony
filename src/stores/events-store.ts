@@ -2,7 +2,7 @@ import { ApiError, api } from '@/utils/axiosConfig';
 import { create } from 'zustand';
 
 export type Event = {
-  id?: string; // Changed from 'any' to 'string' for type safety
+  id?: any;
   title: string;
   objectives: string;
   personnel: string;
@@ -22,8 +22,8 @@ type EventsStore = {
   loading: boolean;
   error: string | null;
   fetchEvents: () => Promise<void>;
-  addEvent: (event: Omit<Event, 'id'>) => Promise<void>;
-  updateEvent: (id: string, event: Partial<Event>) => Promise<void>;
+  addEvent: (event: Omit<Event, 'id'>) => Promise<Event>;
+  updateEvent: (id: string, event: Partial<Event>) => Promise<Event>;
   deleteEvent: (id: string) => Promise<void>;
   toggleArchive: (id: string) => Promise<void>;
   recordAttendance: (eventId: string, menCount: number, womenCount: number) => Promise<void>;
@@ -43,9 +43,11 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
       set({ events: data, loading: false });
     } catch (error) {
       const err = error as ApiError;
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch events';
+      const errorMessage = err.response?.data?.message || 
+                         err.message || 
+                         'Failed to fetch events';
       set({ error: errorMessage, loading: false });
-      throw error; // Re-throw to allow component to handle
+      throw error;
     }
   },
 
@@ -57,6 +59,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
         events: [...state.events, data],
         loading: false
       }));
+      return data;
     } catch (error) {
       const err = error as ApiError;
       const errorMessage = err.response?.data?.message || err.message || 'Failed to add event';
@@ -66,19 +69,30 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   },
 
   updateEvent: async (id, updatedEvent) => {
-    set({ loading: true, error: null });
+    // Optimistic update
+    set(state => ({
+      events: state.events.map(event => 
+        event.id === id ? { ...event, ...updatedEvent } : event
+      ),
+      loading: true
+    }));
+
     try {
       const { data } = await api.patch<Event>(`/event/update/${id}`, updatedEvent);
       set(state => ({
         events: state.events.map(event => 
-          event.id === id ? { ...event, ...data } : event
+          event.id === id ? data : event
         ),
         loading: false
       }));
+      return data;
     } catch (error) {
-      const err = error as ApiError;
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to update event';
-      set({ error: errorMessage, loading: false });
+      // Revert on error
+      set(state => ({
+        events: state.events,
+        loading: false,
+        error: (error as ApiError).message
+      }));
       throw error;
     }
   },
@@ -155,7 +169,6 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   }
 }));
 
-// Optional: Export a function to initialize the store when needed
 export const initializeEventsStore = () => {
   useEventsStore.getState().fetchEvents();
 };

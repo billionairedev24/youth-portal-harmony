@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { useEventsStore } from '@/stores/events-store';
 import { AdminLayout } from '@/components/admin-layout';
 import { DataTable } from '@/components/data-table/data-table';
@@ -34,10 +34,10 @@ const EventsPage = () => {
     deleteEvent, 
     toggleArchive, 
     recordAttendance,
+    fetchEvents,
     loading
   } = useEventsStore();
   
-  const { toast } = useToast();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -61,45 +61,37 @@ const EventsPage = () => {
     try {
       if (dialogMode === 'create') {
         await addEvent(eventData);
+        toast.success('Event created successfully');
       } else {
         await updateEvent(eventData.id, eventData);
+        toast.success('Event updated successfully');
       }
       setDialogOpen(false);
+      // Refresh events to ensure consistency
+      await fetchEvents();
     } catch (err) {
       const error = err as Error;
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to save event',
-        variant: 'destructive',
-      });
+      toast.error(error.message || 'Failed to save event');
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteEvent(id);
+      toast.success('Event deleted successfully');
     } catch (err) {
       const error = err as Error;
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to delete event',
-        variant: 'destructive',
-      });
+      toast.error(error.message || 'Failed to delete event');
     }
   };
 
   const handleToggleArchive = async (id: string) => {
     try {
-      const event = events.find(e => e.id === id);
-      if (!event) throw new Error('Event not found');
       await toggleArchive(id);
+      toast.success('Event archive status updated');
     } catch (err) {
       const error = err as Error;
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to toggle archive status',
-        variant: 'destructive',
-      });
+      toast.error(error.message || 'Failed to toggle archive status');
     }
   };
 
@@ -110,23 +102,15 @@ const EventsPage = () => {
   ) => {
     try {
       await recordAttendance(eventId, menCount, womenCount);
-      toast({
-        title: 'Success',
-        description: 'Attendance recorded successfully',
-        variant: 'default',
-      });
+      toast.success('Attendance recorded successfully');
       setAttendanceDialogOpen(false);
     } catch (err) {
       const error = err as Error;
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to record attendance',
-        variant: 'destructive',
-      });
+      toast.error(error.message || 'Failed to record attendance');
     }
   };
 
-  const columns: ColumnDef<Event>[] = [
+  const columns = useMemo<ColumnDef<Event>[]>(() => [
     {
       accessorKey: 'title',
       header: 'Title',
@@ -202,7 +186,7 @@ const EventsPage = () => {
         );
       },
     },
-  ];
+  ], []);
 
   const EmptyState = ({ type }: { type: 'scheduled' | 'archived' }) => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-secondary/20 rounded-lg border-2 border-dashed border-secondary">

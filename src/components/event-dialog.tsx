@@ -12,46 +12,54 @@ interface EventDialogProps {
   event: Event | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (event: Event) => void;
+  onSave: (event: Event) => Promise<void>;
   mode: "view" | "edit";
-  isLoading: boolean
+  isLoading: boolean;
 }
 
-export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDialogProps) {
+export function EventDialog({ event, open, onOpenChange, onSave, mode, isLoading }: EventDialogProps) {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Reset form when opening/closing or when event changes
   useEffect(() => {
-    if (event) {
+    if (open && event) {
       setEditingEvent({ ...event });
+    } else {
+      setEditingEvent(null);
     }
-  }, [event]);
-
-  if (!editingEvent) return null;
+  }, [open, event]);
 
   const handleSave = async () => {
+    if (!editingEvent) return;
+    
     try {
       setIsSaving(true);
       await onSave(editingEvent);
-      toast.success("Event updated successfully");
-      onOpenChange(false);
+      // Dialog closing is handled by parent after successful save
     } catch (error) {
-      toast.error("Failed to update event");
+      // Error is handled by parent
     } finally {
       setIsSaving(false);
     }
   };
 
+  if (!editingEvent) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(open) => {
+      if (!isSaving) {
+        onOpenChange(open);
+      }
+    }}>
       <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            {mode === "view" ? "Event Details" : "Edit Event"}
+            {mode === "view" ? "Event Details" : editingEvent.id ? "Edit Event" : "Create Event"}
           </DialogTitle>
           {mode === "edit" && (
             <DialogDescription>
-              Make changes to your event here. Click save when you're done.
+              {editingEvent.id ? "Make changes to your event here." : "Create a new event."} Click save when you're done.
             </DialogDescription>
           )}
         </DialogHeader>
@@ -59,7 +67,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
         <ScrollArea className="flex-1 pr-4">
           <div className="grid gap-6 py-4">
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">Title *</Label>
               <Input
                 id="title"
                 value={editingEvent.title}
@@ -68,6 +76,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
                 }
                 readOnly={mode === "view"}
                 className="bg-secondary/50 border-0 focus-visible:ring-0"
+                required
               />
             </div>
 
@@ -98,7 +107,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
             </div>
 
             <div>
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">Location *</Label>
               <Input
                 id="location"
                 value={editingEvent.location}
@@ -107,12 +116,13 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
                 }
                 readOnly={mode === "view"}
                 className="bg-secondary/50 border-0 focus-visible:ring-0"
+                required
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date">Date *</Label>
                 <Input
                   id="date"
                   type="date"
@@ -122,10 +132,11 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
                   }
                   readOnly={mode === "view"}
                   className="bg-secondary/50 border-0 focus-visible:ring-0"
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="time">Time</Label>
+                <Label htmlFor="time">Time *</Label>
                 <Input
                   id="time"
                   type="time"
@@ -135,6 +146,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
                   }
                   readOnly={mode === "view"}
                   className="bg-secondary/50 border-0 focus-visible:ring-0"
+                  required
                 />
               </div>
             </div>
@@ -143,14 +155,18 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode }: EventDi
 
         {mode === "edit" && (
           <DialogFooter className="mt-6">
-            <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
+            <Button 
+              onClick={handleSave} 
+              disabled={isSaving || isLoading}
+              className="w-full sm:w-auto"
+            >
               {isSaving ? (
                 <div className="flex items-center gap-2">
                   <Spinner size="sm" />
                   <span>Saving...</span>
                 </div>
               ) : (
-                "Save changes"
+                editingEvent.id ? "Save changes" : "Create event"
               )}
             </Button>
           </DialogFooter>
