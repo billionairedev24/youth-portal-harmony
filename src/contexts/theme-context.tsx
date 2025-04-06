@@ -12,10 +12,16 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Access localStorage only in browser environment
+    // Check for system preference first
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem("theme");
-      return (savedTheme as Theme) || "light";
+      if (savedTheme) {
+        return savedTheme as Theme;
+      }
+      
+      // If no saved preference, use system preference
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return systemPrefersDark ? "dark" : "light";
     }
     return "light";
   });

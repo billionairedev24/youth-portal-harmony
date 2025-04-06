@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { getDailyVerseReference } from "@/utils/bibleVerseUtils";
+import { toast } from "@/components/ui/use-toast";
 
 // Fallback data in case API fails
 const fallbackVerses = [
@@ -29,13 +30,18 @@ export function ScrollingMessage() {
   
   // Fetch Bible verse from API
   useEffect(() => {
-    const fetchDailyBibleVerse = async () => {
+    const fetchRandomBibleVerse = async () => {
       try {
-        // Get today's Bible verse reference
-        const verseReference = getDailyVerseReference();
+        // Get a random Bible verse reference
+        const verseReference = await getDailyVerseReference();
         
         // Bible API request
         const verseResponse = await fetch(`https://bible-api.com/${verseReference}`);
+        
+        if (!verseResponse.ok) {
+          throw new Error("Failed to fetch Bible verse");
+        }
+        
         const verseData = await verseResponse.json();
         
         if (verseData && verseData.text) {
@@ -61,10 +67,15 @@ export function ScrollingMessage() {
         setCurrentPrayer(prayers[0]);
         setCurrentIndex(0);
         setIsLoading(false);
+        toast({
+          title: "Couldn't fetch today's Bible verse",
+          description: "Using a backup verse instead.",
+          variant: "destructive",
+        });
       }
     };
 
-    fetchDailyBibleVerse();
+    fetchRandomBibleVerse();
   }, []);
   
   // Cycle between verse and prayer
@@ -93,25 +104,25 @@ export function ScrollingMessage() {
       : currentPrayer || "Loading prayer...";
 
   return (
-    <div className="w-full bg-gradient-to-r from-gold-600/30 to-gold-500/20 dark:from-gold-700/30 dark:to-gold-800/20 overflow-hidden py-1.5 relative">
+    <div className="w-full bg-gradient-to-r from-indigo-900/40 to-purple-900/30 dark:from-indigo-700/40 dark:to-purple-800/30 overflow-hidden py-1.5 relative">
       <div className="marquee-container flex items-center">
         <div className="flex items-center animate-marquee whitespace-nowrap">
-          <div className="flex items-center text-sm text-gold-800 dark:text-gold-100">
+          <div className="flex items-center text-sm text-indigo-100 dark:text-indigo-50">
             <span className="font-semibold mx-2">
               {isLoading ? "Loading..." : isVerse ? "Daily Verse" : "Prayer"}:
             </span>
-            <ChevronRight className="h-4 w-4 text-gold-600 dark:text-gold-400" />
+            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
             <span className="mx-2">{currentContent}</span>
-            <ChevronRight className="h-4 w-4 text-gold-600 dark:text-gold-400" />
+            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
           </div>
           {/* Duplicate content for continuous loop effect */}
-          <div className="flex items-center text-sm text-gold-800 dark:text-gold-100 ml-8">
+          <div className="flex items-center text-sm text-indigo-100 dark:text-indigo-50 ml-8">
             <span className="font-semibold mx-2">
               {isLoading ? "Loading..." : isVerse ? "Daily Verse" : "Prayer"}:
             </span>
-            <ChevronRight className="h-4 w-4 text-gold-600 dark:text-gold-400" />
+            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
             <span className="mx-2">{currentContent}</span>
-            <ChevronRight className="h-4 w-4 text-gold-600 dark:text-gold-400" />
+            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
           </div>
         </div>
       </div>
