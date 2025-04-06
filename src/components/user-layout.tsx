@@ -1,5 +1,6 @@
 
 import { Navbar } from "./navbar";
+import { ScrollingMessage } from "./scrolling-message";
 
 export function UserLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function UserLayout({ children }: { children: React.ReactNode }) {
       </div>
       
       <Navbar />
+      <ScrollingMessage />
       <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 animate-fade-in relative z-10">
         {children}
       </main>
