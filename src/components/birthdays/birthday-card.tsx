@@ -15,7 +15,7 @@ export function BirthdayCard({ member }: BirthdayCardProps) {
                  birthdayDate.getMonth() === new Date().getMonth();
   
   return (
-    <div className={`flex items-center p-3 group-hover:bg-gold-50/80 dark:group-hover:bg-gold-800/20 rounded-lg transition-all ${isToday ? 'ring-2 ring-gold-300 dark:ring-gold-600 bg-gold-50/50 dark:bg-gold-800/30' : ''}`}>
+    <div className={`flex items-center p-3 group-hover:bg-gold-50/80 dark:group-hover:bg-gold-800/20 rounded-lg transition-all ${isToday ? 'bg-gold-50/50 dark:bg-gold-800/30' : ''}`}>
       <Avatar className="h-12 w-12 border-2 border-gold-100 dark:border-gold-800 shadow-sm group-hover:scale-105 transition-transform">
         <AvatarImage 
           src={member.image} 
@@ -33,14 +33,14 @@ export function BirthdayCard({ member }: BirthdayCardProps) {
         </p>
         <div className="flex items-center mt-1">
           <Cake className="w-3 h-3 text-gold-500 mr-1" />
-          <p className="text-xs text-gold-600 dark:text-gold-400">
+          <p className="text-xs text-gold-600 dark:text-gold-400 group-hover:opacity-0 transition-opacity">
             {format(birthdayDate, 'MMMM do')}
             {isToday && <span className="ml-1 text-gold-500 font-medium">(Today!)</span>}
           </p>
         </div>
       </div>
       
-      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${isToday ? 'bg-gold-300 text-gold-900 dark:bg-gold-500 dark:text-gold-100 shadow-md' : 'bg-gold-100 dark:bg-gold-800 text-gold-800 dark:text-gold-200 shadow-sm'}`}>
+      <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold group-hover:opacity-0 transition-opacity ${isToday ? 'bg-gold-300 text-gold-900 dark:bg-gold-500 dark:text-gold-100 shadow-md' : 'bg-gold-100 dark:bg-gold-800 text-gold-800 dark:text-gold-200 shadow-sm'}`}>
         {day}
       </div>
     </div>

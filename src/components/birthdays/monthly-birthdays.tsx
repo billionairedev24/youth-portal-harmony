@@ -68,18 +68,13 @@ export function MonthlyBirthdays() {
     return dayA - dayB;
   });
   
-  // Determine if a member has multiple notification methods
-  const hasMultipleNotificationOptions = (member) => {
-    return member.email && member.phone;
-  };
-  
   return (
-    <Card className="bg-gradient-to-br from-gold-50/80 to-gold-100/40 dark:from-gold-900/60 dark:to-gold-800/30 border-gold-200 dark:border-gold-700 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+    <Card className="bg-card dark:bg-card/50 backdrop-blur-sm shadow-lg overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
       <div className="absolute top-0 right-0 w-32 h-32 bg-gold-200/20 dark:bg-gold-600/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 z-0"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-gold-300/20 dark:bg-gold-700/10 rounded-full blur-2xl translate-x-1/2 translate-y-1/2 z-0"></div>
       
       <CardHeader className="relative z-10 pb-2">
-        <CardTitle className="text-lg font-medium flex items-center text-gold-800 dark:text-gold-100">
+        <CardTitle className="text-lg font-medium flex items-center text-foreground">
           <Cake className="mr-2 h-5 w-5 text-gold-500" />
           {format(currentMonth, 'MMMM')} Birthdays
         </CardTitle>
@@ -92,24 +87,24 @@ export function MonthlyBirthdays() {
           </div>
         ) : birthdaysThisMonth.length > 0 ? (
           <ScrollArea className="h-[220px] pr-4 -mr-4">
-            <div className="space-y-3 pr-2">
+            <div className="space-y-4 pr-2">
               {birthdaysThisMonth.map((member) => (
-                <div key={member.id} className="group relative rounded-lg transition-all overflow-visible">
-                  <div className="relative bg-white/50 dark:bg-gold-900/40 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 w-full">
+                <div key={member.id} className="group">
+                  <div className="relative bg-white/50 dark:bg-gold-900/40 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden">
                     <BirthdayCard member={member} />
                     
                     {/* Communication options on hover */}
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5 z-20">
+                    <div className="absolute right-0 top-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pr-3 pl-8 bg-gradient-to-l from-white/80 via-white/60 to-transparent dark:from-gold-900/80 dark:via-gold-900/60 dark:to-transparent z-20">
                       {member.email && (
                         <button 
                           onClick={() => {
                             setSelectedMember({...member, notificationPreference: "email"});
                             setShowMessageDialog(true);
                           }}
-                          className="p-1.5 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300 shadow-sm"
+                          className="p-2 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300 shadow-sm"
                           title="Send birthday wishes via email"
                         >
-                          <Mail className="h-3.5 w-3.5" />
+                          <Mail className="h-4 w-4" />
                         </button>
                       )}
                       {member.phone && (
@@ -118,16 +113,13 @@ export function MonthlyBirthdays() {
                             setSelectedMember({...member, notificationPreference: "sms"});
                             setShowMessageDialog(true);
                           }}
-                          className="p-1.5 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300 shadow-sm"
+                          className="p-2 rounded-full bg-gold-100 hover:bg-gold-200 text-gold-600 dark:bg-gold-800 dark:hover:bg-gold-700 dark:text-gold-300 shadow-sm"
                           title="Send birthday wishes via SMS"
                         >
-                          <Phone className="h-3.5 w-3.5" />
+                          <Phone className="h-4 w-4" />
                         </button>
                       )}
                     </div>
-                    
-                    {/* Overlay to hide date on hover */}
-                    <div className="absolute inset-0 bg-transparent group-hover:bg-white/30 dark:group-hover:bg-gold-900/30 z-10 rounded-lg transition-all duration-200"></div>
                   </div>
                 </div>
               ))}
