@@ -95,9 +95,11 @@ export function MonthlyBirthdays() {
             <div className="space-y-3 pr-2">
               {birthdaysThisMonth.map((member) => (
                 <div key={member.id} className="group relative rounded-lg transition-all overflow-visible">
-                  <div className="bg-white/50 dark:bg-gold-900/40 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                  <div className="relative bg-white/50 dark:bg-gold-900/40 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 w-full">
                     <BirthdayCard member={member} />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5">
+                    
+                    {/* Communication options on hover */}
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5 z-20">
                       {member.email && (
                         <button 
                           onClick={() => {
@@ -123,6 +125,9 @@ export function MonthlyBirthdays() {
                         </button>
                       )}
                     </div>
+                    
+                    {/* Overlay to hide date on hover */}
+                    <div className="absolute inset-0 bg-transparent group-hover:bg-white/30 dark:group-hover:bg-gold-900/30 z-10 rounded-lg transition-all duration-200"></div>
                   </div>
                 </div>
               ))}
