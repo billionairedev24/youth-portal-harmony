@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -14,11 +15,11 @@ export function AttendanceCharts() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Monthly Attendance Distribution</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-card/60">
+        <CardTitle className="text-lg font-medium">Monthly Attendance Distribution</CardTitle>
       </CardHeader>
-      <CardContent className="pl-4">
+      <CardContent className="pl-2 pt-6">
         <ChartContainer className="h-[400px] w-full" config={{}}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -34,17 +35,19 @@ export function AttendanceCharts() {
                 tick={{
                   fill: 'currentColor',
                   dy: 10,
-                  dx: -8
+                  dx: -8,
+                  fontSize: 12
                 }}
-                axisLine={{ stroke: 'currentColor' }}
+                axisLine={{ stroke: 'currentColor', strokeOpacity: 0.3 }}
               />
               <YAxis
-                tick={{ fill: 'currentColor' }}
-                axisLine={{ stroke: 'currentColor' }}
+                tick={{ fill: 'currentColor', fontSize: 12 }}
+                axisLine={{ stroke: 'currentColor', strokeOpacity: 0.3 }}
+                tickLine={{ stroke: 'currentColor', strokeOpacity: 0.3 }}
               />
               <Tooltip 
                 content={<AttendanceTooltip />}
-                cursor={false}
+                cursor={{ fill: 'currentColor', fillOpacity: 0.1 }}
               />
               <Legend 
                 verticalAlign="top"
@@ -57,14 +60,14 @@ export function AttendanceCharts() {
               <Bar
                 dataKey="men"
                 name="Men"
-                fill="#FFB800"
+                fill="hsl(var(--gold-500))"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
               />
               <Bar
                 dataKey="women"
                 name="Women"
-                fill="#CC9900"
+                fill="hsl(var(--gold-700))"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
               />

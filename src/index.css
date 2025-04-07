@@ -50,46 +50,46 @@
   }
 
   .dark {
-    --background: 230 15% 12%;
-    --foreground: 230 15% 94%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --muted: 230 15% 20%;
-    --muted-foreground: 230 15% 75%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --popover: 230 15% 12%;
-    --popover-foreground: 230 15% 94%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --card: 230 15% 14%;
-    --card-foreground: 230 15% 94%;
+    --card: 222 47% 14%;
+    --card-foreground: 210 40% 98%;
 
-    --border: 230 15% 25%;
-    --input: 230 15% 25%;
+    --border: 217 33% 20%;
+    --input: 217 33% 22%;
 
-    --primary: 230 60% 65%;
-    --primary-foreground: 230 15% 10%;
+    --primary: 210 50% 70%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 230 15% 20%;
-    --secondary-foreground: 230 15% 94%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --accent: 230 40% 30%;
-    --accent-foreground: 230 15% 94%;
+    --accent: 217 33% 25%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 210 40% 98%;
 
-    --ring: 230 15% 40%;
+    --ring: 217 33% 30%;
 
-    --gold-50: 230 15% 96%;
-    --gold-100: 230 15% 92%;
-    --gold-200: 230 15% 86%;
-    --gold-300: 230 15% 76%;
-    --gold-400: 230 30% 65%;
-    --gold-500: 230 40% 60%;
-    --gold-600: 230 40% 50%;
-    --gold-700: 230 40% 42%;
-    --gold-800: 230 40% 35%;
-    --gold-900: 230 40% 25%;
-    --gold-950: 230 40% 15%;
+    --gold-50: 36 30% 96%;
+    --gold-100: 36 30% 92%;
+    --gold-200: 36 30% 86%;
+    --gold-300: 36 30% 76%;
+    --gold-400: 36 55% 65%;
+    --gold-500: 36 65% 60%;
+    --gold-600: 36 70% 50%;
+    --gold-700: 36 75% 43%;
+    --gold-800: 36 80% 38%;
+    --gold-900: 36 85% 25%;
+    --gold-950: 36 90% 15%;
   }
 }
 

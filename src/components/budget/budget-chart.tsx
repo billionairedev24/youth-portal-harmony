@@ -1,3 +1,4 @@
+
 import { useMemo, useState } from "react";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
@@ -22,10 +23,18 @@ const categoryDisplayNames: Record<BudgetCategory, string> = {
   outdoor: "Outdoor",
 };
 
-// Colors for the chart segments
+// Colors for the chart segments - updated with more vibrant colors
 const COLORS = [
-  "#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#9966FF", 
-  "#FF66B2", "#66CCFF", "#FF6666", "#66FF66", "#FFD700"
+  "hsl(var(--gold-400))", 
+  "hsl(var(--gold-600))", 
+  "hsl(var(--primary))", 
+  "hsl(var(--accent))",
+  "hsl(var(--gold-500))", 
+  "hsl(var(--gold-700))", 
+  "hsl(var(--gold-800))",
+  "hsl(var(--destructive))",
+  "hsl(var(--muted-foreground))",
+  "hsl(var(--accent-foreground))"
 ];
 
 interface ChartData {
@@ -67,9 +76,9 @@ export function BudgetChart() {
   // If there's no data, show an empty state
   if (chartData.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-card/60">
+          <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <PieChartIcon className="h-5 w-5 text-muted-foreground" />
             Budget Visualization
           </CardTitle>
@@ -99,9 +108,9 @@ export function BudgetChart() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-card/60">
+        <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <PieChartIcon className="h-5 w-5 text-muted-foreground" />
           Budget Visualization
         </CardTitle>
@@ -155,13 +164,12 @@ export function BudgetChart() {
                     <span className="text-muted-foreground">${item.value.toFixed(2)} ({((item.value / totalValue) * 100).toFixed(0)}%)</span>
                   </div>
                   <Progress value={(item.value / totalValue) * 100} className="h-2" 
-                    style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
+                    style={{ backgroundColor: 'rgba(var(--foreground), 0.1)' }}>
                     <div 
-                      className="h-full" 
+                      className="h-full rounded-full" 
                       style={{ 
                         backgroundColor: COLORS[index % COLORS.length],
                         width: `${(item.value / totalValue) * 100}%`,
-                        borderRadius: 'inherit'
                       }} 
                     />
                   </Progress>
