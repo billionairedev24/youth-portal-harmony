@@ -23,18 +23,16 @@ const categoryDisplayNames: Record<BudgetCategory, string> = {
   outdoor: "Outdoor",
 };
 
-// Colors for the chart segments - updated with more vibrant colors
+// Updated colors for better consistency
 const COLORS = [
-  "hsl(var(--gold-400))", 
-  "hsl(var(--gold-600))", 
-  "hsl(var(--primary))", 
-  "hsl(var(--accent))",
-  "hsl(var(--gold-500))", 
-  "hsl(var(--gold-700))", 
-  "hsl(var(--gold-800))",
-  "hsl(var(--destructive))",
-  "hsl(var(--muted-foreground))",
-  "hsl(var(--accent-foreground))"
+  "hsl(210, 90%, 65%)", 
+  "hsl(230, 70%, 70%)", 
+  "hsl(260, 60%, 65%)", 
+  "hsl(280, 70%, 65%)",
+  "hsl(340, 82%, 66%)", 
+  "hsl(360, 85%, 65%)", 
+  "hsl(30, 90%, 65%)",
+  "hsl(10, 75%, 55%)"
 ];
 
 interface ChartData {
@@ -76,8 +74,8 @@ export function BudgetChart() {
   // If there's no data, show an empty state
   if (chartData.length === 0) {
     return (
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-card/60">
+      <Card className="overflow-hidden card-hover">
+        <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <PieChartIcon className="h-5 w-5 text-muted-foreground" />
             Budget Visualization
@@ -108,8 +106,8 @@ export function BudgetChart() {
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-card/60">
+    <Card className="overflow-hidden card-hover">
+      <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg font-medium">
           <PieChartIcon className="h-5 w-5 text-muted-foreground" />
           Budget Visualization
@@ -139,18 +137,34 @@ export function BudgetChart() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    outerRadius={80}
+                    innerRadius={60}
+                    outerRadius={90}
                     fill="#8884d8"
+                    paddingAngle={4}
                     dataKey="value"
                     nameKey="name"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => 
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                    }
                   >
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [`$${parseFloat(value.toString()).toFixed(2)}`, null]} />
-                  <Legend />
+                  <Tooltip 
+                    formatter={(value) => [`$${parseFloat(value.toString()).toFixed(2)}`, null]}
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      borderColor: "hsl(var(--border))",
+                      borderRadius: "var(--radius)",
+                    }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom"
+                    align="center"
+                    layout="horizontal"
+                    iconType="circle"
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -163,8 +177,7 @@ export function BudgetChart() {
                     <span>{item.name}</span>
                     <span className="text-muted-foreground">${item.value.toFixed(2)} ({((item.value / totalValue) * 100).toFixed(0)}%)</span>
                   </div>
-                  <Progress value={(item.value / totalValue) * 100} className="h-2" 
-                    style={{ backgroundColor: 'rgba(var(--foreground), 0.1)' }}>
+                  <Progress value={(item.value / totalValue) * 100} className="h-2">
                     <div 
                       className="h-full rounded-full" 
                       style={{ 

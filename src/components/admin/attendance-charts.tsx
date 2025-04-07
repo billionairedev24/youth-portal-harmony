@@ -1,6 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer } from "@/components/ui/chart";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useEventsStore } from "@/stores/events-store";
 import { AttendanceTooltip } from "./attendance-tooltip";
@@ -11,20 +10,28 @@ export function AttendanceCharts() {
   const attendanceData = processAttendanceData(events);
   
   if (attendanceData.length === 0) {
-    return null;
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Attendance Data</CardTitle>
+          <CardDescription>No attendance data is available</CardDescription>
+        </CardHeader>
+      </Card>
+    );
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-card/60">
-        <CardTitle className="text-lg font-medium">Monthly Attendance Distribution</CardTitle>
+    <Card className="overflow-hidden card-hover">
+      <CardHeader>
+        <CardTitle>Monthly Attendance Distribution</CardTitle>
+        <CardDescription>Male and female attendance over the past year</CardDescription>
       </CardHeader>
-      <CardContent className="pl-2 pt-6">
-        <ChartContainer className="h-[400px] w-full" config={{}}>
+      <CardContent className="pt-2">
+        <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={attendanceData}
-              margin={{ top: 40, right: 20, left: 20, bottom: 60 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
               <XAxis 
                 dataKey="month"
@@ -34,25 +41,26 @@ export function AttendanceCharts() {
                 interval={0}
                 tick={{
                   fill: 'currentColor',
+                  opacity: 0.8,
                   dy: 10,
                   dx: -8,
                   fontSize: 12
                 }}
-                axisLine={{ stroke: 'currentColor', strokeOpacity: 0.3 }}
+                axisLine={{ stroke: 'currentColor', strokeOpacity: 0.2 }}
+                tickLine={false}
               />
               <YAxis
-                tick={{ fill: 'currentColor', fontSize: 12 }}
-                axisLine={{ stroke: 'currentColor', strokeOpacity: 0.3 }}
-                tickLine={{ stroke: 'currentColor', strokeOpacity: 0.3 }}
+                tick={{ fill: 'currentColor', opacity: 0.8, fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
               />
               <Tooltip 
                 content={<AttendanceTooltip />}
-                cursor={{ fill: 'currentColor', fillOpacity: 0.1 }}
+                cursor={{ fill: 'currentColor', fillOpacity: 0.05 }}
               />
               <Legend 
                 verticalAlign="top"
                 align="right"
-                height={36}
                 wrapperStyle={{
                   paddingBottom: '20px'
                 }}
@@ -60,20 +68,20 @@ export function AttendanceCharts() {
               <Bar
                 dataKey="men"
                 name="Men"
-                fill="hsl(var(--gold-500))"
+                fill="hsl(210, 90%, 65%)"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
               />
               <Bar
                 dataKey="women"
                 name="Women"
-                fill="hsl(var(--gold-700))"
+                fill="hsl(340, 82%, 66%)"
                 radius={[4, 4, 0, 0]}
                 stackId="a"
               />
             </BarChart>
           </ResponsiveContainer>
-        </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   );

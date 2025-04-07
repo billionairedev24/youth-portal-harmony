@@ -11,8 +11,7 @@ import {
   Megaphone,
   DollarSign,
   Image,
-  PanelLeftClose,
-  PanelLeftOpen,
+  Menu,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -80,17 +79,17 @@ export function AdminSidebar() {
               <Button 
                 variant="outline" 
                 size="icon" 
-                className="bg-gold-100/80 dark:bg-gold-800/80 backdrop-blur-sm border-gold-200 dark:border-gold-700 shadow-md hover:shadow-lg"
+                className="bg-background/80 backdrop-blur-sm border border-border shadow-sm hover:bg-accent/50"
               >
-                <PanelLeftOpen className="h-5 w-5 text-gold-700 dark:text-gold-300" />
+                <Menu className="h-5 w-5 text-foreground" />
               </Button>
             </DrawerTrigger>
             <DrawerContent className="p-0 max-h-[90vh]">
-              <div className="bg-gradient-to-br from-gold-50 to-gold-100/90 dark:from-gold-900/40 dark:to-gold-950/60 h-full min-h-[60vh]">
-                <div className="flex h-16 items-center justify-between px-4 border-b border-gold-200/50 dark:border-gold-800/30">
+              <div className="bg-background h-full min-h-[60vh]">
+                <div className="flex h-16 items-center justify-between px-4 border-b">
                   <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
                   <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
-                    <ChevronLeft className="h-5 w-5 text-gold-700 dark:text-gold-300" />
+                    <ChevronLeft className="h-5 w-5" />
                   </Button>
                 </div>
                 <nav className="flex-1 space-y-2 p-4">
@@ -103,23 +102,23 @@ export function AdminSidebar() {
                       }}
                       className={cn(
                         "flex w-full items-center space-x-3 rounded-lg px-3 py-2.5 transition-all duration-300",
-                        "text-gold-800 dark:text-gold-100",
-                        "hover:bg-gold-200/50 dark:hover:bg-gold-800/30",
+                        "text-foreground",
+                        "hover:bg-accent/50",
                         "justify-start",
                         "group",
-                        activeRoute === item.href && "bg-gold-200/70 dark:bg-gold-800/60 font-medium"
+                        activeRoute === item.href && "bg-accent/80 font-medium"
                       )}
                       disabled={isLoading}
                     >
                       <div className={cn(
                         "flex items-center justify-center h-8 w-8 rounded-md transition-all duration-300",
-                        activeRoute === item.href ? "bg-gold-300/70 dark:bg-gold-700/60" : "bg-gold-200/30 dark:bg-gold-800/30",
-                        "group-hover:bg-gold-300/70 dark:group-hover:bg-gold-700/60"
+                        activeRoute === item.href ? "bg-primary/20" : "bg-background",
+                        "group-hover:bg-primary/20"
                       )}>
                         {isLoading && activeRoute === item.href ? (
-                          <Spinner size="sm" className="text-gold-800 dark:text-gold-100" />
+                          <Spinner size="sm" className="text-primary" />
                         ) : (
-                          <item.icon className="h-4.5 w-4.5 text-gold-700 dark:text-gold-300" />
+                          <item.icon className="h-4.5 w-4.5 text-primary" />
                         )}
                       </div>
                       <span className="text-sm font-medium">{item.label}</span>
@@ -138,35 +137,34 @@ export function AdminSidebar() {
     <aside
       className={cn(
         "sticky top-0 flex-shrink-0 h-screen transition-all duration-300 ease-in-out z-20",
-        "bg-gradient-to-br from-gold-50 to-gold-100/90 backdrop-blur-sm",
-        "dark:from-gold-900/40 dark:to-gold-950/60 dark:backdrop-blur-lg",
-        "border-r border-gold-200/50 dark:border-gold-800/30",
-        "shadow-md dark:shadow-lg shadow-gold-200/30 dark:shadow-black/30",
+        "bg-background/95 backdrop-blur-sm",
+        "border-r border-border/50",
+        "shadow-sm",
         collapsed ? "w-20" : "w-64"
       )}
     >
-      <div 
+      <Button
         onClick={toggleSidebar}
+        variant="ghost"
+        size="icon"
         className={cn(
-          "absolute -right-3 top-20 z-50 flex items-center justify-center",
-          "w-6 h-12 rounded-full cursor-pointer transition-all duration-300",
-          "bg-gold-100 dark:bg-gold-800 shadow-md hover:shadow-lg",
-          "border border-gold-200 dark:border-gold-700"
+          "absolute -right-4 top-20 z-50 h-8 w-8 rounded-full shadow-sm bg-accent/20 hover:bg-accent/40 border border-border",
+          "flex items-center justify-center transition-transform duration-300"
         )}
       >
         {collapsed ? (
-          <PanelLeftOpen className="h-4 w-4 text-gold-700 dark:text-gold-300" />
+          <ChevronRight className="h-4 w-4 text-foreground" />
         ) : (
-          <PanelLeftClose className="h-4 w-4 text-gold-700 dark:text-gold-300" />
+          <ChevronLeft className="h-4 w-4 text-foreground" />
         )}
-      </div>
+      </Button>
       <div className="flex h-full flex-col">
         <div className={cn(
-          "flex h-16 items-center border-b border-gold-200/50 dark:border-gold-800/30",
+          "flex h-16 items-center border-b border-border/50",
           collapsed ? "justify-center px-2" : "px-4"
         )}>
           <img src="/placeholder.svg" alt="Logo" className="h-8 w-8" />
-          {!collapsed && <span className="ml-3 text-lg font-medium text-gold-800 dark:text-gold-200">Admin</span>}
+          {!collapsed && <span className="ml-3 text-lg font-medium text-foreground">Admin</span>}
         </div>
         <nav className="flex-1 space-y-2 p-2 mt-2">
           {menuItems.map((item) => (
@@ -175,24 +173,24 @@ export function AdminSidebar() {
               onClick={() => handleNavigation(item.href)}
               className={cn(
                 "flex w-full items-center space-x-3 rounded-lg px-3 py-2.5 transition-all duration-300",
-                "text-gold-800 dark:text-gold-100",
-                "hover:bg-gold-200/50 dark:hover:bg-gold-800/30",
+                "text-foreground",
+                "hover:bg-accent/50",
                 collapsed ? "justify-center" : "justify-start",
                 "group",
-                activeRoute === item.href && "bg-gold-200/70 dark:bg-gold-800/60 font-medium"
+                activeRoute === item.href && "bg-accent/80 font-medium"
               )}
               title={collapsed ? item.label : undefined}
               disabled={isLoading}
             >
               <div className={cn(
                 "flex items-center justify-center h-8 w-8 rounded-md transition-all duration-300",
-                activeRoute === item.href ? "bg-gold-300/70 dark:bg-gold-700/60" : "bg-gold-200/30 dark:bg-gold-800/30",
-                "group-hover:bg-gold-300/70 dark:group-hover:bg-gold-700/60"
+                activeRoute === item.href ? "bg-primary/20" : "bg-background",
+                "group-hover:bg-primary/20"
               )}>
                 {isLoading && activeRoute === item.href ? (
-                  <Spinner size="sm" className="text-gold-800 dark:text-gold-100" />
+                  <Spinner size="sm" className="text-primary" />
                 ) : (
-                  <item.icon className="h-4.5 w-4.5 text-gold-700 dark:text-gold-300" />
+                  <item.icon className="h-4.5 w-4.5 text-primary" />
                 )}
               </div>
               {!collapsed && (

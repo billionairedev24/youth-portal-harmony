@@ -8,7 +8,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90 transition-colors duration-300">
+    <div className="flex min-h-screen bg-background transition-colors duration-300">
       <AdminSidebar />
       <div className={`flex-1 flex flex-col min-w-0 ${isMobile ? 'ml-0' : 'md:ml-0'}`}>
         <Navbar />

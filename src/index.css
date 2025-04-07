@@ -35,18 +35,6 @@
     --ring: 215 20.2% 65.1%;
 
     --radius: 0.5rem;
-
-    --gold-50: 45 100% 96%;
-    --gold-100: 45 94% 92%;
-    --gold-200: 43 89% 86%;
-    --gold-300: 43 90% 76%;
-    --gold-400: 36 88% 65%;
-    --gold-500: 36 85% 57%;
-    --gold-600: 36 70% 50%;
-    --gold-700: 35 69% 42%;
-    --gold-800: 34 62% 35%;
-    --gold-900: 38 45% 30%;
-    --gold-950: 32 50% 18%;
   }
 
   .dark {
@@ -78,18 +66,6 @@
     --destructive-foreground: 210 40% 98%;
 
     --ring: 217 33% 30%;
-
-    --gold-50: 36 30% 96%;
-    --gold-100: 36 30% 92%;
-    --gold-200: 36 30% 86%;
-    --gold-300: 36 30% 76%;
-    --gold-400: 36 55% 65%;
-    --gold-500: 36 65% 60%;
-    --gold-600: 36 70% 50%;
-    --gold-700: 36 75% 43%;
-    --gold-800: 36 80% 38%;
-    --gold-900: 36 85% 25%;
-    --gold-950: 36 90% 15%;
   }
 }
 
@@ -129,5 +105,15 @@
     100% {
       transform: translateX(-50%);
     }
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-md hover:translate-y-[-2px];
+  }
+  
+  /* Glass effect for card backgrounds */
+  .glass-effect {
+    @apply bg-background/80 backdrop-blur-sm border border-border/50;
   }
 }
