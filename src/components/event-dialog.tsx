@@ -120,7 +120,7 @@ export function EventDialog({ event, open, onOpenChange, onSave, mode, isLoading
               <Label htmlFor="eventType">Event Type *</Label>
               <Select
                 value={editingEvent.eventType || "REGULAR"}
-                onValueChange={(value) =>
+                onValueChange={(value: "REGULAR" | "SPECIAL") =>
                   setEditingEvent({ ...editingEvent, eventType: value })
                 }
                 disabled={mode === "view"}
