@@ -32,11 +32,8 @@ export function ScrollingMessage() {
   useEffect(() => {
     const fetchRandomBibleVerse = async () => {
       try {
-        // Get a random Bible verse reference
-        const verseReference = await getDailyVerseReference();
-        
-        // Bible API request
-        const verseResponse = await fetch(`https://bible-api.com/${verseReference}`);
+        // Use random bible verse endpoint
+        const verseResponse = await fetch('https://bible-api.com/random');
         
         if (!verseResponse.ok) {
           throw new Error("Failed to fetch Bible verse");
@@ -104,25 +101,25 @@ export function ScrollingMessage() {
       : currentPrayer || "Loading prayer...";
 
   return (
-    <div className="w-full bg-gradient-to-r from-indigo-900/40 to-purple-900/30 dark:from-indigo-700/40 dark:to-purple-800/30 overflow-hidden py-1.5 relative">
+    <div className="w-full bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-slate-800 dark:to-indigo-900/80 overflow-hidden py-1.5 relative shadow-sm">
       <div className="marquee-container flex items-center">
         <div className="flex items-center animate-marquee whitespace-nowrap">
-          <div className="flex items-center text-sm text-indigo-100 dark:text-indigo-50">
+          <div className="flex items-center text-sm text-indigo-800 dark:text-indigo-100">
             <span className="font-semibold mx-2">
               {isLoading ? "Loading..." : isVerse ? "Daily Verse" : "Prayer"}:
             </span>
-            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
+            <ChevronRight className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />
             <span className="mx-2">{currentContent}</span>
-            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
+            <ChevronRight className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />
           </div>
           {/* Duplicate content for continuous loop effect */}
-          <div className="flex items-center text-sm text-indigo-100 dark:text-indigo-50 ml-8">
+          <div className="flex items-center text-sm text-indigo-800 dark:text-indigo-100 ml-8">
             <span className="font-semibold mx-2">
               {isLoading ? "Loading..." : isVerse ? "Daily Verse" : "Prayer"}:
             </span>
-            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
+            <ChevronRight className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />
             <span className="mx-2">{currentContent}</span>
-            <ChevronRight className="h-4 w-4 text-indigo-300 dark:text-indigo-200" />
+            <ChevronRight className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />
           </div>
         </div>
       </div>

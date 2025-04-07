@@ -10,6 +10,7 @@ export type Event = {
   date: string;
   time: string;
   archived: boolean;
+  eventType?: "REGULAR" | "SPECIAL";
   attendance?: {
     men: number;
     women: number;
