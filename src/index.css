@@ -35,6 +35,19 @@
     --ring: 215 20.2% 65.1%;
 
     --radius: 0.5rem;
+
+    /* Gold theme colors */
+    --gold-50: 43 100% 96%;
+    --gold-100: 43 88% 93%;
+    --gold-200: 41 79% 85%;
+    --gold-300: 40 71% 73%;
+    --gold-400: 36 77% 62%;
+    --gold-500: 36 83% 54%;
+    --gold-600: 36 77% 49%;
+    --gold-700: 34 77% 39%;
+    --gold-800: 32 68% 28%;
+    --gold-900: 32 51% 24%;
+    --gold-950: 31 64% 13%;
   }
 
   .dark {
@@ -66,6 +79,19 @@
     --destructive-foreground: 210 40% 98%;
 
     --ring: 217 33% 30%;
+
+    /* Dark mode gold theme colors */
+    --gold-50: 32 51% 24%;
+    --gold-100: 32 51% 26%;
+    --gold-200: 34 77% 30%;
+    --gold-300: 36 77% 40%;
+    --gold-400: 36 83% 45%;
+    --gold-500: 36 83% 54%;
+    --gold-600: 36 77% 62%;
+    --gold-700: 40 71% 73%;
+    --gold-800: 41 79% 85%;
+    --gold-900: 43 88% 93%;
+    --gold-950: 43 100% 96%;
   }
 }
 
@@ -116,4 +142,23 @@
   .glass-effect {
     @apply bg-background/80 backdrop-blur-sm border border-border/50;
   }
+
+  /* Fade in animation */
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* Fix for the tailwind dark mode */
+.dark body {
+  color-scheme: dark;
 }

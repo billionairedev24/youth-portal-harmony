@@ -4,10 +4,35 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } fro
 import { useEventsStore } from "@/stores/events-store";
 import { AttendanceTooltip } from "./attendance-tooltip";
 import { processAttendanceData } from "@/utils/attendance-utils";
+import { useEffect, useState } from "react";
 
 export function AttendanceCharts() {
-  const { events } = useEventsStore();
+  const { events, fetchEvents } = useEventsStore();
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    console.log("AttendanceCharts: Fetching events");
+    fetchEvents().finally(() => {
+      setIsLoading(false);
+      console.log("AttendanceCharts: Events fetched");
+    });
+  }, [fetchEvents]);
+  
   const attendanceData = processAttendanceData(events);
+  
+  console.log("AttendanceCharts: Data length", attendanceData.length);
+  console.log("AttendanceCharts: Events length", events.length);
+  
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Attendance Data</CardTitle>
+          <CardDescription>Loading attendance data...</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
   
   if (attendanceData.length === 0) {
     return (

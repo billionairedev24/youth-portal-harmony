@@ -6,6 +6,7 @@ import { ScrollingMessage } from "./scrolling-message";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
+  console.log("Rendering AdminLayout, isMobile:", isMobile);
 
   return (
     <div className="flex min-h-screen bg-background transition-colors duration-300">
